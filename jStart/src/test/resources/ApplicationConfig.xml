@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <GlobalConfig>
-	
+	<Constants>
+		<!--框架配置信息以下-->
+	    <!--需扫描的包-->
+		<Constant name="CLASSSCANPATH" value="test.framework"/>
+		<!-- 数据保存主路径 -->
+		<Constant name="ROOTPATH" value="/Users/start/Desktop/Data/"/>
+		<!--文件临时存放的目录-->
+		<Constant name="TMPPATH" value="/Users/start/Desktop/Temp/"/>
+		
+	</Constants>
 </GlobalConfig>
