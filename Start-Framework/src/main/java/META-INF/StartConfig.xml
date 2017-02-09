@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--默认配置文件-->
+<GlobalConfig>
+
+	<import path="ApplicationConfig.xml"/>
+	
+	<!-- 常量 -->
+	<Constants>
+		<!--开发模式-->
+		<Constant name="DEVMODE" value="true"/>
+		<!--全局编码模式-->
+		<Constant name="ENCODING" value="UTF-8"/>
+		<!-- 默认日期时间格式 -->
+		<Constant name="DATAFORMAT" value="yyyyMMddHHmmss"/>
+		<!-- 数据保存主路径 -->
+		<Constant name="ROOTPATH" value="/Data/"/>
+		<!--文件临时存放的目录-->
+		<Constant name="TMPPATH" value="/Temp/"/>
+		<!--文件上传文件大小默认1G-->
+		<Constant name="MAXUPLOADSIZE" value="1073741824"/>
+		<!--允许上传的类型-->
+		<Constant name="ALLOWUPLOADTYPES">*</Constant>
+		<!-- 日志文件的扩展名 -->
+		<Constant name="LOGSUFFIX" value=".log"/>
+		<!-- 每个日志文件的大小默认10MB -->
+		<Constant name="LOGMAXFILESIZE" value="10485760"/>
+		<!-- 日志 -->
+		<Constant name="LOGGER" value="jdk"/>
+	</Constants>
+	
+	<!-- 容器对象 -->
+	<Beans>
+		<bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/>
+		<bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/>
+	</Beans>
+	
+	<!-- 拦截器 -->
+	<Interceptors>
+        <Interceptor ref="parametersInterceptor"/>
+        <Interceptor ref="uploadFileInterceptor"/>
+    </Interceptors>
+	
+</GlobalConfig>
