@@ -8,6 +8,5 @@
 		<Constant name="ROOTPATH" value="/Users/start/Desktop/Data/"/>
 		<!--文件临时存放的目录-->
 		<Constant name="TMPPATH" value="/Users/start/Desktop/Temp/"/>
-		
 	</Constants>
 </GlobalConfig>

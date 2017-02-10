@@ -2,16 +2,21 @@ package start.application.context;
 
 import java.io.Closeable;
 
+import start.application.commons.logger.Logger;
+import start.application.commons.logger.LoggerFactory;
 import start.application.context.config.ConfigInfo;
 import start.application.context.config.ConstantConfig;
 import start.application.core.Constant;
 import start.application.core.beans.BeanInfo;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.ReflectUtils;
+import start.application.core.utils.StringHelper;
 import start.application.orm.AnnotationConfigEntityContext;
 import start.application.orm.entity.EntityInfo;
 
 public class Container implements Closeable {
+	
+	private final static Logger log=LoggerFactory.getLogger(Container.class);
 	
 	/**
 	 * 容器初始化时调用该方法来加载容器对象
@@ -25,6 +30,10 @@ public class Container implements Closeable {
 			ContextObject.putBeans(configInfo.getBeans().get(name));
 		}
 		ContextObject.getInterceptors().addAll(configInfo.getInterceptors());
+		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
+			log.info("扫描的类路径为空");
+			return;
+		}
 		//2、扫描包下所有的类
 		for (String packageName : ConstantConfig.CLASSSCANPATH.split(Constant.COMMA)) {
 			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
