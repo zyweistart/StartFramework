@@ -38,12 +38,14 @@ public final class Print implements ActionResult {
 			pw=response.getWriter();
 			pw.print(message);
 			pw.flush();
-			pw.close();
 		} catch (IOException e) {
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new ActionException(e);
 		}finally{
-			pw=null;
+			if(pw!=null){
+				pw.close();
+				pw=null;
+			}
 		}
 	}
 
