@@ -35,27 +35,18 @@ public class ApplicationContext implements Closeable{
 	private Map<String,Object> mContextObjectHolder=new HashMap<String,Object>();
 
 	public Object getBean(String name){
-		BeanInfo bean=ContextObject.getBeans(name);
-		if(bean==null){
-			String message = Message.getMessage(Message.PM_1003, name);
-			throw new NullPointerException(message);
-		}
-		return getBean(bean);
+		return getBean(ContextObject.getBean(name));
 	}
 	
-	public Object getBean(Class<?> prototype){
-		BeanInfo bean=AnnotationConfigApplicationContext.getBeanInfo(prototype);
-		if(bean==null){
-			String message = Message.getMessage(Message.PM_1003, prototype.getName());
-			throw new NullPointerException(message);
-		}
-		return getBean(bean);
+	public Object getBean(Object instance){
+		return injectionObject(instance, ContextObject.getBeanInfo(instance.getClass().getName()));
 	}
 	
 	public Object getBean(BeanInfo bean){
 		Object instance=null;
+		//判断是否为单例模式
 		if(bean.isSingleton()){
-			instance=ContextObject.getSingletonBeans().get(bean.getName());
+			instance=Container.getSingletonBeans().get(bean.getName());
 		}else{
 			instance=mContextObjectHolder.get(bean.getName());
 		}
@@ -63,6 +54,7 @@ public class ApplicationContext implements Closeable{
 			//如果已经存在实例则直接返回
 			return instance;
 		}
+		//构造函数注入
 		for (Constructor<?> constructor : bean.getPrototype().getConstructors()) {
 			List<Object> initTargs=new ArrayList<Object>();
 			for(Parameter param:constructor.getParameters()){
@@ -97,7 +89,25 @@ public class ApplicationContext implements Closeable{
 				throw new ApplicationException(e);
 			}
 		}
-		Class<?> cClass=bean.getPrototype();
+		injectionObject(instance, bean);
+		//执行初始化方法
+		ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getInit());
+		if(bean.isSingleton()){
+			Container.getSingletonBeans().put(bean.getName(), instance);
+		}else{
+			mContextObjectHolder.put(bean.getName(), instance);
+		}
+		return instance;
+	}
+	
+	/**
+	 * 实例化对象注入
+	 * @param instance
+	 * @return
+	 */
+	private Object injectionObject(Object instance,BeanInfo bean){
+		//字段注入
+		Class<?> cClass=instance.getClass();
 		while (true) {
 			if (cClass == null||cClass.equals(Object.class)) {
 				break;
@@ -136,39 +146,35 @@ public class ApplicationContext implements Closeable{
 			}
 			cClass = cClass.getSuperclass();
 		}
-		for(Method method:bean.getPrototype().getMethods()){
-			String methodName=method.getName();
-			if(methodName.startsWith("set")){
-				String name=methodName.substring(3, 4).toLowerCase()+methodName.substring(4, methodName.length());
-				String value=bean.getValues().get(name);
-				if(value!=null){
-					Class<?> type=method.getParameterTypes()[0];
-					try {
-						method.invoke(instance, ContextDataReadWrite.convertReadIn(null,type,ConstantConfig.get(bean.getValues().get(name))));
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
-						throw new ApplicationException(e);
+		//当前对象为BeanInfo则注入设置的常量值
+		if(bean!=null){
+			for(Method method:bean.getPrototype().getMethods()){
+				String methodName=method.getName();
+				if(methodName.startsWith("set")){
+					String name=methodName.substring(3, 4).toLowerCase()+methodName.substring(4, methodName.length());
+					String value=bean.getValues().get(name);
+					if(value!=null){
+						Class<?> type=method.getParameterTypes()[0];
+						try {
+							method.invoke(instance, ContextDataReadWrite.convertReadIn(null,type,ConstantConfig.get(bean.getValues().get(name))));
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
+							throw new ApplicationException(e);
+						}
+						continue;
 					}
-					continue;
-				}
-				value=bean.getRefs().get(name);
-				if(value!=null){
-					try {
-						method.invoke(instance, getBean(bean.getRefs().get(name)));
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
-						throw new ApplicationException(e);
+					value=bean.getRefs().get(name);
+					if(value!=null){
+						try {
+							method.invoke(instance, getBean(bean.getRefs().get(name)));
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
+							throw new ApplicationException(e);
+						}
+						continue;
 					}
-					continue;
 				}
 			}
-		}
-		//执行初始化方法
-		ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getInit());
-		if(bean.isSingleton()){
-			ContextObject.getSingletonBeans().put(bean.getName(), instance);
-		}else{
-			mContextObjectHolder.put(bean.getName(), instance);
 		}
 		return instance;
 	}
@@ -176,7 +182,7 @@ public class ApplicationContext implements Closeable{
 	@Override
 	public void close() {
 		for(String name:mContextObjectHolder.keySet()){
-			BeanInfo bean=ContextObject.getBeans(name);
+			BeanInfo bean=ContextObject.getBean(name);
 			Object instance=mContextObjectHolder.get(name);
 			ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
 		}

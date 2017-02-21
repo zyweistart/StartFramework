@@ -11,7 +11,18 @@ import start.application.context.config.ConstantConfig;
 import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.TimeUtils;
 
+@Deprecated
 public class LogUtils {
+	
+	/**
+	 * 日志文件的扩展名
+	 */
+	public final static String LOGSUFFIX=".log";
+	
+	/**
+	 * 日志文件最大的文件大小
+	 */
+	public final static Long LOGMAXFILESIZE=10485760L;
 	
 	private final static ConcurrentLinkedQueue<String> logqueue= new ConcurrentLinkedQueue<String>();
 	/**
@@ -43,10 +54,10 @@ public class LogUtils {
 						path.mkdirs();
 					}
 					//日志文件
-					File logfile = new File(logPath + getTime(TimeUtils.yyyyMMddHH) + ConstantConfig.LOGSUFFIX);
+					File logfile = new File(logPath + getTime(TimeUtils.yyyyMMddHH) + LOGSUFFIX);
 					if(logfile.exists()) {
-						if(logfile.length() >=  ConstantConfig.LOGMAXFILESIZE) {
-							File backlogfile = new File(logPath + getTime(TimeUtils.yyyyMMddHHmmsssss) + ConstantConfig.LOGSUFFIX);
+						if(logfile.length() >=  LOGMAXFILESIZE) {
+							File backlogfile = new File(logPath + getTime(TimeUtils.yyyyMMddHHmmsssss) + LOGSUFFIX);
 							logfile.renameTo(backlogfile);
 							if(backlogfile.canWrite()) {
 								backlogfile.setWritable(false);

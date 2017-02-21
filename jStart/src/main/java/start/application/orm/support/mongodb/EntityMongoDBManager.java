@@ -37,7 +37,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 
 	@Override
 	public void persist(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntitys(entity.getClass());
+		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
 		// 主键值
 		Object primaryKeyValue = null;
 		MongoCollection<Document> dbCollection = getSession().getDataBase().getCollection(entityMember.getTableName());
@@ -92,7 +92,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 
 	@Override
 	public long merge(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntitys(entity.getClass());
+		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -136,7 +136,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 	@Override
 	public long remove(Object entity) {
 		Class<?> prototype = entity.getClass();
-		EntityInfo entityMember = ContextObject.getEntitys(prototype);
+		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -162,7 +162,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 
 	@Override
 	public <T> T load(Class<T> prototype, Serializable primaryKeyValue) {
-		EntityInfo entityMember = ContextObject.getEntitys(prototype);
+		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
 			log.error(StackTraceInfo.getTraceInfo() + message);
@@ -181,7 +181,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getListEntity(Class<T> prototype, Document doc) {
 		// 把List,Map组成装对象
-		EntityInfo entityMember = ContextObject.getEntitys(prototype);
+		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		List<Map<String, String>> entitys = getListMap(entityMember.getTableName(),doc);
 		List<T> tEntitys = new ArrayList<T>();
 		if (entitys.isEmpty()) {

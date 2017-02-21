@@ -8,7 +8,12 @@ import start.application.core.beans.BeanInfo;
 
 public class AnnotationConfigApplicationContext {
 	
-	public static BeanInfo getBeanInfo(Class<?> prototype){
+	/**
+	 * 解析注解
+	 * @param prototype
+	 * @return
+	 */
+	public static BeanInfo analysisAnnotation(Class<?> prototype){
 		// 控制层
 		Controller controller = prototype.getAnnotation(Controller.class);
 		if (controller != null) {

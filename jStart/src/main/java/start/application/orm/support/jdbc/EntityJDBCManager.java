@@ -44,7 +44,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 
 	@Override
 	public void persist(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntitys(entity.getClass());
+		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
 		// 主键值
 		Object primaryKeyValue = null;
 		List<String> fieldNames = new ArrayList<String>();
@@ -111,7 +111,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 
 	@Override
 	public long merge(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntitys(entity.getClass());
+		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -161,7 +161,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 	@Override
 	public long remove(Object entity) {
 		Class<?> prototype = entity.getClass();
-		EntityInfo entityMember = ContextObject.getEntitys(prototype);
+		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -194,7 +194,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 	/////////////////////////////////////// Select///////////////////////////////////////////////////
 	@Override
 	public <T> T load(Class<T> prototype, Serializable primaryKeyValue) {
-		EntityInfo entityMember = ContextObject.getEntitys(prototype);
+		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
 			log.error(StackTraceInfo.getTraceInfo() + message);
@@ -259,7 +259,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			return tEntitys;
 		}
 		// 把List,Map组成装对象
-		EntityInfo entityMember = ContextObject.getEntitys(prototype);
+		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		for (Map<String, String> en : entitys) {
 			Object obj;
 			try {

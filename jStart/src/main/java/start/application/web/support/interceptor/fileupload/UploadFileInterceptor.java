@@ -26,6 +26,20 @@ import start.application.web.support.interceptor.RequestParameterInject;
 public class UploadFileInterceptor extends InterceptorHandler {
 
 	private final static Logger log=LoggerFactory.getLogger(UploadFileInterceptor.class);
+	
+	/**
+	 * 文件上传大小限制BYTE为单位
+	 */
+	public final static Long MAXUPLOADSIZE=ConstantConfig.getLong("MAXUPLOADSIZE");
+	
+	/**
+	 * 允许上传的文件类型"*"代表允许所有
+	 * <pre>
+	 * 可选值：*或其他文件类型
+	 * </pre>
+	 */
+	public final static String[] ALLOWUPLOADTYPES=ConstantConfig.getString("ALLOWUPLOADTYPES").trim().split(",");
+	
 	/**
 	 * 每次读取字节的大小
 	 */
@@ -84,12 +98,12 @@ public class UploadFileInterceptor extends InterceptorHandler {
 										lists = new ArrayList<UpLoadFile>();
 									}
 									long fileSize = tmpFile.length();
-									if (fileSize <= ConstantConfig.MAXUPLOADSIZE) {
+									if (fileSize <= MAXUPLOADSIZE) {
 										lists.add(new UpLoadFile(tmpFile, fileName, fileContentType, fileSize));
 										upLoadFiles.put(fieldName, lists);
 									} else {
 										tmpFile.delete();
-										log.error("文件大小超过了：" + ConstantConfig.MAXUPLOADSIZE);
+										log.error("文件大小超过了：" + MAXUPLOADSIZE);
 									}
 									// 清理对象
 									bufferedOutputStream.flush();
@@ -245,7 +259,7 @@ public class UploadFileInterceptor extends InterceptorHandler {
 	 * 是否允许上传
 	 */
 	static boolean isAllowUpload(String contentType) {
-		for (String all : ConstantConfig.ALLOWUPLOADTYPES) {
+		for (String all : ALLOWUPLOADTYPES) {
 			if ("*".equals(all.trim())) {
 				return true;
 			} else if (all.trim().equals(contentType.trim())) {

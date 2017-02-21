@@ -28,20 +28,17 @@ public final class ConfigInfo {
 	
 	private DocumentBuilder builder;
 	
-	private Map<String,String> constants;
-	private Map<String, BeanInfo> beans;
-	private List<String> interceptors;
+	private Map<String,String> constants = new HashMap<String,String>();
+	private Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
+	private List<String> interceptors = new ArrayList<String>();
 	
 	public ConfigInfo(){
-		constants=new HashMap<String,String>();
-		interceptors=new ArrayList<String>();
-		beans = new HashMap<String, BeanInfo>();
-		
 		DocumentBuilderFactory factory=null;
 		try {
 			factory=DocumentBuilderFactory.newInstance();
 			builder = factory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 			throw new ApplicationException(e);
 		}
 	}
@@ -60,6 +57,7 @@ public final class ConfigInfo {
 		try{
 			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,ConfigInfo.class)));
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ConfigError("导入文件:"+classpath+"打开失败。错误信息："+e.getMessage());
 		}
 	}

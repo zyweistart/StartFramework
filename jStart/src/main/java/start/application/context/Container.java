@@ -1,6 +1,8 @@
 package start.application.context;
 
 import java.io.Closeable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
@@ -18,6 +20,16 @@ public class Container implements Closeable {
 	
 	private final static Logger log=LoggerFactory.getLogger(Container.class);
 	
+	private static Map<String, Object> singletonBeans = new ConcurrentHashMap<String, Object>();
+	
+	/**
+	 * 容器单例Bean
+	 * @return
+	 */
+	public static Map<String, Object> getSingletonBeans() {
+		return singletonBeans;
+	}
+	
 	/**
 	 * 容器初始化时调用该方法来加载容器对象
 	 */
@@ -25,11 +37,18 @@ public class Container implements Closeable {
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo();
 		configInfo.loadDefaultConfigFile();
-		ContextObject.getConstants().putAll(configInfo.getConstants());
-		for(String name:configInfo.getBeans().keySet()){
-			ContextObject.putBeans(configInfo.getBeans().get(name));
+		//1.1注册常量
+		for(String key:configInfo.getConstants().keySet()){
+			ContextObject.registerConstant(key, configInfo.getConstants().get(key));
 		}
-		ContextObject.getInterceptors().addAll(configInfo.getInterceptors());
+		//1.2注册Bean
+		for(String name:configInfo.getBeans().keySet()){
+			ContextObject.registerBean(configInfo.getBeans().get(name));
+		}
+		//1.3注册拦截器
+		for(String interceptor:configInfo.getInterceptors()){
+			ContextObject.registerInterceptors(interceptor);
+		}
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
 			log.warn("扫描的类路径为空");
 			return;
@@ -37,16 +56,16 @@ public class Container implements Closeable {
 		//2、扫描包下所有的类
 		for (String packageName : ConstantConfig.CLASSSCANPATH.split(Constant.COMMA)) {
 			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
-				//Bean
-				BeanInfo bean=AnnotationConfigApplicationContext.getBeanInfo(clasz);
+				//2.1注册Bean
+				BeanInfo bean=AnnotationConfigApplicationContext.analysisAnnotation(clasz);
 				if(bean!=null){
-					ContextObject.putBeans(bean);
+					ContextObject.registerBean(bean);
 					continue;
 				}
-				//Entity
+				//2.2注册实体类
 				EntityInfo entity =AnnotationConfigEntityContext.buildEntity(clasz);
 				if(entity!=null){
-					ContextObject.putEntitys(entity);
+					ContextObject.registerEntity(entity);
 					continue;
 				}
 			}
@@ -58,9 +77,9 @@ public class Container implements Closeable {
 	 */
 	@Override
 	public void close() {
-		for(String name:ContextObject.getSingletonBeans().keySet()){
-			BeanInfo bean=ContextObject.getBeans(name);
-			Object instance=ContextObject.getSingletonBeans().get(name);
+		for(String name:getSingletonBeans().keySet()){
+			BeanInfo bean=ContextObject.getBean(name);
+			Object instance=getSingletonBeans().get(name);
 			ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
 		}
 	}

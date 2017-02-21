@@ -41,10 +41,7 @@ public final class ActionDispatcher {
 	 *            控制层的Action别名
 	 */
 	public void start(String name) throws Exception {
-		BeanInfo bean = ContextObject.getBeans(name);
-		if (bean == null) {
-			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
-		}
+		BeanInfo bean = ContextObject.getBean(name);
 		// 只允许访问@Controller的Bean
 		if (!bean.getPrototype().isAnnotationPresent(Controller.class)) {
 			throw new  IllegalAccessException(name+"无访问权限" );
