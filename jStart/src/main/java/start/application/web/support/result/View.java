@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.utils.StackTraceInfo;
-import start.application.web.exceptions.ActionException;
 import start.application.web.result.ActionResult;
 import start.application.web.result.ActionResultInvocation;
 
@@ -53,8 +52,8 @@ public class View implements ActionResult {
 			RequestDispatcher requestDispatcher=request.getRequestDispatcher(getDispatcherPage());
 			requestDispatcher.forward(request,response);
 		}catch(Exception e){
+			e.printStackTrace();
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
-			throw new ActionException(e);
 		}
 	}
 

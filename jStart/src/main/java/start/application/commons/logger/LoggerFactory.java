@@ -42,7 +42,7 @@ public class LoggerFactory {
 
 	// 查找常用的日志框架
 	static {
-	    String logger = "";
+	    String logger = System.getProperty("start.application.logger");
 	    if ("slf4j".equals(logger)) {
     		setLoggerAdapter(new Slf4jLoggerAdapter());
     	} else if ("jcl".equals(logger)) {

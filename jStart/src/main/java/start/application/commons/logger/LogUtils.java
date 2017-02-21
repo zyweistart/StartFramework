@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import start.application.context.config.ConstantConfig;
-import start.application.core.Constant;
 import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.TimeUtils;
 
@@ -18,7 +17,7 @@ public class LogUtils {
 	/**
 	 * 日志文件路径
 	 */
-	public final static  String LOG_PATH=ConstantConfig.ROOTPATH+Constant.FILESEPARATOR+"Logs"+Constant.FILESEPARATOR;
+	public final static  String LOG_PATH=ConstantConfig.ROOTPATH+File.separator+"Logs"+File.separator;
 	
 	private final static String INFO="INFO";
 	
@@ -37,7 +36,7 @@ public class LogUtils {
 				if(!logqueue.isEmpty()) {
 					String log=logqueue.poll();
 					//日志存放路径
-					String logPath = LogUtils.LOG_PATH + getTime(TimeUtils.yyyyMMdd)+ Constant.FILESEPARATOR;
+					String logPath = LogUtils.LOG_PATH + getTime(TimeUtils.yyyyMMdd)+ File.separator;
 					//日志目录
 					File path = new File(logPath);
 					if (!path.exists()) {

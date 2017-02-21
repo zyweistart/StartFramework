@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.utils.StackTraceInfo;
-import start.application.web.exceptions.ActionException;
 import start.application.web.result.ActionResult;
 import start.application.web.result.ActionResultInvocation;
 
@@ -39,8 +38,8 @@ public final class Print implements ActionResult {
 			pw.print(message);
 			pw.flush();
 		} catch (IOException e) {
+			e.printStackTrace();
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
-			throw new ActionException(e);
 		}finally{
 			if(pw!=null){
 				pw.close();

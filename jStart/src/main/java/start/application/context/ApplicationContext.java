@@ -38,7 +38,6 @@ public class ApplicationContext implements Closeable{
 		BeanInfo bean=ContextObject.getBeans(name);
 		if(bean==null){
 			String message = Message.getMessage(Message.PM_1003, name);
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new NullPointerException(message);
 		}
 		return getBean(bean);
@@ -48,7 +47,6 @@ public class ApplicationContext implements Closeable{
 		BeanInfo bean=AnnotationConfigApplicationContext.getBeanInfo(prototype);
 		if(bean==null){
 			String message = Message.getMessage(Message.PM_1003, prototype.getName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new NullPointerException(message);
 		}
 		return getBean(bean);
@@ -74,7 +72,6 @@ public class ApplicationContext implements Closeable{
 				}else{
 					if(initTargs.size()>0){
 						String message=Message.getMessage(Message.PM_3017, bean.getName());
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new ApplicationException(message);
 					}
 					break;

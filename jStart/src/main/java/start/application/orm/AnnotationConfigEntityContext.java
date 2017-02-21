@@ -69,7 +69,6 @@ public class AnnotationConfigEntityContext {
 				if(!ContextDataReadWrite.isDataTypeSupport(field)){
 					String message=Message.getMessage(Message.PM_5019,entityInfo.getEntityName(),
 							field.getName(), field.getType().getName());
-					log.error(StackTraceInfo.getTraceInfo() + message);
 					throw new AnnoationError(message);
 				}
 				EntityProperty propertyMember = new EntityProperty();
@@ -83,9 +82,9 @@ public class AnnotationConfigEntityContext {
 					// 根据JavaBean的字段名称获取实体对象中get,set方法
 					pd = new PropertyDescriptor(field.getName(), clasz);
 					// 当前字段的get方法
-					propertyMember.setGMethod(pd.getReadMethod());
+					propertyMember.setGet(pd.getReadMethod());
 					// 当前有字段的set方法
-					propertyMember.setSMethod(pd.getWriteMethod());
+					propertyMember.setSet(pd.getWriteMethod());
 				} catch (IntrospectionException e) {
 					log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 					throw new EntityDefinitionError(e);
@@ -103,7 +102,6 @@ public class AnnotationConfigEntityContext {
 								.contains(propertyMember.getReturnTypeName())) {
 							String message=Message.getMessage(Message.PM_3016,
 									entityName, field.getName());
-							log.error(StackTraceInfo.getTraceInfo() + message);
 							throw new AnnoationError(message);
 						}
 					}
@@ -115,7 +113,6 @@ public class AnnotationConfigEntityContext {
 					} else {
 						String message=Message.getMessage(Message.PM_3002,
 								entityInfo.getEntityName());
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new AnnoationError(message);
 					}
 					continue;
@@ -126,7 +123,6 @@ public class AnnotationConfigEntityContext {
 							.contains(propertyMember.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3012,
 								entityName, field.getName());
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new AnnoationError(message);
 					}
 					if (!column.name().isEmpty()) {
@@ -143,7 +139,6 @@ public class AnnotationConfigEntityContext {
 									.contains(propertyMember.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3013,
 								entityName, field.getName());
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new AnnoationError(message);
 					}
 					if (!temporal.name().isEmpty()) {
@@ -156,7 +151,6 @@ public class AnnotationConfigEntityContext {
 							.contains(propertyMember.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3011,
 								entityName, field.getName());
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new AnnoationError(message);
 					}
 				}
@@ -166,7 +160,6 @@ public class AnnotationConfigEntityContext {
 							.contains(propertyMember.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3014,
 								entityName, field.getName());
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new AnnoationError(message);
 					}
 					if (!lob.name().isEmpty()) {
@@ -181,7 +174,6 @@ public class AnnotationConfigEntityContext {
 		// 实体主键为必须
 		if (entityInfo.getPrimaryKeyMember() == null) {
 			String message=Message.getMessage(Message.PM_3001, entityInfo.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new AnnoationError(message);
 		}
 		return entityInfo;

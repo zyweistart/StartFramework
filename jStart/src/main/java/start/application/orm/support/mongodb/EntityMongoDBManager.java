@@ -47,7 +47,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			// 如果为UID生成策略则自动生成一个UID值
 			primaryKeyValue = StringHelper.random();
 			try {
-				entityMember.getPrimaryKeyMember().getSMethod().invoke(entity, primaryKeyValue);
+				entityMember.getPrimaryKeyMember().getSet().invoke(entity, primaryKeyValue);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
@@ -55,7 +55,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		} else if (id.value() == GeneratedValue.NONE) {
 			// 获取已经设置的主键值
 			try {
-				primaryKeyValue = entityMember.getPrimaryKeyMember().getGMethod().invoke(entity);
+				primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
@@ -75,7 +75,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
 			Object value=null;
 			try {
-				value = propertyMember.getGMethod().invoke(entity);
+				value = propertyMember.getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
@@ -95,7 +95,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		EntityInfo entityMember = ContextObject.getEntitys(entity.getClass());
 		Object primaryKeyValue=null;
 		try {
-			primaryKeyValue = entityMember.getPrimaryKeyMember().getGMethod().invoke(entity);
+			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
@@ -114,7 +114,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
 			Object value=null;
 			try {
-				value = propertyMember.getGMethod().invoke(entity);
+				value = propertyMember.getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
@@ -139,7 +139,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		EntityInfo entityMember = ContextObject.getEntitys(prototype);
 		Object primaryKeyValue=null;
 		try {
-			primaryKeyValue = entityMember.getPrimaryKeyMember().getGMethod().invoke(entity);
+			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
@@ -200,7 +200,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			Object tarValue = ContextDataReadWrite.convertReadIn(entityMember.getPrimaryKeyMember().getField(), value);
 			if (tarValue != null) {
 				try {
-					entityMember.getPrimaryKeyMember().getSMethod().invoke(obj, tarValue);
+					entityMember.getPrimaryKeyMember().getSet().invoke(obj, tarValue);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 					throw new RepositoryException(e);
@@ -212,7 +212,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 				tarValue = ContextDataReadWrite.convertReadIn(propertyMember.getField(), value);
 				if (tarValue != null) {
 					try {
-						propertyMember.getSMethod().invoke(obj, tarValue);
+						propertyMember.getSet().invoke(obj, tarValue);
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 						throw new RepositoryException(e);

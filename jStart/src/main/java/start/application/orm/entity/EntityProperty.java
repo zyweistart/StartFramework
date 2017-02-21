@@ -12,11 +12,11 @@ public final class EntityProperty{
 	/**
 	 * 当前的成员方法
 	 */
-	private Method GMethod;
+	private Method get;
 	/**
 	 * 当前成员方法的Set方法
 	 */
-	private Method SMethod;
+	private Method set;
 	/**
 	 * 对应的字段成员
 	 */
@@ -34,20 +34,20 @@ public final class EntityProperty{
 		this.field = field;
 	}
 
-	public Method getGMethod() {
-		return GMethod;
+	public Method getGet() {
+		return get;
 	}
 
-	public void setGMethod(Method gMethod) {
-		GMethod = gMethod;
+	public void setGet(Method get) {
+		this.get = get;
 	}
 
-	public Method getSMethod() {
-		return SMethod;
+	public Method getSet() {
+		return set;
 	}
 
-	public void setSMethod(Method sMethod) {
-		SMethod = sMethod;
+	public void setSet(Method set) {
+		this.set = set;
 	}
 
 	public String getFieldName() {

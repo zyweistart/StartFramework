@@ -6,8 +6,6 @@ package start.application.core;
  */
 public interface Constant {
 	
-	final String FILESEPARATOR = System.getProperty("file.separator");
-
 	final Integer FALSE=0;
 	
 	final Integer TRUE=1;

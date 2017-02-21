@@ -31,7 +31,7 @@ public class Container implements Closeable {
 		}
 		ContextObject.getInterceptors().addAll(configInfo.getInterceptors());
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
-			log.info("扫描的类路径为空");
+			log.warn("扫描的类路径为空");
 			return;
 		}
 		//2、扫描包下所有的类

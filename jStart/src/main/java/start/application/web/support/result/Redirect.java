@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.utils.StackTraceInfo;
-import start.application.web.exceptions.ActionException;
 import start.application.web.result.ActionResultInvocation;
 
 
@@ -28,8 +27,8 @@ public final class Redirect extends View {
 		try {
 			response.sendRedirect(getDispatcherPage());
 		} catch (IOException e) {
+			e.printStackTrace();
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
-			throw new ActionException(e);
 		}
 	}
 
