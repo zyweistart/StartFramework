@@ -49,6 +49,12 @@ public class Container implements Closeable {
 		for(String interceptor:configInfo.getInterceptors()){
 			ContextObject.registerInterceptors(interceptor);
 		}
+		//1.4注册自定义标签
+		for(String tagName:configInfo.getCustom().keySet()){
+			for(Map<String,String> values:configInfo.getCustom().get(tagName)){
+				ContextObject.registerCustom(tagName, values);
+			}
+		}
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
 			log.warn("扫描的类路径为空");
 			return;

@@ -17,6 +17,7 @@ public class ContextObject {
 	private static Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
 	private static Map<String, EntityInfo> entitys = new HashMap<String, EntityInfo>();
 	private static List<String> interceptors=new ArrayList<String>();
+	private static Map<String,List<Map<String,String>>> custom=new HashMap<String,List<Map<String,String>>>();
 	
 	/**
 	 * 注册全局常量值
@@ -80,6 +81,20 @@ public class ContextObject {
 				entitys.put(name, entity);
 			}
 		}
+	}
+	
+	/**
+	 * 注册自定义标签
+	 * @param tagName
+	 * @param values
+	 */
+	public static void registerCustom(String tagName,Map<String,String> values){
+		List<Map<String,String>> reValues=custom.get(tagName);
+		if(reValues==null){
+			reValues=new ArrayList<Map<String,String>>();
+		}
+		reValues.add(values);
+		custom.put(tagName, reValues);
 	}
 	
 	/**
@@ -151,6 +166,19 @@ public class ContextObject {
 		}else{
 			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
 		}
+	}
+	
+	/**
+	 * 获取自定义标签数据
+	 * @param tagName
+	 * @return
+	 */
+	public static List<Map<String,String>> getCustom(String tagName){
+		List<Map<String,String>>values=custom.get(tagName);
+		if(values==null){
+			throw new NullPointerException("未定义"+tagName+"对应的数据");
+		}
+		return values;
 	}
 	
 }

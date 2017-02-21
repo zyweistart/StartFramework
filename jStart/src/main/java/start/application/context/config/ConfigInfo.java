@@ -31,6 +31,8 @@ public final class ConfigInfo {
 	private Map<String,String> constants = new HashMap<String,String>();
 	private Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
 	private List<String> interceptors = new ArrayList<String>();
+	private Map<String,List<Map<String,String>>> custom=new HashMap<String,List<Map<String,String>>>();
+	
 	
 	public ConfigInfo(){
 		DocumentBuilderFactory factory=null;
@@ -90,6 +92,8 @@ public final class ConfigInfo {
 					readBeans(node);
 				}else if("interceptors".equalsIgnoreCase(node.getNodeName())){
 					readInterceptor(node);
+				}else if("custom".equalsIgnoreCase(node.getNodeName())){
+					readCustom(node);
 				}
 			}
 		}
@@ -213,6 +217,34 @@ public final class ConfigInfo {
 			}
 		}
 	}
+	
+	/**
+	 * 自定义标签
+	 */
+	private void readCustom(Node node){
+		NodeList childNodes=node.getChildNodes();
+		for(int i=0;i<childNodes.getLength();i++){
+			Node childNode=childNodes.item(i);
+			if(childNode.getNodeType()==1){
+				String nodeName=childNode.getNodeName();
+				List<Map<String,String>> values=custom.get(nodeName);
+				if(values==null){
+					values=new ArrayList<Map<String,String>>();
+				}
+				Map<String,String> vals=new HashMap<String,String>();
+				NamedNodeMap nodeAtts=childNode.getAttributes();
+				for(int j=0;j<nodeAtts.getLength();j++){
+					Node nodeAtt=nodeAtts.item(j);
+					if(childNode.getNodeType()==1){
+						vals.put(nodeAtt.getNodeName(),nodeAtt.getNodeValue());
+					}
+				}
+				values.add(vals);
+				custom.put(nodeName, values);
+			}
+			
+		}
+	}
 
 	public Map<String, String> getConstants() {
 		return constants;
@@ -224,6 +256,10 @@ public final class ConfigInfo {
 
 	public Map<String, BeanInfo> getBeans() {
 		return beans;
+	}
+
+	public Map<String, List<Map<String, String>>> getCustom() {
+		return custom;
 	}
 	
 }
