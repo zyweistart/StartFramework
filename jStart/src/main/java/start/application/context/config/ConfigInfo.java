@@ -57,7 +57,7 @@ public final class ConfigInfo {
 			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,ConfigInfo.class)));
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new ConfigError("导入文件:"+classpath+"打开失败。错误信息："+e.getMessage());
+			throw new ConfigError(classpath+"打开失败， 请检查XML配置文件，错误信息："+e.getMessage());
 		}
 	}
 	

@@ -77,7 +77,7 @@ public class Container implements Closeable {
 		});
 		configInfo.loadDefaultConfigFile();
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
-			log.warn("扫描的类路径为空");
+			log.warn("扫描的类路径为空，请配置CLASSSCANPATH常量,需要扫描的类路径");
 			return;
 		}
 		//2、扫描包下所有的类

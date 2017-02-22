@@ -5,6 +5,8 @@
 	<import path="ApplicationConfig.xml"/>
 	
 	<!-- 常量 -->
+	<!--需扫描的包-->
+	<Constant name="CLASSSCANPATH" value=""/>
 	<!--开发模式-->
 	<Constant name="DEVMODE" value="true"/>
 	<!--全局编码模式-->
