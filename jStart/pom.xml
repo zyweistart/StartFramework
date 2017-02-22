@@ -109,6 +109,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<url>https://github.com/zyweistart/StartFramework</url>
+	<name>jStart</name>
+	<description>MVC</description>
+	<organization>
+		<url>http://www.ancun.com</url>
+		<name>Ancun</name>
+	</organization>
 	<scm>
 		<url>https://github.com/zyweistart/StartFramework.git</url>
 	</scm>
