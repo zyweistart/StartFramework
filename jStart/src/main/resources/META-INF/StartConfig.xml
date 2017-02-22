@@ -15,14 +15,13 @@
 	<Constant name="ROOTPATH" value="/Data/"/>
 	<!--文件临时存放的目录-->
 	<Constant name="TMPPATH" value="/Temp/"/>
-	
 	<!--文件上传文件大小默认1G-->
 	<Constant name="MAXUPLOADSIZE" value="1073741824"/>
 	<!--允许上传的类型-->
 	<Constant name="ALLOWUPLOADTYPES">*</Constant>
 	
-	<!-- 容器对象 -->
-	<bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/>
+	<!-- 以下拦截器对象，可自执行选择加载使用 -->
+	<!-- <bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/> -->
 	<bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/>
 	
 </GlobalConfig>

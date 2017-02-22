@@ -81,7 +81,11 @@ public final class ActionDispatcher {
 			currentHandler.setHandler(handler);
 			handler=currentHandler;
 		}
-		handler.intercept(action);
+		if(handler==null){
+			
+		}else{
+			handler.intercept(action);
+		}
 	}
 	
 }

@@ -79,16 +79,21 @@ public class ApplicationContext implements Closeable{
 			for(Parameter param:constructor.getParameters()){
 				if(param.isAnnotationPresent(Qualifier.class)){
 					Qualifier qualifier=param.getAnnotation(Qualifier.class);
-					initTargs.add(getBean(qualifier.value()));
+					String name=qualifier.value().isEmpty()?param.getName():qualifier.value();
+					if(ContextObject.isBeanExistence(name)){
+						initTargs.add(getBean(name));
+					}else{
+						initTargs.add(getBean(param.getType()));
+					}
 				}else{
-					if(initTargs.size()>0){
+					if(!initTargs.isEmpty()){
 						String message=Message.getMessage(Message.PM_3017, bean.getName());
 						throw new ApplicationException(message);
 					}
 					break;
 				}
 			}
-			if(initTargs.size()>0){
+			if(!initTargs.isEmpty()){
 				try {
 					instance=constructor.newInstance(initTargs.toArray());
 					break;
