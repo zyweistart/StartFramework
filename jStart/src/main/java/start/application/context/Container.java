@@ -2,9 +2,9 @@ package start.application.context;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
@@ -24,7 +24,7 @@ public class Container implements Closeable {
 	
 	private final static Logger log=LoggerFactory.getLogger(Container.class);
 	
-	private static Map<String, Object> singletonBeans = new ConcurrentHashMap<String, Object>();
+	private static Map<String, Object> singletonBeans = new HashMap<String, Object>();
 	
 	/**
 	 * 容器单例Bean
