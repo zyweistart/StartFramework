@@ -103,9 +103,11 @@ public class Container implements Closeable {
 	@Override
 	public void close() {
 		for(String name:getSingletonBeans().keySet()){
-			BeanInfo bean=ContextObject.getBean(name);
-			Object instance=getSingletonBeans().get(name);
-			ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
+			if(ContextObject.isBeanExistence(name)){
+				BeanInfo bean=ContextObject.getBean(name);
+				Object instance=getSingletonBeans().get(name);
+				ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
+			}
 		}
 	}
 	
