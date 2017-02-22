@@ -30,7 +30,6 @@ public final class ConfigInfo {
 	
 	private Map<String,String> constants = new HashMap<String,String>();
 	private Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
-	private List<String> interceptors = new ArrayList<String>();
 	private Map<String,List<Map<String,String>>> custom=new HashMap<String,List<Map<String,String>>>();
 	
 	
@@ -90,8 +89,6 @@ public final class ConfigInfo {
 					readConstant(node);
 				}else if("beans".equalsIgnoreCase(node.getNodeName())){
 					readBeans(node);
-				}else if("interceptors".equalsIgnoreCase(node.getNodeName())){
-					readInterceptor(node);
 				}else if("custom".equalsIgnoreCase(node.getNodeName())){
 					readCustom(node);
 				}
@@ -199,26 +196,6 @@ public final class ConfigInfo {
 	}
 	
 	/**
-	 * 拦截器配置
-	 */
-	private void readInterceptor(Node node){
-		NodeList childNodes=node.getChildNodes();
-		for(int i=0;i<childNodes.getLength();i++){
-			Node childNode=childNodes.item(i);
-			if("interceptor".equalsIgnoreCase(childNode.getNodeName())){
-				NamedNodeMap nodeAtts=childNode.getAttributes();
-				for(int j=0;j<nodeAtts.getLength();j++){
-					Node nodeAtt=nodeAtts.item(j);
-					if("ref".equalsIgnoreCase(nodeAtt.getNodeName())){
-						//加载时不进行初始化操作,只有在调用newInstance()方法才进行初始化操作
-						interceptors.add(nodeAtt.getNodeValue());
-					}
-				}
-			}
-		}
-	}
-	
-	/**
 	 * 自定义标签
 	 */
 	private void readCustom(Node node){
@@ -248,10 +225,6 @@ public final class ConfigInfo {
 
 	public Map<String, String> getConstants() {
 		return constants;
-	}
-
-	public List<String> getInterceptors() {
-		return interceptors;
 	}
 
 	public Map<String, BeanInfo> getBeans() {

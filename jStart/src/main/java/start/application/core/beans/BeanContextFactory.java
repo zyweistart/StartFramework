@@ -9,17 +9,17 @@ public class BeanContextFactory implements BeanProvider {
 	
 	private final static Logger log=LoggerFactory.getLogger(BeanContextFactory.class);
 	
-	private static String prototype="start.application.core.beans.BeanContext";
+	private static Class<?> prototype=BeanContext.class;
 	
-	public static void setPrototype(String prototypeName){
-		BeanContextFactory.prototype=prototypeName;
+	public static void setPrototype(Class<?> prototype){
+		BeanContextFactory.prototype=prototype;
 	}
 
 	@Override
 	public BeanBuilder produce() {
 		try {
-			return (BeanBuilder) Class.forName(BeanContextFactory.prototype).newInstance();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			return (BeanBuilder) BeanContextFactory.prototype.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new ApplicationException(e);
 		}

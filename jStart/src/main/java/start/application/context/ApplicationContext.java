@@ -55,7 +55,7 @@ public class ApplicationContext implements Closeable{
 			bean=new BeanInfo();
 			bean.setName(prototype.getName());
 			bean.setPrototype(prototype.getName());
-			bean.setSingleton(false);
+//			bean.setSingleton(false);
 //			ContextObject.registerBean(bean);
 		}
 		return getBean(bean);

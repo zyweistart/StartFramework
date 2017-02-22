@@ -29,10 +29,4 @@
 		<bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/>
 	</Beans>
 	
-	<!-- 拦截器 -->
-	<Interceptors>
-        <Interceptor ref="parametersInterceptor"/>
-        <Interceptor ref="uploadFileInterceptor"/>
-    </Interceptors>
-	
 </GlobalConfig>

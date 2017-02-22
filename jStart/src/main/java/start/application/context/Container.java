@@ -45,11 +45,7 @@ public class Container implements Closeable {
 		for(String name:configInfo.getBeans().keySet()){
 			ContextObject.registerBean(configInfo.getBeans().get(name));
 		}
-		//1.3注册拦截器
-		for(String interceptor:configInfo.getInterceptors()){
-			ContextObject.registerInterceptors(interceptor);
-		}
-		//1.4注册自定义标签
+		//1.3注册自定义标签
 		for(String tagName:configInfo.getCustom().keySet()){
 			for(Map<String,String> values:configInfo.getCustom().get(tagName)){
 				ContextObject.registerCustom(tagName, values);

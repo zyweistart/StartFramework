@@ -74,7 +74,7 @@ public final class ActionDispatcher {
 	 * 责任链模式执行拦截器
 	 */
 	private void doInterceptor(ActionSupport action) throws Exception {
-		InterceptorHandler handler=action;
+		InterceptorHandler handler=null;
 		Iterator<String> interceptors = ContextObject.getInterceptors().iterator();
 		while(interceptors.hasNext()){
 			InterceptorHandler currentHandler=(InterceptorHandler) action.getBean(interceptors.next());

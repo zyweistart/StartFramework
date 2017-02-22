@@ -5,12 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import start.application.context.annotation.Entity;
 import start.application.core.Message;
+import start.application.core.beans.BeanBuilder;
+import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanInfo;
+import start.application.core.utils.ReflectUtils;
 import start.application.orm.entity.EntityInfo;
+import start.application.web.interceptor.InterceptorHandler;
 
 public class ContextObject {
+	
+	private final static Log log = LogFactory.getLog(ContextObject.class);
 	
 	private static Map<String,String> constants=new HashMap<String,String>();
 	private static Map<String, String> beanPrototypes = new HashMap<String, String>();
@@ -35,22 +44,33 @@ public class ContextObject {
 	}
 	
 	/**
-	 * 注册Bean对象 
+	 * 注册Bean对象,不定义name不加入Bean容器
 	 * @param bean
 	 */
 	public static void registerBean(BeanInfo bean){
 		if(bean!=null){
-			if (beanPrototypes.containsKey(bean.getName())) {
-				String message=Message.getMessage(Message.PM_3000, bean.getName());
-				throw new IllegalArgumentException(message);
-			}else{
-				beanPrototypes.put(bean.getName(), bean.getPrototypeString());
+			if(bean.getName()!=null){
+				if (beanPrototypes.containsKey(bean.getName())) {
+					String message=Message.getMessage(Message.PM_3000, bean.getName());
+					throw new IllegalArgumentException(message);
+				}else{
+					beanPrototypes.put(bean.getName(), bean.getPrototypeString());
+				}
+				if (beans.containsKey(bean.getPrototypeString())) {
+					String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
+					throw new IllegalArgumentException(message);
+				}else{
+					beans.put(bean.getPrototypeString(), bean);
+				}
 			}
-			if (beans.containsKey(bean.getPrototypeString())) {
-				String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
-				throw new IllegalArgumentException(message);
-			}else{
-				beans.put(bean.getPrototypeString(), bean);
+			if(ReflectUtils.isInterface(bean.getPrototype(), BeanBuilder.class)){
+				BeanContextFactory.setPrototype(bean.getPrototype());
+				log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
+			}
+			
+			if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
+				registerInterceptors(bean.getName());
+				log.info("自定义Interceptor类："+bean.getPrototypeString()+"，加载成功!");
 			}
 		}
 	}
