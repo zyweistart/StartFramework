@@ -4,11 +4,11 @@ import start.application.context.annotation.Controller;
 import start.application.context.annotation.Repository;
 import start.application.context.annotation.Scope;
 import start.application.context.annotation.Service;
+import start.application.context.exceptions.AnnoationError;
 import start.application.core.Message;
 import start.application.core.beans.BeanInfo;
 import start.application.core.utils.ReflectUtils;
 import start.application.web.action.ActionSupport;
-import start.application.web.exceptions.ActionException;
 
 public class AnnotationConfigApplicationContext {
 	
@@ -23,7 +23,7 @@ public class AnnotationConfigApplicationContext {
 		if (controller != null) {
 			if(!ReflectUtils.isSuperClass(prototype, ActionSupport.class)){
 				String message = Message.getMessage(Message.PM_4005);
-				throw new ActionException(message);
+				throw new AnnoationError(message);
 			}
 			return buildBean(controller.value(),controller.init(),controller.destory(),prototype);
 		}

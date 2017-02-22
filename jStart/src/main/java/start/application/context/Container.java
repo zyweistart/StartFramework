@@ -50,10 +50,6 @@ public class Container implements Closeable {
 					for(String key:attributes.keySet()){
 						ContextObject.registerConstant(key, attributes.get(key));
 					}
-				}else if("bean".equals(tagName)){
-					for(String key:attributes.keySet()){
-						ContextObject.registerConstant(key, attributes.get(key));
-					}
 				}else{
 					//注册自定义标签
 					ContextObject.registerCustom(tagName, attributes);
