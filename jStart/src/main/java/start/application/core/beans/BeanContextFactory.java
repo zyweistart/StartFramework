@@ -1,22 +1,28 @@
 package start.application.core.beans;
 
-public class BeanContextFactory {
+import start.application.commons.logger.Logger;
+import start.application.commons.logger.LoggerFactory;
+import start.application.core.exceptions.ApplicationException;
+import start.application.core.utils.StackTraceInfo;
+
+public class BeanContextFactory implements BeanProvider {
 	
-	private BeanContextFactory(){}
+	private final static Logger log=LoggerFactory.getLogger(BeanContextFactory.class);
 	
-	private static class BeanFactory {
-		private static BeanContext instance = new BeanContext();
+	private static String prototype="start.application.core.beans.BeanContext";
+	
+	public static void setPrototype(String prototypeName){
+		BeanContextFactory.prototype=prototypeName;
 	}
 
-	public static BeanContext getInstance() {
-		return BeanFactory.instance;
-	}
-	
-	/**
-	 * 设置Bean创建容器
-	 */
-	public static void setContext(BeanContext context){
-		BeanFactory.instance=context;
+	@Override
+	public BeanBuilder produce() {
+		try {
+			return (BeanBuilder) Class.forName(BeanContextFactory.prototype).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
+			throw new ApplicationException(e);
+		}
 	}
 	
 }

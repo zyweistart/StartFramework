@@ -109,6 +109,19 @@ public class ContextObject {
 	}
 
 	/**
+	 * 判断当前Bean对象是否存在
+	 * @param name
+	 * @return
+	 */
+	public static boolean isBeanExistence(String name){
+		String prototypeString=beanPrototypes.get(name);
+		if(prototypeString==null){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	/**
 	 * 获取Bean 
 	 * @param name BeanName  
 	 * @return

@@ -1,10 +1,22 @@
 package start.application.core.beans;
 
-public class BeanContext {
+import start.application.commons.logger.Logger;
+import start.application.commons.logger.LoggerFactory;
+import start.application.core.exceptions.ApplicationException;
+import start.application.core.utils.StackTraceInfo;
 
-	public Object getBean(Class<?> prototype) throws Exception{
-		//如果构造函数未注册则创造一个实例
-		return  prototype.newInstance();
+public class BeanContext implements BeanBuilder {
+	
+	private final static Logger log=LoggerFactory.getLogger(BeanContext.class);
+
+	@Override
+	public Object getBean(Class<?> prototype){
+		try {
+			return prototype.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
+			throw new ApplicationException(e);
+		}
 	}
 	
 }
