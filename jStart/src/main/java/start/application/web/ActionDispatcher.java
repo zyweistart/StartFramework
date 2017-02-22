@@ -9,10 +9,8 @@ import start.application.context.ApplicationContext;
 import start.application.context.ContextObject;
 import start.application.context.annotation.Controller;
 import start.application.context.config.ConstantConfig;
-import start.application.core.Message;
 import start.application.core.beans.BeanInfo;
 import start.application.web.action.ActionSupport;
-import start.application.web.exceptions.ActionException;
 import start.application.web.interceptor.InterceptorHandler;
 import start.application.web.result.ActionResult;
 import start.application.web.result.ActionResultInvocation;
@@ -56,44 +54,36 @@ public final class ActionDispatcher {
 		try{
 			application=new ApplicationContext();
 			Object obj =application.getBean(bean.getName());
-			if (obj instanceof ActionSupport) {
-				ActionSupport action = (ActionSupport) obj;
-				action.setRequest(this.mRequest);
-				action.setResponse(this.mResponse);
-				action.setFilterHostConfig(this.mFilterHostConfig);
-				action.setApplicationContext(application);
-				doInterceptor(action);
-			} else {
-				String message = Message.getMessage(Message.PM_4005);
-				throw new ActionException(message);
+			ActionSupport action = (ActionSupport) obj;
+			action.setRequest(this.mRequest);
+			action.setResponse(this.mResponse);
+			action.setFilterHostConfig(this.mFilterHostConfig);
+			action.setApplicationContext(application);
+			if(!ContextObject.getInterceptors().isEmpty()){
+				//责任链模式执行拦截器
+				InterceptorHandler handler=null;
+				Iterator<String> interceptors = ContextObject.getInterceptors().iterator();
+				while(interceptors.hasNext()){
+					InterceptorHandler currentHandler=(InterceptorHandler)application.getBean(interceptors.next());
+					currentHandler.setHandler(handler);
+					handler=currentHandler;
+				}
+				//执行拦截器
+				handler.intercept(action);
+			}
+			//执行Action
+			ActionResult result=action.execute();
+			if (result != null) {
+				// 返回值必须实现了ActionResult接口
+				ActionResultInvocation invocation = new ActionResultInvocation();
+				invocation.setAction(action);
+				result.doExecute(invocation);
 			}
 		}finally{
-			application.close();
-		}
-	}
-	
-	/**
-	 * 责任链模式执行拦截器
-	 */
-	private void doInterceptor(ActionSupport action) throws Exception {
-		InterceptorHandler handler=null;
-		Iterator<String> interceptors = ContextObject.getInterceptors().iterator();
-		while(interceptors.hasNext()){
-			InterceptorHandler currentHandler=(InterceptorHandler) action.getBean(interceptors.next());
-			currentHandler.setHandler(handler);
-			handler=currentHandler;
-		}
-		//执行拦截器
-		if(handler!=null){
-			handler.intercept(action);
-		}
-		//执行Action
-		ActionResult result=action.execute();
-		if (result != null) {
-			// 返回值必须实现了ActionResult接口
-			ActionResultInvocation invocation = new ActionResultInvocation();
-			invocation.setAction(action);
-			result.doExecute(invocation);
+			if(application!=null){
+				application.close();
+				application=null;
+			}
 		}
 	}
 	
