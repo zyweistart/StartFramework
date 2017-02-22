@@ -44,8 +44,8 @@ public class Container implements Closeable {
 			private List<BeanInfo> beans = new ArrayList<BeanInfo>();
 			
 			@Override
-			public void read(String tagName, Map<String, String> attributes, Map<String, String> values) {
-				if("constant".equals(tagName)){
+			public void read(String tagName, Map<String, String> attributes, Map<String, String> propertys) {
+				if(ConfigInfo.CONSTANT.equals(tagName)){
 					//注册常量
 					for(String key:attributes.keySet()){
 						ContextObject.registerConstant(key, attributes.get(key));
@@ -71,7 +71,7 @@ public class Container implements Closeable {
 			}
 			
 		});
-		configInfo.loadDefaultConfigFile();
+		configInfo.loadConfigFile();
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
 			log.warn("扫描的类路径为空，请配置CLASSSCANPATH常量,需要扫描的类路径");
 			return;

@@ -13,6 +13,10 @@ public class ConfigError extends Error {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public ConfigError(Throwable e) {
+		super(e);
+	}
+	
 	public ConfigError(String message) {
 		super(message);
 	}

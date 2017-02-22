@@ -18,7 +18,6 @@ import org.w3c.dom.NodeList;
 
 import start.application.context.exceptions.ConfigError;
 import start.application.core.beans.BeanInfo;
-import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassLoaderUtils;
 /**
  * 全局配置
@@ -26,25 +25,26 @@ import start.application.core.utils.ClassLoaderUtils;
  */
 public final class ConfigInfo {
 	
+	public static final String IMPORT="import";
+	public static final String CONSTANT="constant";
+	public static final String BEAN="bean";
+	
 	private DocumentBuilder builder;
 	private ConfigImpl impl;
 	
 	public ConfigInfo(ConfigImpl impl){
 		this.impl=impl;
-		DocumentBuilderFactory factory=null;
 		try {
-			factory=DocumentBuilderFactory.newInstance();
-			builder = factory.newDocumentBuilder();
+			builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			throw new ApplicationException(e);
+			throw new ConfigError(e);
 		}
 	}
 	
 	/**
 	 * 解析框架默认的配置文件
 	 */
-	public void loadDefaultConfigFile() {
+	public void loadConfigFile() {
 		readXml("META-INF/StartConfig.xml");
 		impl.finish();
 	}
@@ -54,9 +54,8 @@ public final class ConfigInfo {
 	 */
 	public void readXml(String classpath){
 		try{
-			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,ConfigInfo.class)));
+			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,getClass())));
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new ConfigError(classpath+"打开失败， 请检查XML配置文件，错误信息："+e.getMessage());
 		}
 	}
@@ -71,22 +70,24 @@ public final class ConfigInfo {
 			for(int j=0;j<nodes.getLength();j++){
 				Node node=nodes.item(j);
 				if(node.getNodeType()==1){
-					if("import".equalsIgnoreCase(node.getNodeName())){
+					if(IMPORT.equalsIgnoreCase(node.getNodeName())){
 						//加载自定义配置文件
 						NamedNodeMap beanAttributes=node.getAttributes();
 						for(int k=0;k<beanAttributes.getLength();k++){
 							Node nodeAtt=beanAttributes.item(k);
 							if("path".equalsIgnoreCase(nodeAtt.getNodeName())){
+								//读取配置文件
 								String path=nodeAtt.getNodeValue();
 								configFiles.add(path);
 							}else if("config".equalsIgnoreCase(nodeAtt.getNodeName())){
+								//读取属性文件
 								String path=nodeAtt.getNodeValue();
 								resourceFiles.add(path);
 							}
 						}
-					}else if("constant".equalsIgnoreCase(node.getNodeName())){
+					}else if(CONSTANT.equalsIgnoreCase(node.getNodeName())){
 						readConstant(node);
-					}else if("bean".equalsIgnoreCase(node.getNodeName())){
+					}else if(BEAN.equalsIgnoreCase(node.getNodeName())){
 						readBean(node);
 					}else{
 						readCustom(node);
@@ -114,10 +115,9 @@ public final class ConfigInfo {
 		while(keys.hasMoreElements()){
 			String key=keys.nextElement();
 			String value=bundle.getString(key);
-			
 			Map<String,String> attributes=new HashMap<String,String>();
 			attributes.put(key, value);
-			impl.read("constant", attributes, null);
+			impl.read(CONSTANT, attributes, null);
 		}
 	}
 	
