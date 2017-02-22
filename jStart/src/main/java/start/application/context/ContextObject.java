@@ -65,7 +65,7 @@ public class ContextObject {
 				}
 			}
 			if(ReflectUtils.isInterface(bean.getPrototype(), BeanBuilder.class)){
-				BeanContextFactory.setPrototype(bean.getPrototype());
+				BeanContextFactory.init(bean.getPrototype());
 				log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
 			}
 			

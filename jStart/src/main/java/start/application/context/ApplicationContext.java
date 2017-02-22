@@ -18,10 +18,8 @@ import start.application.context.annotation.Qualifier;
 import start.application.context.annotation.Resource;
 import start.application.context.config.ConstantConfig;
 import start.application.core.Message;
-import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanInfo;
-import start.application.core.beans.BeanProvider;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StackTraceInfo;
@@ -36,13 +34,6 @@ public class ApplicationContext implements Closeable{
 	
 	private Map<String,Object> contextObjectHolder=new HashMap<String,Object>();
 	
-	private BeanBuilder builder;
-	
-	public ApplicationContext(){
-		BeanProvider provider=new BeanContextFactory();
-		builder=provider.produce();
-	}
-	
 	public Object getBean(String name){
 		BeanInfo bean=ContextObject.getBean(name);
 		return getBean(bean);
@@ -55,8 +46,7 @@ public class ApplicationContext implements Closeable{
 			bean=new BeanInfo();
 			bean.setName(prototype.getName());
 			bean.setPrototype(prototype.getName());
-//			bean.setSingleton(false);
-//			ContextObject.registerBean(bean);
+			bean.setSingleton(false);
 		}
 		return getBean(bean);
 	}
@@ -106,7 +96,7 @@ public class ApplicationContext implements Closeable{
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
-			instance = builder.getBean(bean.getPrototype());
+			instance = BeanContextFactory.getInstanceBuilder().getBean(bean.getPrototype());
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();

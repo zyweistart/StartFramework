@@ -22,6 +22,6 @@
 	
 	<!-- 以下拦截器对象，可自执行选择加载使用 -->
 	<!-- <bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/> -->
-	<bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/>
+	<!-- <bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/> -->
 	
 </GlobalConfig>

@@ -12,6 +12,7 @@ import start.application.context.config.ConfigImpl;
 import start.application.context.config.ConfigInfo;
 import start.application.context.config.ConstantConfig;
 import start.application.core.Constant;
+import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanInfo;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.ReflectUtils;
@@ -96,6 +97,8 @@ public class Container implements Closeable {
 				}
 			}
 		}
+		//3、初始化Bean容器
+		BeanContextFactory.init();
 	}
 	
 	/**

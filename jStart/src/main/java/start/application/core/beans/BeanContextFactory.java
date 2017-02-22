@@ -5,24 +5,33 @@ import start.application.commons.logger.LoggerFactory;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.StackTraceInfo;
 
-public class BeanContextFactory implements BeanProvider {
+public class BeanContextFactory {
 	
 	private final static Logger log=LoggerFactory.getLogger(BeanContextFactory.class);
 	
-	private static Class<?> prototype=BeanContext.class;
+	private static BeanBuilder builder;
 	
-	public static void setPrototype(Class<?> prototype){
-		BeanContextFactory.prototype=prototype;
+	public static void init(){
+		init(BeanContext.class);
+	}
+	
+	public static void init(Class<?> prototype){
+		if(builder==null){
+			try {
+				builder=(BeanBuilder)prototype.newInstance();
+				log.info("BeanBuilder容器对象："+prototype.getName()+",初始化完成");
+			} catch (InstantiationException | IllegalAccessException e) {
+				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
+				throw new ApplicationException(e);
+			}
+		}
 	}
 
-	@Override
-	public BeanBuilder produce() {
-		try {
-			return (BeanBuilder) BeanContextFactory.prototype.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
-			throw new ApplicationException(e);
+	public static BeanBuilder getInstanceBuilder() {
+		if(builder==null){
+			throw new NullPointerException("请调用init方法，初始化Bean容器");
 		}
+		return builder;
 	}
 	
 }

@@ -14,6 +14,8 @@ import start.application.core.beans.BeanInfo;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
 import start.application.web.interceptor.InterceptorHandler;
+import start.application.web.result.ActionResult;
+import start.application.web.result.ActionResultInvocation;
 import start.application.web.utils.FilterHostConfig;
 
 
@@ -81,10 +83,17 @@ public final class ActionDispatcher {
 			currentHandler.setHandler(handler);
 			handler=currentHandler;
 		}
-		if(handler==null){
-			
-		}else{
+		//执行拦截器
+		if(handler!=null){
 			handler.intercept(action);
+		}
+		//执行Action
+		ActionResult result=action.execute();
+		if (result != null) {
+			// 返回值必须实现了ActionResult接口
+			ActionResultInvocation invocation = new ActionResultInvocation();
+			invocation.setAction(action);
+			result.doExecute(invocation);
 		}
 	}
 	
