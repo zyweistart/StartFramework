@@ -1,11 +1,14 @@
 package start.application.context;
 
 import java.io.Closeable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
+import start.application.context.config.ConfigImpl;
 import start.application.context.config.ConfigInfo;
 import start.application.context.config.ConstantConfig;
 import start.application.core.Constant;
@@ -35,22 +38,43 @@ public class Container implements Closeable {
 	 */
 	public void init() {
 		//1、解析配置文件
-		ConfigInfo configInfo=new ConfigInfo();
-		configInfo.loadDefaultConfigFile();
-		//1.1注册常量
-		for(String key:configInfo.getConstants().keySet()){
-			ContextObject.registerConstant(key, configInfo.getConstants().get(key));
-		}
-		//1.2注册Bean
-		for(String name:configInfo.getBeans().keySet()){
-			ContextObject.registerBean(configInfo.getBeans().get(name));
-		}
-		//1.3注册自定义标签
-		for(String tagName:configInfo.getCustom().keySet()){
-			for(Map<String,String> values:configInfo.getCustom().get(tagName)){
-				ContextObject.registerCustom(tagName, values);
+		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
+			
+			private List<BeanInfo> beans = new ArrayList<BeanInfo>();
+			
+			@Override
+			public void read(String tagName, Map<String, String> attributes, Map<String, String> values) {
+				if("constant".equals(tagName)){
+					//注册常量
+					for(String key:attributes.keySet()){
+						ContextObject.registerConstant(key, attributes.get(key));
+					}
+				}else if("bean".equals(tagName)){
+					for(String key:attributes.keySet()){
+						ContextObject.registerConstant(key, attributes.get(key));
+					}
+				}else{
+					//注册自定义标签
+					ContextObject.registerCustom(tagName, attributes);
+				}
 			}
-		}
+
+			@Override
+			public void readBean(BeanInfo bean) {
+				//注册Bean
+				beans.add(bean);
+			}
+
+			@Override
+			public void finish() {
+				//读取完成后执行注册加载操作
+				for(BeanInfo bean:beans){
+					ContextObject.registerBean(bean);
+				}
+			}
+			
+		});
+		configInfo.loadDefaultConfigFile();
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
 			log.warn("扫描的类路径为空");
 			return;

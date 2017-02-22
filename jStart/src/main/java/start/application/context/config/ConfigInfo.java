@@ -27,13 +27,10 @@ import start.application.core.utils.ClassLoaderUtils;
 public final class ConfigInfo {
 	
 	private DocumentBuilder builder;
+	private ConfigImpl impl;
 	
-	private Map<String,String> constants = new HashMap<String,String>();
-	private Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
-	private Map<String,List<Map<String,String>>> custom=new HashMap<String,List<Map<String,String>>>();
-	
-	
-	public ConfigInfo(){
+	public ConfigInfo(ConfigImpl impl){
+		this.impl=impl;
 		DocumentBuilderFactory factory=null;
 		try {
 			factory=DocumentBuilderFactory.newInstance();
@@ -49,6 +46,7 @@ public final class ConfigInfo {
 	 */
 	public void loadDefaultConfigFile() {
 		readXml("META-INF/StartConfig.xml");
+		impl.finish();
 	}
 	
 	/**
@@ -72,25 +70,27 @@ public final class ConfigInfo {
 			NodeList nodes=childNode.getChildNodes();
 			for(int j=0;j<nodes.getLength();j++){
 				Node node=nodes.item(j);
-				if("import".equalsIgnoreCase(node.getNodeName())){
-					//加载自定义配置文件
-					NamedNodeMap beanAttributes=node.getAttributes();
-					for(int k=0;k<beanAttributes.getLength();k++){
-						Node nodeAtt=beanAttributes.item(k);
-						if("path".equalsIgnoreCase(nodeAtt.getNodeName())){
-							String path=nodeAtt.getNodeValue();
-							configFiles.add(path);
-						}else if("config".equalsIgnoreCase(nodeAtt.getNodeName())){
-							String path=nodeAtt.getNodeValue();
-							resourceFiles.add(path);
+				if(node.getNodeType()==1){
+					if("import".equalsIgnoreCase(node.getNodeName())){
+						//加载自定义配置文件
+						NamedNodeMap beanAttributes=node.getAttributes();
+						for(int k=0;k<beanAttributes.getLength();k++){
+							Node nodeAtt=beanAttributes.item(k);
+							if("path".equalsIgnoreCase(nodeAtt.getNodeName())){
+								String path=nodeAtt.getNodeValue();
+								configFiles.add(path);
+							}else if("config".equalsIgnoreCase(nodeAtt.getNodeName())){
+								String path=nodeAtt.getNodeValue();
+								resourceFiles.add(path);
+							}
 						}
+					}else if("constant".equalsIgnoreCase(node.getNodeName())){
+						readConstant(node);
+					}else if("bean".equalsIgnoreCase(node.getNodeName())){
+						readBean(node);
+					}else{
+						readCustom(node);
 					}
-				}else if("constants".equalsIgnoreCase(node.getNodeName())){
-					readConstant(node);
-				}else if("beans".equalsIgnoreCase(node.getNodeName())){
-					readBeans(node);
-				}else if("custom".equalsIgnoreCase(node.getNodeName())){
-					readCustom(node);
 				}
 			}
 		}
@@ -114,7 +114,10 @@ public final class ConfigInfo {
 		while(keys.hasMoreElements()){
 			String key=keys.nextElement();
 			String value=bundle.getString(key);
-			constants.put(key, value);
+			
+			Map<String,String> attributes=new HashMap<String,String>();
+			attributes.put(key, value);
+			impl.read("constant", attributes, null);
 		}
 	}
 	
@@ -122,41 +125,27 @@ public final class ConfigInfo {
 	 * 常量配置
 	 */
 	private void readConstant(Node node){
-		NodeList childNodes=node.getChildNodes();
-		for(int i=0;i<childNodes.getLength();i++){
-			Node childNode=childNodes.item(i);
-			if("constant".equalsIgnoreCase(childNode.getNodeName())){
-				String key=null,value=null;
-				NamedNodeMap nodeAtts=childNode.getAttributes();
-				for(int j=0;j<nodeAtts.getLength();j++){
-					Node nodeAtt=nodeAtts.item(j);
-					if("name".equalsIgnoreCase(nodeAtt.getNodeName())){
-						key=nodeAtt.getNodeValue();
-					}else if("value".equalsIgnoreCase(nodeAtt.getNodeName())){
-						value=nodeAtt.getNodeValue();
-					}
-				}
-				if(value==null){
-					value=childNode.getTextContent();
-				}
-				constants.put(key, value);
+		String key=null,value=null;
+		NamedNodeMap nodeAtts=node.getAttributes();
+		for(int j=0;j<nodeAtts.getLength();j++){
+			Node nodeAtt=nodeAtts.item(j);
+			if("name".equalsIgnoreCase(nodeAtt.getNodeName())){
+				key=nodeAtt.getNodeValue();
+			}else if("value".equalsIgnoreCase(nodeAtt.getNodeName())){
+				value=nodeAtt.getNodeValue();
 			}
 		}
+		if(value==null){
+			value=node.getTextContent();
+		}
+		Map<String,String> attributes=new HashMap<String,String>();
+		attributes.put(key, value);
+		impl.read(node.getNodeName().toLowerCase(), attributes, null);
 	}
 	
 	/**
 	 * 读取Bean信息
 	 */
-	private void readBeans(Node node){
-		NodeList childNodes=node.getChildNodes();
-		for(int k=0;k<childNodes.getLength();k++){
-			Node childNode=childNodes.item(k);
-			if("bean".equalsIgnoreCase(childNode.getNodeName())){
-				this.readBean(childNode);
-			}
-		}
-	}
-	
 	private void readBean(Node node){
 		NamedNodeMap beanAttributes=node.getAttributes();
 		BeanInfo bean=new BeanInfo();
@@ -192,47 +181,22 @@ public final class ConfigInfo {
 				}
 			}
 		}
-		beans.put(bean.getName(), bean);
+		impl.readBean(bean);
 	}
 	
 	/**
 	 * 自定义标签
 	 */
 	private void readCustom(Node node){
-		NodeList childNodes=node.getChildNodes();
-		for(int i=0;i<childNodes.getLength();i++){
-			Node childNode=childNodes.item(i);
-			if(childNode.getNodeType()==1){
-				String nodeName=childNode.getNodeName();
-				List<Map<String,String>> values=custom.get(nodeName);
-				if(values==null){
-					values=new ArrayList<Map<String,String>>();
-				}
-				Map<String,String> vals=new HashMap<String,String>();
-				NamedNodeMap nodeAtts=childNode.getAttributes();
-				for(int j=0;j<nodeAtts.getLength();j++){
-					Node nodeAtt=nodeAtts.item(j);
-					if(childNode.getNodeType()==1){
-						vals.put(nodeAtt.getNodeName(),nodeAtt.getNodeValue());
-					}
-				}
-				values.add(vals);
-				custom.put(nodeName, values);
+		Map<String,String> vals=new HashMap<String,String>();
+		NamedNodeMap nodeAtts=node.getAttributes();
+		for(int j=0;j<nodeAtts.getLength();j++){
+			Node nodeAtt=nodeAtts.item(j);
+			if(node.getNodeType()==1){
+				vals.put(nodeAtt.getNodeName(),nodeAtt.getNodeValue());
 			}
-			
 		}
-	}
-
-	public Map<String, String> getConstants() {
-		return constants;
-	}
-
-	public Map<String, BeanInfo> getBeans() {
-		return beans;
-	}
-
-	public Map<String, List<Map<String, String>>> getCustom() {
-		return custom;
+		impl.read(node.getNodeName().toLowerCase(), vals, null);
 	}
 	
 }

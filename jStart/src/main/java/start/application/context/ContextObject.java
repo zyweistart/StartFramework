@@ -35,11 +35,12 @@ public class ContextObject {
 	 */
 	public static void registerConstant(String key,String value){
 		if(key!=null&&value!=null){
-			if(constants.containsKey(key)){
-				throw new IllegalArgumentException("常量："+key+" 已存在，参数异常!");
-			}else{
-				constants.put(key, value);
-			}
+//			if(constants.containsKey(key)){
+//				throw new IllegalArgumentException("常量："+key+" 已存在，参数异常!");
+//			}else{
+//				constants.put(key, value);
+//			}
+			constants.put(key, value);
 		}
 	}
 	

@@ -5,28 +5,24 @@
 	<import path="ApplicationConfig.xml"/>
 	
 	<!-- 常量 -->
-	<Constants>
-		<!--开发模式-->
-		<Constant name="DEVMODE" value="true"/>
-		<!--全局编码模式-->
-		<Constant name="ENCODING" value="UTF-8"/>
-		<!-- 默认日期时间格式 -->
-		<Constant name="DATAFORMAT" value="yyyyMMddHHmmss"/>
-		<!-- 数据保存主路径 -->
-		<Constant name="ROOTPATH" value="/Data/"/>
-		<!--文件临时存放的目录-->
-		<Constant name="TMPPATH" value="/Temp/"/>
-		
-		<!--文件上传文件大小默认1G-->
-		<Constant name="MAXUPLOADSIZE" value="1073741824"/>
-		<!--允许上传的类型-->
-		<Constant name="ALLOWUPLOADTYPES">*</Constant>
-	</Constants>
+	<!--开发模式-->
+	<Constant name="DEVMODE" value="true"/>
+	<!--全局编码模式-->
+	<Constant name="ENCODING" value="UTF-8"/>
+	<!-- 默认日期时间格式 -->
+	<Constant name="DATAFORMAT" value="yyyyMMddHHmmss"/>
+	<!-- 数据保存主路径 -->
+	<Constant name="ROOTPATH" value="/Data/"/>
+	<!--文件临时存放的目录-->
+	<Constant name="TMPPATH" value="/Temp/"/>
+	
+	<!--文件上传文件大小默认1G-->
+	<Constant name="MAXUPLOADSIZE" value="1073741824"/>
+	<!--允许上传的类型-->
+	<Constant name="ALLOWUPLOADTYPES">*</Constant>
 	
 	<!-- 容器对象 -->
-	<Beans>
-		<bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/>
-		<bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/>
-	</Beans>
+	<bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/>
+	<bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/>
 	
 </GlobalConfig>
