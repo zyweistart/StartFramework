@@ -62,8 +62,40 @@ public class Container implements Closeable {
 
 			@Override
 			public void readCustom(CustomTag custom) {
-				//注册自定义标签
-				ContextObject.registerCustom(custom.getName(), custom);
+				if(ConfigInfo.CONSTANT.equalsIgnoreCase(custom.getName())){
+					String name=custom.getAttributes().get("name");
+					String value=null;
+					if(custom.getAttributes().containsKey("value")){
+						value=custom.getAttributes().get("value");
+					}else{
+						value=custom.getTextContent();
+					}
+					//注册常量
+					ContextObject.registerConstant(name, value);
+				}else if(ConfigInfo.BEAN.equalsIgnoreCase(custom.getName())){
+					BeanInfo bean=new BeanInfo();
+					bean.getAttributes().putAll(custom.getAttributes());
+					for(CustomTag child:custom.getChildTags()){
+						if("property".equals(child.getName())){
+							Map<String,String> attributes=child.getAttributes();
+							String name=attributes.get("name");
+							if(attributes.containsKey("value")){
+								String value=attributes.get("value");
+								bean.getValues().put(name, value);
+							}else if(attributes.containsKey("ref")){
+								String ref=attributes.get("ref");
+								bean.getRefs().put(name, ref);
+							}else{
+								bean.getValues().put(name, child.getTextContent());
+							}
+						}
+					}
+					//注册Bean
+					beans.add(bean);
+				}else{
+					//注册自定义标签
+					ContextObject.registerCustom(custom.getName(), custom);
+				}
 			}
 
 			@Override

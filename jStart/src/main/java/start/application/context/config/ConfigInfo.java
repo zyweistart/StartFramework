@@ -17,7 +17,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import start.application.context.exceptions.ConfigError;
-import start.application.core.beans.BeanInfo;
 import start.application.core.utils.ClassLoaderUtils;
 /**
  * 全局配置
@@ -85,10 +84,10 @@ public final class ConfigInfo {
 								resourceFiles.add(path);
 							}
 						}
-					}else if(CONSTANT.equalsIgnoreCase(node.getNodeName())){
-						readConstant(node);
-					}else if(BEAN.equalsIgnoreCase(node.getNodeName())){
-						readBean(node);
+//					}else if(CONSTANT.equalsIgnoreCase(node.getNodeName())){
+//						readConstant(node);
+//					}else if(BEAN.equalsIgnoreCase(node.getNodeName())){
+//						readBean(node);
 					}else{
 						readCustom(node);
 					}
@@ -124,65 +123,65 @@ public final class ConfigInfo {
 	/**
 	 * 常量配置
 	 */
-	private void readConstant(Node node){
-		String key=null,value=null;
-		NamedNodeMap nodeAtts=node.getAttributes();
-		for(int j=0;j<nodeAtts.getLength();j++){
-			Node nodeAtt=nodeAtts.item(j);
-			if("name".equalsIgnoreCase(nodeAtt.getNodeName())){
-				key=nodeAtt.getNodeValue();
-			}else if("value".equalsIgnoreCase(nodeAtt.getNodeName())){
-				value=nodeAtt.getNodeValue();
-			}
-		}
-		if(value==null){
-			value=node.getTextContent();
-		}
-		Map<String,String> attributes=new HashMap<String,String>();
-		attributes.put(key, value);
-		impl.read(node.getNodeName().toLowerCase(), attributes);
-	}
+//	private void readConstant(Node node){
+//		String key=null,value=null;
+//		NamedNodeMap nodeAtts=node.getAttributes();
+//		for(int j=0;j<nodeAtts.getLength();j++){
+//			Node nodeAtt=nodeAtts.item(j);
+//			if("name".equalsIgnoreCase(nodeAtt.getNodeName())){
+//				key=nodeAtt.getNodeValue();
+//			}else if("value".equalsIgnoreCase(nodeAtt.getNodeName())){
+//				value=nodeAtt.getNodeValue();
+//			}
+//		}
+//		if(value==null){
+//			value=node.getTextContent();
+//		}
+//		Map<String,String> attributes=new HashMap<String,String>();
+//		attributes.put(key, value);
+//		impl.read(node.getNodeName().toLowerCase(), attributes);
+//	}
 	
 	/**
 	 * 读取Bean信息
 	 */
-	private void readBean(Node node){
-		NamedNodeMap beanAttributes=node.getAttributes();
-		BeanInfo bean=new BeanInfo();
-		for(int i=0;i<beanAttributes.getLength();i++){
-			Node beanObjAttributes=beanAttributes.item(i);
-			String key=beanObjAttributes.getNodeName();
-			String value=beanAttributes.getNamedItem(key).getNodeValue();
-			bean.getAttributes().put(key, value);
-		}
-		NodeList propertyNodes=node.getChildNodes();
-		for(int k=0;k<propertyNodes.getLength();k++){
-			Node childNode=propertyNodes.item(k);
-			if("property".equalsIgnoreCase(childNode.getNodeName())){
-				NamedNodeMap propertyAttributes=childNode.getAttributes();
-				if(propertyAttributes!=null){
-					String name=null;
-					String value=null;
-					for(int l=0;l<propertyAttributes.getLength();l++){
-						Node propertyNodeAttributes=propertyAttributes.item(l);
-						name=propertyAttributes.getNamedItem("name").getNodeValue();
-						if("value".equalsIgnoreCase(propertyNodeAttributes.getNodeName())){
-							value=propertyAttributes.getNamedItem("value").getNodeValue();
-							bean.getValues().put(name, value);
-						}else if("ref".equalsIgnoreCase(propertyNodeAttributes.getNodeName())){
-							value=propertyAttributes.getNamedItem("ref").getNodeValue();
-							bean.getRefs().put(name, value);
-						}
-					}
-					if(value==null){
-						value=childNode.getTextContent();
-						bean.getValues().put(name, value);
-					}
-				}
-			}
-		}
-		impl.readBean(bean);
-	}
+//	private void readBean(Node node){
+//		NamedNodeMap beanAttributes=node.getAttributes();
+//		BeanInfo bean=new BeanInfo();
+//		for(int i=0;i<beanAttributes.getLength();i++){
+//			Node beanObjAttributes=beanAttributes.item(i);
+//			String key=beanObjAttributes.getNodeName();
+//			String value=beanAttributes.getNamedItem(key).getNodeValue();
+//			bean.getAttributes().put(key, value);
+//		}
+//		NodeList propertyNodes=node.getChildNodes();
+//		for(int k=0;k<propertyNodes.getLength();k++){
+//			Node childNode=propertyNodes.item(k);
+//			if("property".equalsIgnoreCase(childNode.getNodeName())){
+//				NamedNodeMap propertyAttributes=childNode.getAttributes();
+//				if(propertyAttributes!=null){
+//					String name=null;
+//					String value=null;
+//					for(int l=0;l<propertyAttributes.getLength();l++){
+//						Node propertyNodeAttributes=propertyAttributes.item(l);
+//						name=propertyAttributes.getNamedItem("name").getNodeValue();
+//						if("value".equalsIgnoreCase(propertyNodeAttributes.getNodeName())){
+//							value=propertyAttributes.getNamedItem("value").getNodeValue();
+//							bean.getValues().put(name, value);
+//						}else if("ref".equalsIgnoreCase(propertyNodeAttributes.getNodeName())){
+//							value=propertyAttributes.getNamedItem("ref").getNodeValue();
+//							bean.getRefs().put(name, value);
+//						}
+//					}
+//					if(value==null){
+//						value=childNode.getTextContent();
+//						bean.getValues().put(name, value);
+//					}
+//				}
+//			}
+//		}
+//		impl.readBean(bean);
+//	}
 	
 	/**
 	 * 自定义标签
@@ -200,19 +199,19 @@ public final class ConfigInfo {
 		//读取属性
 		NamedNodeMap nodeAtts=node.getAttributes();
 		if(nodeAtts!=null){
-			Map<String,String> vals=new HashMap<String,String>();
 			for(int j=0;j<nodeAtts.getLength();j++){
 				Node nodeAtt=nodeAtts.item(j);
-				vals.put(nodeAtt.getNodeName(),nodeAtt.getNodeValue());
+				custom.getAttributes().put(nodeAtt.getNodeName(),nodeAtt.getNodeValue());
 			}
-			custom.setAttributes(vals);
 		}
+		//文本内容
+		custom.setTextContent(node.getTextContent());
 		//读取子
 		NodeList childNodes=node.getChildNodes();
 		for(int j=0;j<childNodes.getLength();j++){
 			Node childNode=childNodes.item(j);
 			if(childNode.getNodeType()==1){
-				custom.setChildTag(readCustom1(childNode));
+				custom.getChildTags().add(readCustom1(childNode));
 			}
 		}
 		return custom;
