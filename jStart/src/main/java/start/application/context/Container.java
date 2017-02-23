@@ -11,6 +11,7 @@ import start.application.commons.logger.LoggerFactory;
 import start.application.context.config.ConfigImpl;
 import start.application.context.config.ConfigInfo;
 import start.application.context.config.ConstantConfig;
+import start.application.context.config.CustomTag;
 import start.application.core.Constant;
 import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanInfo;
@@ -44,15 +45,12 @@ public class Container implements Closeable {
 			private List<BeanInfo> beans = new ArrayList<BeanInfo>();
 			
 			@Override
-			public void read(String tagName, Map<String, String> attributes, Map<String, String> propertys) {
+			public void read(String tagName, Map<String, String> attributes) {
 				if(ConfigInfo.CONSTANT.equals(tagName)){
 					//注册常量
 					for(String key:attributes.keySet()){
 						ContextObject.registerConstant(key, attributes.get(key));
 					}
-				}else{
-					//注册自定义标签
-					ContextObject.registerCustom(tagName, attributes);
 				}
 			}
 
@@ -60,6 +58,12 @@ public class Container implements Closeable {
 			public void readBean(BeanInfo bean) {
 				//注册Bean
 				beans.add(bean);
+			}
+
+			@Override
+			public void readCustom(CustomTag custom) {
+				//注册自定义标签
+				ContextObject.registerCustom(custom.getName(), custom);
 			}
 
 			@Override

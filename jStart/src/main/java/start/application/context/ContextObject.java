@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import start.application.context.annotation.Entity;
+import start.application.context.config.CustomTag;
 import start.application.core.Message;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanContextFactory;
@@ -26,7 +27,7 @@ public class ContextObject {
 	private static Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
 	private static Map<String, EntityInfo> entitys = new HashMap<String, EntityInfo>();
 	private static List<String> interceptors=new ArrayList<String>();
-	private static Map<String,List<Map<String,String>>> custom=new HashMap<String,List<Map<String,String>>>();
+	private static Map<String,List<CustomTag>> customTags=new HashMap<String,List<CustomTag>>();
 	
 	/**
 	 * 注册全局常量值
@@ -35,11 +36,6 @@ public class ContextObject {
 	 */
 	public static void registerConstant(String key,String value){
 		if(key!=null&&value!=null){
-//			if(constants.containsKey(key)){
-//				throw new IllegalArgumentException("常量："+key+" 已存在，参数异常!");
-//			}else{
-//				constants.put(key, value);
-//			}
 			constants.put(key, value);
 		}
 	}
@@ -109,13 +105,13 @@ public class ContextObject {
 	 * @param tagName
 	 * @param values
 	 */
-	public static void registerCustom(String tagName,Map<String,String> values){
-		List<Map<String,String>> reValues=custom.get(tagName);
-		if(reValues==null){
-			reValues=new ArrayList<Map<String,String>>();
+	public static void registerCustom(String name,CustomTag customTag){
+		List<CustomTag> tagValues=customTags.get(name);
+		if(tagValues==null){
+			tagValues=new ArrayList<CustomTag>();
 		}
-		reValues.add(values);
-		custom.put(tagName, reValues);
+		tagValues.add(customTag);
+		customTags.put(name, tagValues);
 	}
 	
 	/**
@@ -207,8 +203,8 @@ public class ContextObject {
 	 * @param tagName
 	 * @return
 	 */
-	public static List<Map<String,String>> getCustom(String tagName){
-		List<Map<String,String>>values=custom.get(tagName);
+	public static List<CustomTag> getCustom(String tagName){
+		List<CustomTag>values=customTags.get(tagName);
 		if(values==null){
 			throw new NullPointerException("未定义"+tagName+"对应的数据");
 		}

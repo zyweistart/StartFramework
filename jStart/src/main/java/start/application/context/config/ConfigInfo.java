@@ -117,7 +117,7 @@ public final class ConfigInfo {
 			String value=bundle.getString(key);
 			Map<String,String> attributes=new HashMap<String,String>();
 			attributes.put(key, value);
-			impl.read(CONSTANT, attributes, null);
+			impl.read(CONSTANT, attributes);
 		}
 	}
 	
@@ -140,7 +140,7 @@ public final class ConfigInfo {
 		}
 		Map<String,String> attributes=new HashMap<String,String>();
 		attributes.put(key, value);
-		impl.read(node.getNodeName().toLowerCase(), attributes, null);
+		impl.read(node.getNodeName().toLowerCase(), attributes);
 	}
 	
 	/**
@@ -188,15 +188,34 @@ public final class ConfigInfo {
 	 * 自定义标签
 	 */
 	private void readCustom(Node node){
-		Map<String,String> vals=new HashMap<String,String>();
+		if(node.getNodeType()==1){
+			impl.readCustom(readCustom1(node));
+		}
+	}
+	
+	private CustomTag readCustom1(Node node){
+		CustomTag custom=new CustomTag();
+		//名称
+		custom.setName(node.getNodeName());
+		//读取属性
 		NamedNodeMap nodeAtts=node.getAttributes();
-		for(int j=0;j<nodeAtts.getLength();j++){
-			Node nodeAtt=nodeAtts.item(j);
-			if(node.getNodeType()==1){
+		if(nodeAtts!=null){
+			Map<String,String> vals=new HashMap<String,String>();
+			for(int j=0;j<nodeAtts.getLength();j++){
+				Node nodeAtt=nodeAtts.item(j);
 				vals.put(nodeAtt.getNodeName(),nodeAtt.getNodeValue());
 			}
+			custom.setAttributes(vals);
 		}
-		impl.read(node.getNodeName().toLowerCase(), vals, null);
+		//读取子
+		NodeList childNodes=node.getChildNodes();
+		for(int j=0;j<childNodes.getLength();j++){
+			Node childNode=childNodes.item(j);
+			if(childNode.getNodeType()==1){
+				custom.setChildTag(readCustom1(childNode));
+			}
+		}
+		return custom;
 	}
 	
 }
