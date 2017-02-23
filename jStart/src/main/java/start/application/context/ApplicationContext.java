@@ -52,16 +52,15 @@ public class ApplicationContext implements Closeable{
 	}
 	
 	public Object getBean(String name,Class<?> prototype){
-		BeanInfo bean=null;
 		if(ContextObject.isBeanExistence(name)){
-			bean=ContextObject.getBean(name);
+			return getBean(ContextObject.getBean(name));
 		}else{
-			bean=new BeanInfo();
+			BeanInfo bean=new BeanInfo();
 			bean.setName(name);
 			bean.setPrototype(prototype.getName());
 			bean.setSingleton(false);
+			return getBean(bean);
 		}
-		return getBean(bean);
 	}
 	
 	private Object getBean(BeanInfo bean){
