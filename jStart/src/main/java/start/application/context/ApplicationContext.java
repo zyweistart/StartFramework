@@ -43,10 +43,7 @@ public class ApplicationContext implements Closeable{
 		BeanInfo bean=ContextObject.getBeanInfo(prototype.getName());
 		if(bean==null){
 			//如果当前类对象不是定义的Bean对象则创建一个临时的Bean对象
-			bean=new BeanInfo();
-			bean.setName(prototype.getName());
-			bean.setPrototype(prototype.getName());
-			bean.setSingleton(false);
+			bean=AnnotationConfigApplicationContext.buildBean(prototype.getName(), null, null, prototype);
 		}
 		return getBean(bean);
 	}
@@ -55,10 +52,7 @@ public class ApplicationContext implements Closeable{
 		if(ContextObject.isBeanExistence(name)){
 			return getBean(ContextObject.getBean(name));
 		}else{
-			BeanInfo bean=new BeanInfo();
-			bean.setName(name);
-			bean.setPrototype(prototype.getName());
-			bean.setSingleton(false);
+			BeanInfo bean=AnnotationConfigApplicationContext.buildBean(name, null, null, prototype);
 			return getBean(bean);
 		}
 	}

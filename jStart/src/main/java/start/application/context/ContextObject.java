@@ -9,7 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import start.application.context.annotation.Entity;
-import start.application.context.config.CustomTag;
+import start.application.context.config.XmlTag;
 import start.application.core.Message;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanContextFactory;
@@ -27,7 +27,7 @@ public class ContextObject {
 	private static Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
 	private static Map<String, EntityInfo> entitys = new HashMap<String, EntityInfo>();
 	private static List<String> interceptors=new ArrayList<String>();
-	private static Map<String,List<CustomTag>> customTags=new HashMap<String,List<CustomTag>>();
+	private static Map<String,List<XmlTag>> xmlTags=new HashMap<String,List<XmlTag>>();
 	
 	/**
 	 * 注册全局常量值
@@ -43,8 +43,9 @@ public class ContextObject {
 	/**
 	 * 注册Bean对象,不定义name不加入Bean容器
 	 * @param bean
+	 * @param analysis 是否分析当前类信息
 	 */
-	public static void registerBean(BeanInfo bean){
+	public static void registerBean(BeanInfo bean,boolean analysis){
 		if(bean!=null){
 			if(bean.getName()!=null){
 				if (beanPrototypes.containsKey(bean.getName())) {
@@ -60,14 +61,16 @@ public class ContextObject {
 					beans.put(bean.getPrototypeString(), bean);
 				}
 			}
-			if(ReflectUtils.isInterface(bean.getPrototype(), BeanBuilder.class)){
-				BeanContextFactory.init(bean.getPrototype());
-				log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
-			}
-			
-			if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
-				registerInterceptors(bean.getName());
-				log.info("自定义Interceptor类："+bean.getPrototypeString()+"，加载成功!");
+			if(analysis){
+				if(ReflectUtils.isInterface(bean.getPrototype(), BeanBuilder.class)){
+					BeanContextFactory.init(bean.getPrototype());
+					log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
+				}
+				
+				if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
+					registerInterceptors(bean.getName());
+					log.info("自定义Interceptor类："+bean.getPrototypeString()+"，加载成功!");
+				}
 			}
 		}
 	}
@@ -105,13 +108,13 @@ public class ContextObject {
 	 * @param tagName
 	 * @param values
 	 */
-	public static void registerCustom(String name,CustomTag customTag){
-		List<CustomTag> tagValues=customTags.get(name);
+	public static void registerCustom(String name,XmlTag xmlTag){
+		List<XmlTag> tagValues=xmlTags.get(name);
 		if(tagValues==null){
-			tagValues=new ArrayList<CustomTag>();
+			tagValues=new ArrayList<XmlTag>();
 		}
-		tagValues.add(customTag);
-		customTags.put(name, tagValues);
+		tagValues.add(xmlTag);
+		xmlTags.put(name, tagValues);
 	}
 	
 	/**
@@ -203,8 +206,8 @@ public class ContextObject {
 	 * @param tagName
 	 * @return
 	 */
-	public static List<CustomTag> getCustom(String tagName){
-		List<CustomTag>values=customTags.get(tagName);
+	public static List<XmlTag> getCustom(String tagName){
+		List<XmlTag>values=xmlTags.get(tagName);
 		if(values==null){
 			throw new NullPointerException("未定义"+tagName+"对应的数据");
 		}

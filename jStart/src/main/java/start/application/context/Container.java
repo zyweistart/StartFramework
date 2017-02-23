@@ -11,7 +11,7 @@ import start.application.commons.logger.LoggerFactory;
 import start.application.context.config.ConfigImpl;
 import start.application.context.config.ConfigInfo;
 import start.application.context.config.ConstantConfig;
-import start.application.context.config.CustomTag;
+import start.application.context.config.XmlTag;
 import start.application.core.Constant;
 import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanInfo;
@@ -42,40 +42,29 @@ public class Container implements Closeable {
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
 			
-			private List<BeanInfo> beans = new ArrayList<BeanInfo>();
+			private List<BeanInfo> registerBeans = new ArrayList<BeanInfo>();
 			
 			@Override
-			public void read(String tagName, Map<String, String> attributes) {
-				if(ConfigInfo.CONSTANT.equals(tagName)){
-					//注册常量
-					for(String key:attributes.keySet()){
-						ContextObject.registerConstant(key, attributes.get(key));
-					}
-				}
-			}
-
-			@Override
-			public void readBean(BeanInfo bean) {
-				//注册Bean
-				beans.add(bean);
-			}
-
-			@Override
-			public void readCustom(CustomTag custom) {
-				if(ConfigInfo.CONSTANT.equalsIgnoreCase(custom.getName())){
-					String name=custom.getAttributes().get("name");
+			public void read(XmlTag xml) {
+				if(ConfigInfo.CONSTANT.equalsIgnoreCase(xml.getName())){
+					String name=xml.getAttributes().get("name");
 					String value=null;
-					if(custom.getAttributes().containsKey("value")){
-						value=custom.getAttributes().get("value");
+					if(xml.getAttributes().containsKey("value")){
+						value=xml.getAttributes().get("value");
 					}else{
-						value=custom.getTextContent();
+						value=xml.getTextContent();
 					}
 					//注册常量
 					ContextObject.registerConstant(name, value);
-				}else if(ConfigInfo.BEAN.equalsIgnoreCase(custom.getName())){
+				}else if(ConfigInfo.PROPERTIES.equalsIgnoreCase(xml.getName())){
+					for(String key:xml.getAttributes().keySet()){
+						//注册常量
+						ContextObject.registerConstant(key, xml.getAttributes().get(key));
+					}
+				}else if(ConfigInfo.BEAN.equalsIgnoreCase(xml.getName())){
 					BeanInfo bean=new BeanInfo();
-					bean.getAttributes().putAll(custom.getAttributes());
-					for(CustomTag child:custom.getChildTags()){
+					bean.getAttributes().putAll(xml.getAttributes());
+					for(XmlTag child:xml.getChildTags()){
 						if("property".equals(child.getName())){
 							Map<String,String> attributes=child.getAttributes();
 							String name=attributes.get("name");
@@ -91,18 +80,18 @@ public class Container implements Closeable {
 						}
 					}
 					//注册Bean
-					beans.add(bean);
+					registerBeans.add(bean);
 				}else{
 					//注册自定义标签
-					ContextObject.registerCustom(custom.getName(), custom);
+					ContextObject.registerCustom(xml.getName(), xml);
 				}
 			}
 
 			@Override
 			public void finish() {
 				//读取完成后执行注册加载操作
-				for(BeanInfo bean:beans){
-					ContextObject.registerBean(bean);
+				for(BeanInfo bean:registerBeans){
+					ContextObject.registerBean(bean,true);
 				}
 			}
 			
@@ -118,7 +107,7 @@ public class Container implements Closeable {
 				//2.1注册Bean
 				BeanInfo bean=AnnotationConfigApplicationContext.analysisAnnotation(clasz);
 				if(bean!=null){
-					ContextObject.registerBean(bean);
+					ContextObject.registerBean(bean,false);
 					continue;
 				}
 				//2.2注册实体类

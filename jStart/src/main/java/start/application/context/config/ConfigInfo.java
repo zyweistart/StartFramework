@@ -2,9 +2,7 @@ package start.application.context.config;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -26,7 +24,10 @@ public final class ConfigInfo {
 	
 	public static final String IMPORT="import";
 	public static final String CONSTANT="constant";
+	public static final String PROPERTIES="properties";
 	public static final String BEAN="bean";
+	public static final String PATH="path";
+	public static final String CONFIG="config";
 	
 	private DocumentBuilder builder;
 	private ConfigImpl impl;
@@ -44,14 +45,21 @@ public final class ConfigInfo {
 	 * 解析框架默认的配置文件
 	 */
 	public void loadConfigFile() {
-		readXml("META-INF/StartConfig.xml");
+		loadConfigFile("META-INF/StartConfig.xml");
+	}
+	
+	/**
+	 * 解析框架默认的配置文件
+	 */
+	public void loadConfigFile(String xmlfile) {
+		readXml(xmlfile);
 		impl.finish();
 	}
 	
 	/**
 	 * @param classpath	类路径下的文件
 	 */
-	public void readXml(String classpath){
+	private void readXml(String classpath){
 		try{
 			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,getClass())));
 		} catch (Exception e) {
@@ -74,22 +82,18 @@ public final class ConfigInfo {
 						NamedNodeMap beanAttributes=node.getAttributes();
 						for(int k=0;k<beanAttributes.getLength();k++){
 							Node nodeAtt=beanAttributes.item(k);
-							if("path".equalsIgnoreCase(nodeAtt.getNodeName())){
+							if(PATH.equalsIgnoreCase(nodeAtt.getNodeName())){
 								//读取配置文件
 								String path=nodeAtt.getNodeValue();
 								configFiles.add(path);
-							}else if("config".equalsIgnoreCase(nodeAtt.getNodeName())){
+							}else if(CONFIG.equalsIgnoreCase(nodeAtt.getNodeName())){
 								//读取属性文件
 								String path=nodeAtt.getNodeValue();
 								resourceFiles.add(path);
 							}
 						}
-//					}else if(CONSTANT.equalsIgnoreCase(node.getNodeName())){
-//						readConstant(node);
-//					}else if(BEAN.equalsIgnoreCase(node.getNodeName())){
-//						readBean(node);
 					}else{
-						readCustom(node);
+						impl.read(read(node));
 					}
 				}
 			}
@@ -109,91 +113,23 @@ public final class ConfigInfo {
 	 * 读取资源文件
 	 */
 	private void readResourceBundle(String path){
+		XmlTag custom=new XmlTag();
+		custom.setName(PROPERTIES);
 		ResourceBundle bundle=ResourceBundle.getBundle(path);
 		Enumeration<String> keys=bundle.getKeys();
 		while(keys.hasMoreElements()){
 			String key=keys.nextElement();
 			String value=bundle.getString(key);
-			Map<String,String> attributes=new HashMap<String,String>();
-			attributes.put(key, value);
-			impl.read(CONSTANT, attributes);
+			custom.getAttributes().put(key, value);
 		}
+		impl.read(custom);
 	}
 	
 	/**
-	 * 常量配置
+	 * 读取配置信息
 	 */
-//	private void readConstant(Node node){
-//		String key=null,value=null;
-//		NamedNodeMap nodeAtts=node.getAttributes();
-//		for(int j=0;j<nodeAtts.getLength();j++){
-//			Node nodeAtt=nodeAtts.item(j);
-//			if("name".equalsIgnoreCase(nodeAtt.getNodeName())){
-//				key=nodeAtt.getNodeValue();
-//			}else if("value".equalsIgnoreCase(nodeAtt.getNodeName())){
-//				value=nodeAtt.getNodeValue();
-//			}
-//		}
-//		if(value==null){
-//			value=node.getTextContent();
-//		}
-//		Map<String,String> attributes=new HashMap<String,String>();
-//		attributes.put(key, value);
-//		impl.read(node.getNodeName().toLowerCase(), attributes);
-//	}
-	
-	/**
-	 * 读取Bean信息
-	 */
-//	private void readBean(Node node){
-//		NamedNodeMap beanAttributes=node.getAttributes();
-//		BeanInfo bean=new BeanInfo();
-//		for(int i=0;i<beanAttributes.getLength();i++){
-//			Node beanObjAttributes=beanAttributes.item(i);
-//			String key=beanObjAttributes.getNodeName();
-//			String value=beanAttributes.getNamedItem(key).getNodeValue();
-//			bean.getAttributes().put(key, value);
-//		}
-//		NodeList propertyNodes=node.getChildNodes();
-//		for(int k=0;k<propertyNodes.getLength();k++){
-//			Node childNode=propertyNodes.item(k);
-//			if("property".equalsIgnoreCase(childNode.getNodeName())){
-//				NamedNodeMap propertyAttributes=childNode.getAttributes();
-//				if(propertyAttributes!=null){
-//					String name=null;
-//					String value=null;
-//					for(int l=0;l<propertyAttributes.getLength();l++){
-//						Node propertyNodeAttributes=propertyAttributes.item(l);
-//						name=propertyAttributes.getNamedItem("name").getNodeValue();
-//						if("value".equalsIgnoreCase(propertyNodeAttributes.getNodeName())){
-//							value=propertyAttributes.getNamedItem("value").getNodeValue();
-//							bean.getValues().put(name, value);
-//						}else if("ref".equalsIgnoreCase(propertyNodeAttributes.getNodeName())){
-//							value=propertyAttributes.getNamedItem("ref").getNodeValue();
-//							bean.getRefs().put(name, value);
-//						}
-//					}
-//					if(value==null){
-//						value=childNode.getTextContent();
-//						bean.getValues().put(name, value);
-//					}
-//				}
-//			}
-//		}
-//		impl.readBean(bean);
-//	}
-	
-	/**
-	 * 自定义标签
-	 */
-	private void readCustom(Node node){
-		if(node.getNodeType()==1){
-			impl.readCustom(readCustom1(node));
-		}
-	}
-	
-	private CustomTag readCustom1(Node node){
-		CustomTag custom=new CustomTag();
+	private XmlTag read(Node node){
+		XmlTag custom=new XmlTag();
 		//名称
 		custom.setName(node.getNodeName());
 		//读取属性
@@ -211,7 +147,7 @@ public final class ConfigInfo {
 		for(int j=0;j<childNodes.getLength();j++){
 			Node childNode=childNodes.item(j);
 			if(childNode.getNodeType()==1){
-				custom.getChildTags().add(readCustom1(childNode));
+				custom.getChildTags().add(read(childNode));
 			}
 		}
 		return custom;

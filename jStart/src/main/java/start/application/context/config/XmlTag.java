@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CustomTag {
+public class XmlTag {
 	
 	private String name;
 	
@@ -13,7 +13,7 @@ public class CustomTag {
 	
 	private String textContent;
 	
-	private List<CustomTag> childTags=new ArrayList<CustomTag>();
+	private List<XmlTag> childTags=new ArrayList<XmlTag>();
 
 	public String getName() {
 		return name;
@@ -39,11 +39,11 @@ public class CustomTag {
 		this.textContent = textContent;
 	}
 
-	public List<CustomTag> getChildTags() {
+	public List<XmlTag> getChildTags() {
 		return childTags;
 	}
 
-	public void setChildTags(List<CustomTag> childTags) {
+	public void setChildTags(List<XmlTag> childTags) {
 		this.childTags = childTags;
 	}
 
