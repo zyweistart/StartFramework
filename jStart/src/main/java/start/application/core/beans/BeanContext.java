@@ -10,9 +10,9 @@ public class BeanContext implements BeanBuilder {
 	private final static Logger log=LoggerFactory.getLogger(BeanContext.class);
 
 	@Override
-	public Object getBean(Class<?> prototype){
+	public Object getBean(BeanInfo bean){
 		try {
-			return prototype.newInstance();
+			return bean.getPrototype().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new ApplicationException(e);

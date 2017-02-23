@@ -51,6 +51,19 @@ public class ApplicationContext implements Closeable{
 		return getBean(bean);
 	}
 	
+	public Object getBean(String name,Class<?> prototype){
+		BeanInfo bean=null;
+		if(ContextObject.isBeanExistence(name)){
+			bean=ContextObject.getBean(name);
+		}else{
+			bean=new BeanInfo();
+			bean.setName(name);
+			bean.setPrototype(prototype.getName());
+			bean.setSingleton(false);
+		}
+		return getBean(bean);
+	}
+	
 	private Object getBean(BeanInfo bean){
 		Object instance=null;
 		//判断是否为单例模式
@@ -69,11 +82,10 @@ public class ApplicationContext implements Closeable{
 			for(Parameter param:constructor.getParameters()){
 				if(param.isAnnotationPresent(Qualifier.class)){
 					Qualifier qualifier=param.getAnnotation(Qualifier.class);
-					String name=qualifier.value().isEmpty()?param.getName():qualifier.value();
-					if(ContextObject.isBeanExistence(name)){
-						initTargs.add(getBean(name));
+					if(qualifier.value().isEmpty()){
+						initTargs.add(getBean(param.getName(),param.getType()));
 					}else{
-						initTargs.add(getBean(param.getType()));
+						initTargs.add(getBean(qualifier.value(),param.getType()));
 					}
 				}else{
 					if(!initTargs.isEmpty()){
@@ -96,7 +108,7 @@ public class ApplicationContext implements Closeable{
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
-			instance = BeanContextFactory.getInstanceBuilder().getBean(bean.getPrototype());
+			instance = BeanContextFactory.getInstanceBuilder().getBean(bean);
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();
@@ -127,11 +139,10 @@ public class ApplicationContext implements Closeable{
 				if (resource!=null) {
 					field.setAccessible(true);
 					try {
-						String name=resource.value().isEmpty()?field.getName():resource.value();
-						if(ContextObject.isBeanExistence(name)){
-							field.set(instance,getBean(name));
+						if(resource.value().isEmpty()){
+							field.set(instance,getBean(field.getName(),field.getType()));
 						}else{
-							field.set(instance,getBean(field.getType()));
+							field.set(instance,getBean(resource.value(),field.getType()));
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
