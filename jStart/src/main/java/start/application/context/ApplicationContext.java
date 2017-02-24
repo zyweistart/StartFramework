@@ -193,6 +193,7 @@ public class ApplicationContext implements Closeable{
 				ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
 			}
 		}
+		this.contextObjectHolder=null;
 	}
 
 	public Map<String, Object> getContextObjectHolder() {
