@@ -46,6 +46,7 @@ public class ApplicationContext implements Closeable{
 			bean=AnnotationConfigContext.analysisBean(prototype);
 			if(bean==null){
 				bean=new BeanDefinition();
+				bean.setName(prototype.getName());
 				bean.setPrototype(prototype.getName());
 			}
 		}
@@ -59,6 +60,7 @@ public class ApplicationContext implements Closeable{
 			BeanDefinition bean=AnnotationConfigContext.analysisBean(prototype);
 			if(bean==null){
 				bean=new BeanDefinition();
+				bean.setName(name);
 				bean.setPrototype(prototype.getName());
 			}
 			return getBean(bean);

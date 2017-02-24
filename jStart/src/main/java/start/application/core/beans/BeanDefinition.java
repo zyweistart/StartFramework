@@ -34,9 +34,6 @@ public class BeanDefinition {
 	public String getName() {
 		if(name==null){
 			name=getAttributes().get("name");
-			if(name==null){
-				name=getPrototypeString();
-			}
 		}
 		return name;
 	}
