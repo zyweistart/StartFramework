@@ -111,12 +111,15 @@
 	</build>
 	<url>https://github.com/zyweistart/StartFramework</url>
 	<name>jStart</name>
-	<description>MVC</description>
 	<organization>
 		<url>http://www.ancun.com</url>
 		<name>Ancun</name>
 	</organization>
 	<scm>
 		<url>https://github.com/zyweistart/StartFramework.git</url>
+		<tag>MVC、ORM、IOC</tag>
+		<connection>https://github.com/zyweistart/StartFramework.git</connection>
+		<developerConnection>Start</developerConnection>
 	</scm>
+	<description>MVC、ORM、IOC</description>
 </project>
