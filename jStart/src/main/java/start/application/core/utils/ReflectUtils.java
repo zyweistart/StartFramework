@@ -11,12 +11,12 @@ public class ReflectUtils {
 
 	private final static Logger log = LoggerFactory.getLogger(ReflectUtils.class);
 
-	public static void invokeMethod(Object instance, Class<?> prototype, String methodName) {
+	public static void invokeMethod(Object instance, String methodName) {
 		if (StringHelper.isEmpty(methodName)) {
 			return;
 		}
 		try {
-			Method method = prototype.getMethod(methodName);
+			Method method = instance.getClass().getMethod(methodName);
 			method.invoke(instance);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {

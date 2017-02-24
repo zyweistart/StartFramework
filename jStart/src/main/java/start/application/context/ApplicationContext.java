@@ -19,7 +19,7 @@ import start.application.context.annotation.Resource;
 import start.application.context.config.ConstantConfig;
 import start.application.core.Message;
 import start.application.core.beans.BeanContextFactory;
-import start.application.core.beans.BeanInfo;
+import start.application.core.beans.BeanDefinition;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StackTraceInfo;
@@ -35,15 +35,19 @@ public class ApplicationContext implements Closeable{
 	private Map<String,Object> contextObjectHolder=new HashMap<String,Object>();
 	
 	public Object getBean(String name){
-		BeanInfo bean=ContextObject.getBean(name);
+		BeanDefinition bean=ContextObject.getBean(name);
 		return getBean(bean);
 	}
 
 	public Object getBean(Class<?> prototype){
-		BeanInfo bean=ContextObject.getBeanInfo(prototype.getName());
+		BeanDefinition bean=ContextObject.getBeanInfo(prototype.getName());
 		if(bean==null){
 			//如果当前类对象不是定义的Bean对象则创建一个临时的Bean对象
-			bean=AnnotationConfigApplicationContext.buildBean(prototype.getName(), null, null, prototype);
+			bean=AnnotationConfigContext.analysisBean(prototype);
+			if(bean==null){
+				bean=new BeanDefinition();
+				bean.setPrototype(prototype.getName());
+			}
 		}
 		return getBean(bean);
 	}
@@ -52,12 +56,16 @@ public class ApplicationContext implements Closeable{
 		if(ContextObject.isBeanExistence(name)){
 			return getBean(ContextObject.getBean(name));
 		}else{
-			BeanInfo bean=AnnotationConfigApplicationContext.buildBean(name, null, null, prototype);
+			BeanDefinition bean=AnnotationConfigContext.analysisBean(prototype);
+			if(bean==null){
+				bean=new BeanDefinition();
+				bean.setPrototype(prototype.getName());
+			}
 			return getBean(bean);
 		}
 	}
 	
-	private Object getBean(BeanInfo bean){
+	private Object getBean(BeanDefinition bean){
 		Object instance=null;
 		//判断是否为单例模式
 		if(bean.isSingleton()){
@@ -175,7 +183,7 @@ public class ApplicationContext implements Closeable{
 			}
 		}
 		//执行初始化方法
-		ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getInit());
+		ReflectUtils.invokeMethod(instance,bean.getInit());
 		if(bean.isSingleton()){
 			Container.getSingletonBeans().put(bean.getName(), instance);
 		}else{
@@ -188,9 +196,9 @@ public class ApplicationContext implements Closeable{
 	public void close() {
 		for(String name:getContextObjectHolder().keySet()){
 			if(ContextObject.isBeanExistence(name)){
-				BeanInfo bean=ContextObject.getBean(name);
+				BeanDefinition bean=ContextObject.getBean(name);
 				Object instance=getContextObjectHolder().get(name);
-				ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
+				ReflectUtils.invokeMethod(instance,bean.getDestory());
 			}
 		}
 		this.contextObjectHolder=null;

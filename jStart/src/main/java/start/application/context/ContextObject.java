@@ -13,7 +13,7 @@ import start.application.context.config.XmlTag;
 import start.application.core.Message;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanContextFactory;
-import start.application.core.beans.BeanInfo;
+import start.application.core.beans.BeanDefinition;
 import start.application.core.utils.ReflectUtils;
 import start.application.orm.entity.EntityInfo;
 import start.application.web.interceptor.InterceptorHandler;
@@ -24,7 +24,7 @@ public class ContextObject {
 	
 	private static Map<String,String> constants=new HashMap<String,String>();
 	private static Map<String, String> beanPrototypes = new HashMap<String, String>();
-	private static Map<String, BeanInfo> beans = new HashMap<String, BeanInfo>();
+	private static Map<String, BeanDefinition> beans = new HashMap<String, BeanDefinition>();
 	private static Map<String, EntityInfo> entitys = new HashMap<String, EntityInfo>();
 	private static List<String> interceptors=new ArrayList<String>();
 	private static Map<String,List<XmlTag>> xmlTags=new HashMap<String,List<XmlTag>>();
@@ -45,7 +45,7 @@ public class ContextObject {
 	 * @param bean
 	 * @param analysis 是否分析当前类信息
 	 */
-	public static void registerBean(BeanInfo bean,boolean analysis){
+	public static void registerBean(BeanDefinition bean,boolean analysis){
 		if(bean!=null){
 			if(bean.getName()!=null){
 				if (beanPrototypes.containsKey(bean.getName())) {
@@ -146,12 +146,12 @@ public class ContextObject {
 	 * @param name BeanName  
 	 * @return
 	 */
-	public static BeanInfo getBean(String name) {
+	public static BeanDefinition getBean(String name) {
 		String prototypeString=beanPrototypes.get(name);
 		if(prototypeString==null){
 			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
 		}
-		BeanInfo bean=beans.get(prototypeString);
+		BeanDefinition bean=beans.get(prototypeString);
 		if(bean==null){
 			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
 		}
@@ -163,7 +163,7 @@ public class ContextObject {
 	 * @param prototypeString 类名
 	 * @return
 	 */
-	public static BeanInfo getBeanInfo(String prototypeString) {
+	public static BeanDefinition getBeanInfo(String prototypeString) {
 		return beans.get(prototypeString);
 	}
 	

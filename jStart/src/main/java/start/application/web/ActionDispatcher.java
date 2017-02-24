@@ -9,7 +9,7 @@ import start.application.context.ApplicationContext;
 import start.application.context.ContextObject;
 import start.application.context.annotation.Controller;
 import start.application.context.config.ConstantConfig;
-import start.application.core.beans.BeanInfo;
+import start.application.core.beans.BeanDefinition;
 import start.application.web.action.Action;
 import start.application.web.action.ActionResult;
 import start.application.web.action.ActionSupport;
@@ -41,7 +41,7 @@ public final class ActionDispatcher {
 	 *            控制层的Action别名
 	 */
 	public void start(String name) throws Exception {
-		BeanInfo bean = ContextObject.getBean(name);
+		BeanDefinition bean = ContextObject.getBean(name);
 		// 只允许访问@Controller的Bean
 		if (!bean.getPrototype().isAnnotationPresent(Controller.class)) {
 			throw new  IllegalAccessException(name+"无访问权限" );

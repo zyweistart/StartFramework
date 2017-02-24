@@ -14,11 +14,10 @@ import start.application.context.config.ConstantConfig;
 import start.application.context.config.XmlTag;
 import start.application.core.Constant;
 import start.application.core.beans.BeanContextFactory;
-import start.application.core.beans.BeanInfo;
+import start.application.core.beans.BeanDefinition;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
-import start.application.orm.AnnotationConfigEntityContext;
 import start.application.orm.entity.EntityInfo;
 
 public class Container implements Closeable {
@@ -42,7 +41,7 @@ public class Container implements Closeable {
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
 			
-			private List<BeanInfo> registerBeans = new ArrayList<BeanInfo>();
+			private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();
 			
 			@Override
 			public void read(XmlTag xml) {
@@ -62,7 +61,7 @@ public class Container implements Closeable {
 						ContextObject.registerConstant(key, xml.getAttributes().get(key));
 					}
 				}else if(ConfigInfo.BEAN.equalsIgnoreCase(xml.getName())){
-					BeanInfo bean=new BeanInfo();
+					BeanDefinition bean=new BeanDefinition();
 					bean.getAttributes().putAll(xml.getAttributes());
 					for(XmlTag child:xml.getChildTags()){
 						if("property".equals(child.getName())){
@@ -90,7 +89,7 @@ public class Container implements Closeable {
 			@Override
 			public void finish() {
 				//读取完成后执行注册加载操作
-				for(BeanInfo bean:registerBeans){
+				for(BeanDefinition bean:registerBeans){
 					ContextObject.registerBean(bean,true);
 				}
 			}
@@ -105,13 +104,13 @@ public class Container implements Closeable {
 		for (String packageName : ConstantConfig.CLASSSCANPATH.split(Constant.COMMA)) {
 			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
 				//2.1注册Bean
-				BeanInfo bean=AnnotationConfigApplicationContext.analysisAnnotation(clasz);
+				BeanDefinition bean=AnnotationConfigContext.analysisBean(clasz);
 				if(bean!=null){
 					ContextObject.registerBean(bean,false);
 					continue;
 				}
 				//2.2注册实体类
-				EntityInfo entity =AnnotationConfigEntityContext.buildEntity(clasz);
+				EntityInfo entity =AnnotationConfigContext.analysisEntity(clasz);
 				if(entity!=null){
 					ContextObject.registerEntity(entity);
 					continue;
@@ -129,9 +128,9 @@ public class Container implements Closeable {
 	public void close() {
 		for(String name:getSingletonBeans().keySet()){
 			if(ContextObject.isBeanExistence(name)){
-				BeanInfo bean=ContextObject.getBean(name);
+				BeanDefinition bean=ContextObject.getBean(name);
 				Object instance=getSingletonBeans().get(name);
-				ReflectUtils.invokeMethod(instance,bean.getPrototype(),bean.getDestory());
+				ReflectUtils.invokeMethod(instance,bean.getDestory());
 			}
 		}
 	}

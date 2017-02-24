@@ -1,4 +1,4 @@
-package start.application.orm;
+package start.application.context;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -6,12 +6,15 @@ import java.lang.reflect.Field;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.context.ContextDataReadWrite;
-import start.application.context.DataTypeValidation;
+import start.application.context.annotation.Controller;
 import start.application.context.annotation.Entity;
+import start.application.context.annotation.Repository;
+import start.application.context.annotation.Service;
 import start.application.context.exceptions.AnnoationError;
 import start.application.context.exceptions.EntityDefinitionError;
 import start.application.core.Message;
+import start.application.core.beans.BeanDefinition;
+import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StackTraceInfo;
 import start.application.orm.annotation.Column;
 import start.application.orm.annotation.GeneratedValue;
@@ -23,37 +26,77 @@ import start.application.orm.annotation.Temporal;
 import start.application.orm.annotation.Transient;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
+import start.application.web.action.Action;
 
-public class AnnotationConfigEntityContext {
+public class AnnotationConfigContext {
 	
-	private final static Logger log=LoggerFactory.getLogger(AnnotationConfigEntityContext.class);
+	private final static Logger log=LoggerFactory.getLogger(AnnotationConfigContext.class);
 	
-	public static EntityInfo buildEntity(Class<?> prototype){
-		Entity entity = prototype.getAnnotation(Entity.class);
-		if (entity != null) {
-			return buildEntity(entity.value(),prototype);
+	/**
+	 * 解析Bean对象
+	 * @param prototype
+	 * @return
+	 */
+	public static BeanDefinition analysisBean(Class<?> prototype){
+		BeanDefinition bean=null;
+		// 控制层
+		Controller controller = prototype.getAnnotation(Controller.class);
+		if (controller != null) {
+			if(!ReflectUtils.isInterface(prototype, Action.class)){
+				String message = Message.getMessage(Message.PM_4005, prototype.getName());
+				throw new AnnoationError(message);
+			}
+			bean=new BeanDefinition();
+			bean.setName(controller.value());
+			bean.setInit(controller.init());
+			bean.setDestory(controller.destory());
 		}
-		return null;
+		// 服务层
+		Service service = prototype.getAnnotation(Service.class);
+		if (service != null) {
+			bean=new BeanDefinition();
+			bean.setName(service.value());
+			bean.setInit(service.init());
+			bean.setDestory(service.destory());
+		}
+		// 数据访问层
+		Repository repository = prototype.getAnnotation(Repository.class);
+		if (repository != null) {
+			bean=new BeanDefinition();
+			bean.setName(repository.value());
+			bean.setInit(repository.init());
+			bean.setDestory(repository.destory());
+		}
+		if(bean!=null){
+			bean.setPrototype(prototype.getName());
+		}
+		return bean;
 	}
 	
-	private static EntityInfo buildEntity(String entityName,Class<?> prototype){
+	/**
+	 * 解析ORM实体对象
+	 * @param prototype
+	 * @return
+	 */
+	public static EntityInfo analysisEntity(Class<?> prototype){
+		Entity entity = prototype.getAnnotation(Entity.class);
+		if (entity == null) {
+			return null;
+		}
 		Class<?> clasz=prototype;
 		EntityInfo entityInfo = new EntityInfo();
 		// 实体名称
-		entityInfo.setEntityName(entityName);
+		entityInfo.setEntityName(entity.value());
 		// 是否存在@Table表名注解如果不存在则默认表名使用实体类的名称
 		Table table = clasz.getAnnotation(Table.class);
 		if (table != null) {
 			// 表名
 			entityInfo.setTableName(table.value());
 		} else {
-			// 如果为注解@Table则表名默认为实体名
+			// 如果未注解@Table则表名默认为实体名
 			entityInfo.setTableName(entityInfo.getEntityName());
 		}
 		while (true) {
-//			if (clasz == null||clasz.equals(Object.class)) {
-//				break;
-//			}
 			if (!clasz.isAnnotationPresent(Entity.class)&&
 					!clasz.isAnnotationPresent(MappedSuperclass.class)) {
 				break;
@@ -102,7 +145,7 @@ public class AnnotationConfigEntityContext {
 						if (!DataTypeValidation.isString
 								.contains(property.getReturnTypeName())) {
 							String message=Message.getMessage(Message.PM_3016,
-									entityName, field.getName());
+									entity.value(), field.getName());
 							throw new AnnoationError(message);
 						}
 					}
@@ -123,7 +166,7 @@ public class AnnotationConfigEntityContext {
 					if (DataTypeValidation.isDate
 							.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3012,
-								entityName, field.getName());
+								entity.value(), field.getName());
 						throw new AnnoationError(message);
 					}
 					if (!column.name().isEmpty()) {
@@ -139,7 +182,7 @@ public class AnnotationConfigEntityContext {
 							&& !DataTypeValidation.isDate
 									.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3013,
-								entityName, field.getName());
+								entity.value(), field.getName());
 						throw new AnnoationError(message);
 					}
 					if (!temporal.name().isEmpty()) {
@@ -151,7 +194,7 @@ public class AnnotationConfigEntityContext {
 					if (DataTypeValidation.isDate
 							.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3011,
-								entityName, field.getName());
+								entity.value(), field.getName());
 						throw new AnnoationError(message);
 					}
 				}
@@ -160,7 +203,7 @@ public class AnnotationConfigEntityContext {
 					if (!DataTypeValidation.isString
 							.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3014,
-								entityName, field.getName());
+								entity.value(), field.getName());
 						throw new AnnoationError(message);
 					}
 					if (!lob.name().isEmpty()) {

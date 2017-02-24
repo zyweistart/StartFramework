@@ -3,12 +3,13 @@ package start.application.core.beans;
 import java.util.HashMap;
 import java.util.Map;
 
+import start.application.context.annotation.Scope;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.StringHelper;
 
-public class BeanInfo {
+public class BeanDefinition {
 	
-	public BeanInfo(){
+	public BeanDefinition(){
 		values=new HashMap<String,String>();
 		refs=new HashMap<String,String>();
 		attributes=new HashMap<String,String>();
@@ -33,6 +34,9 @@ public class BeanInfo {
 	public String getName() {
 		if(name==null){
 			name=getAttributes().get("name");
+			if(name==null){
+				name=getPrototypeString();
+			}
 		}
 		return name;
 	}
@@ -104,12 +108,16 @@ public class BeanInfo {
 	
 	public Boolean isSingleton(){
 		if(singleton==null){
-			String sing=getAttributes().get("singleton");
-			if(StringHelper.isEmpty(sing)){
-				//默认为单例
-				singleton=true;
+			if(getPrototype().isAnnotationPresent(Scope.class)){
+				singleton=false;
 			}else{
-				singleton=StringHelper.nullToBoolean(sing);
+				String sing=getAttributes().get("singleton");
+				if(StringHelper.isEmpty(sing)){
+					//默认为单例
+					singleton=true;
+				}else{
+					singleton=StringHelper.nullToBoolean(sing);
+				}
 			}
 		}
 		return singleton;

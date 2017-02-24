@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 实现了Action接口的子类
+ * 注解于实现了Action接口的子类
  * @author zhenyao
  */
 @Target(ElementType.TYPE)
