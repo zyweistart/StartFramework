@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 一般注解于数据访问层,使用Resource(字段)或Qualifier(构造注入参数)
+ * 定义于数据访问层,使用Resource(字段)或Qualifier(构造注入参数)
+ * @author zhenyao
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

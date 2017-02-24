@@ -6,13 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 实现了Action接口的子类
+ * 用于实现组件功能不归入Bean容器进行管理
  * @author zhenyao
+ *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Controller {
-	String value();
-	String init() default "";
-	String destory() default "";
+public @interface Component {
 }
+
