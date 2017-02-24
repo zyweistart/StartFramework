@@ -16,7 +16,7 @@ public final class Message {
 	
 	private final static Logger log=LoggerFactory.getLogger(Message.class);
 	
-	private final static String BUNDLE_NAME_MESSAGE="META-INF.Message";
+	private final static String BUNDLE_NAME_MESSAGE="Message";
 
 	private final static ResourceBundle RESOURCE_BUNDLE_MESSAGE;
 	

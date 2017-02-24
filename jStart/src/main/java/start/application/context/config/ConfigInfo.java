@@ -45,7 +45,7 @@ public final class ConfigInfo {
 	 * 解析框架默认的配置文件
 	 */
 	public void loadConfigFile() {
-		loadConfigFile("META-INF/StartConfig.xml");
+		loadConfigFile("StartConfig.xml");
 	}
 	
 	/**
