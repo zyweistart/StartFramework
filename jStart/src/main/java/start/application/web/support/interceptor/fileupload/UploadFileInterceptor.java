@@ -52,9 +52,9 @@ public class UploadFileInterceptor extends InterceptorHandler {
 	private final static String MULTIPARTFORMDATA="multipart/form-data";
 
 	@Override
-	public void intercept(ActionSupport action) throws Exception {
+	public void intercept(ActionSupport support) throws Exception {
 		try {
-			HttpServletRequest request = action.request();
+			HttpServletRequest request = support.request();
 			String contentType = request.getContentType();
 			if (contentType != null && contentType.startsWith(MULTIPARTFORMDATA)) {
 
@@ -187,20 +187,20 @@ public class UploadFileInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(lists));
 					}
 				}
-				RequestParameterInject.injectParameter(action,params);
+				RequestParameterInject.injectParameter(support.getAction(),params);
 				// 文件注入
 				Map<String,List<UpLoadFile>> fileParams=new HashMap<String,List<UpLoadFile>>();
 				for (String fileField : upLoadFiles.keySet()) {
 					fileParams.put(fileField	, upLoadFiles.get(fileField));
 				}
-				RequestParameterInject.injectObject(action, fileParams);
+				RequestParameterInject.injectObject(support.getAction(), fileParams);
 			}
 		} catch (Exception e) {
 			log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 			throw new ActionException(e);
 		} finally {
 			// 继续执行下一个拦截器
-			doInterceptor(action);
+			doInterceptor(support);
 		}
 	}
 

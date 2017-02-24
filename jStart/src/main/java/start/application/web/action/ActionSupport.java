@@ -9,8 +9,9 @@ import start.application.web.utils.FilterHostConfig;
 import start.application.web.utils.RequestMap;
 import start.application.web.utils.SessionMap;
 
-public abstract class ActionSupport implements Action{
+public class ActionSupport{
 
+	private Action action;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private FilterHostConfig filterHostConfig;
@@ -19,6 +20,14 @@ public abstract class ActionSupport implements Action{
 	private RequestMap requestMap;
 	private SessionMap<String, Object> sessionMap;
 	private ApplicationMap applicationMap;
+
+	public Action getAction() {
+		return action;
+	}
+
+	public void setAction(Action action) {
+		this.action = action;
+	}
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;

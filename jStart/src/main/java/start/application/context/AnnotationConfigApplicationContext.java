@@ -8,7 +8,7 @@ import start.application.context.exceptions.AnnoationError;
 import start.application.core.Message;
 import start.application.core.beans.BeanInfo;
 import start.application.core.utils.ReflectUtils;
-import start.application.web.action.ActionSupport;
+import start.application.web.action.Action;
 
 public class AnnotationConfigApplicationContext {
 	
@@ -21,8 +21,8 @@ public class AnnotationConfigApplicationContext {
 		// 控制层
 		Controller controller = prototype.getAnnotation(Controller.class);
 		if (controller != null) {
-			if(!ReflectUtils.isSuperClass(prototype, ActionSupport.class)){
-				String message = Message.getMessage(Message.PM_4005);
+			if(!ReflectUtils.isInterface(prototype, Action.class)){
+				String message = Message.getMessage(Message.PM_4005, prototype.getName());
 				throw new AnnoationError(message);
 			}
 			return buildBean(controller.value(),controller.init(),controller.destory(),prototype);

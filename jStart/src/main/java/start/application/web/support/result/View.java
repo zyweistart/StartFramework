@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.utils.StackTraceInfo;
-import start.application.web.result.ActionResult;
-import start.application.web.result.ActionResultInvocation;
+import start.application.web.action.ActionResult;
+import start.application.web.action.ActionSupport;
 
 
 /**
@@ -27,12 +27,12 @@ public class View implements ActionResult {
 	}
 	
 	@Override
-	public void doExecute(ActionResultInvocation invocation) {
+	public void doExecute(ActionSupport support) {
 		try{
-			HttpServletRequest request=invocation.getAction().request();
-			HttpServletResponse response=invocation.getAction().response();
+			HttpServletRequest request=support.request();
+			HttpServletResponse response=support.response();
 			//设置Request作用域的值
-			for(Method method:invocation.getAction().getClass().getMethods()){
+			for(Method method:support.getAction().getClass().getMethods()){
 				String methodName=method.getName();
 				if(methodName.startsWith("get")||methodName.startsWith("is")){
 					String fieldName=null;
@@ -44,7 +44,7 @@ public class View implements ActionResult {
 					if(fieldName!=null){
 						//只添加不存在的键值
 						if(request.getAttribute(fieldName)==null){
-							request.setAttribute(fieldName,method.invoke(invocation.getAction()));
+							request.setAttribute(fieldName,method.invoke(support.getAction()));
 						}
 					}
 				}

@@ -6,10 +6,25 @@
 	<artifactId>jstart</artifactId>
 	<version>1.0.1</version>
 	<packaging>jar</packaging>
-
+	<name>jStart</name>
+	<url>https://github.com/zyweistart/StartFramework</url>
+	<description>MVC、ORM、IOC</description>
+	<organization>
+		<name>Ancun</name>
+		<url>http://www.ancun.com</url>
+	</organization>
+	<scm>
+		<url>https://github.com/zyweistart/StartFramework.git</url>
+		<connection>https://github.com/zyweistart/StartFramework.git</connection>
+		<developerConnection>Start</developerConnection>
+		<tag>MVC、ORM、IOC</tag>
+	</scm>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
+		<maven-surefire-plugin.version>2.4.2</maven-surefire-plugin.version>
+		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
 		<junit.version>4.10</junit.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<mongo-java-driver.version>3.2.0</mongo-java-driver.version>
@@ -17,8 +32,6 @@
 		<commons-logging.version>1.2</commons-logging.version>
 		<log4j.version>1.2.17</log4j.version>
 		<slf4j-api.version>1.7.21</slf4j-api.version>
-		<maven-surefire-plugin.version>2.4.2</maven-surefire-plugin.version>
-		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -104,22 +117,10 @@
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
-					<encoding>UTF-8</encoding>
+					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	<url>https://github.com/zyweistart/StartFramework</url>
-	<name>jStart</name>
-	<organization>
-		<url>http://www.ancun.com</url>
-		<name>Ancun</name>
-	</organization>
-	<scm>
-		<url>https://github.com/zyweistart/StartFramework.git</url>
-		<tag>MVC、ORM、IOC</tag>
-		<connection>https://github.com/zyweistart/StartFramework.git</connection>
-		<developerConnection>Start</developerConnection>
-	</scm>
-	<description>MVC、ORM、IOC</description>
+	
 </project>

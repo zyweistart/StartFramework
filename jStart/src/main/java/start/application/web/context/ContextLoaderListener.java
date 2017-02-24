@@ -22,7 +22,6 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-//		log.info(Message.getMessage(Message.PM_1000));
 		long start=System.currentTimeMillis();
 		mContainer.init();
 		long value=System.currentTimeMillis()-start;

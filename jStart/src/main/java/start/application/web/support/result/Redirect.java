@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.utils.StackTraceInfo;
-import start.application.web.result.ActionResultInvocation;
+import start.application.web.action.ActionSupport;
 
 
 /**
@@ -22,8 +22,8 @@ public final class Redirect extends View {
 	}
 
 	@Override
-	public void doExecute(ActionResultInvocation invocation) {
-		HttpServletResponse response=invocation.getAction().response();
+	public void doExecute(ActionSupport support) {
+		HttpServletResponse response=support.response();
 		try {
 			response.sendRedirect(getDispatcherPage());
 		} catch (IOException e) {

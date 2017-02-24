@@ -99,7 +99,7 @@ public final class Message {
 	 */
 	public final static Integer PM_4003=4003;
 	/**
-	 * 当前Action类实例不是ActionSupport的子类，数据注入失败！
+	 * %s类没有实现Action接口，数据注入失败！
 	 */
 	public final static Integer PM_4005=4005;
 	/**

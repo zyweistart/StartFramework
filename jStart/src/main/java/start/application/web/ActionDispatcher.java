@@ -10,10 +10,10 @@ import start.application.context.ContextObject;
 import start.application.context.annotation.Controller;
 import start.application.context.config.ConstantConfig;
 import start.application.core.beans.BeanInfo;
+import start.application.web.action.Action;
+import start.application.web.action.ActionResult;
 import start.application.web.action.ActionSupport;
 import start.application.web.interceptor.InterceptorHandler;
-import start.application.web.result.ActionResult;
-import start.application.web.result.ActionResultInvocation;
 import start.application.web.utils.FilterHostConfig;
 
 
@@ -50,15 +50,14 @@ public final class ActionDispatcher {
 		if (this.mRequest.getCharacterEncoding() == null) {
 			this.mRequest.setCharacterEncoding(ConstantConfig.ENCODING);
 		}
-		ApplicationContext application=null;
-		try{
-			application=new ApplicationContext();
-			Object obj =application.getBean(bean.getName());
-			ActionSupport action = (ActionSupport) obj;
-			action.setRequest(this.mRequest);
-			action.setResponse(this.mResponse);
-			action.setFilterHostConfig(this.mFilterHostConfig);
-			action.setApplicationContext(application);
+		try(ApplicationContext application=new ApplicationContext()){
+			Action action = (Action)application.getBean(bean.getName());
+			ActionSupport support=new ActionSupport();
+			support.setAction(action);
+			support.setRequest(this.mRequest);
+			support.setResponse(this.mResponse);
+			support.setFilterHostConfig(this.mFilterHostConfig);
+			support.setApplicationContext(application);
 			if(!ContextObject.getInterceptors().isEmpty()){
 				//责任链模式执行拦截器
 				InterceptorHandler handler=null;
@@ -69,20 +68,13 @@ public final class ActionDispatcher {
 					handler=currentHandler;
 				}
 				//执行拦截器
-				handler.intercept(action);
+				handler.intercept(support);
 			}
 			//执行Action
-			ActionResult result=action.execute();
+			ActionResult result=action.execute(support);
 			if (result != null) {
 				// 返回值必须实现了ActionResult接口
-				ActionResultInvocation invocation = new ActionResultInvocation();
-				invocation.setAction(action);
-				result.doExecute(invocation);
-			}
-		}finally{
-			if(application!=null){
-				application.close();
-				application=null;
+				result.doExecute(support);
 			}
 		}
 	}

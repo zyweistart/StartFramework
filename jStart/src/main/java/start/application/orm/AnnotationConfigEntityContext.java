@@ -51,9 +51,9 @@ public class AnnotationConfigEntityContext {
 			entityInfo.setTableName(entityInfo.getEntityName());
 		}
 		while (true) {
-			if (clasz == null) {
-				break;
-			}
+//			if (clasz == null||clasz.equals(Object.class)) {
+//				break;
+//			}
 			if (!clasz.isAnnotationPresent(Entity.class)&&
 					!clasz.isAnnotationPresent(MappedSuperclass.class)) {
 				break;
@@ -66,25 +66,26 @@ public class AnnotationConfigEntityContext {
 						&& field.getModifiers() != 4) {
 					continue;
 				}
+				//判断是否为支持的数据类型
 				if(!ContextDataReadWrite.isDataTypeSupport(field)){
 					String message=Message.getMessage(Message.PM_5019,entityInfo.getEntityName(),
 							field.getName(), field.getType().getName());
 					throw new AnnoationError(message);
 				}
-				EntityProperty propertyMember = new EntityProperty();
-				propertyMember.setField(field);
+				EntityProperty property = new EntityProperty();
+				property.setField(field);
 				// 在数据表中对应的字段列的名称
-				propertyMember.setFieldName(field.getName());
+				property.setFieldName(field.getName());
 				// 字段的返回类型的简单名称例：java.lang.String返回String
-				propertyMember.setReturnTypeName(field.getType().getName());
+				property.setReturnTypeName(field.getType().getName());
 				PropertyDescriptor pd = null;
 				try {
 					// 根据JavaBean的字段名称获取实体对象中get,set方法
 					pd = new PropertyDescriptor(field.getName(), clasz);
 					// 当前字段的get方法
-					propertyMember.setGet(pd.getReadMethod());
+					property.setGet(pd.getReadMethod());
 					// 当前有字段的set方法
-					propertyMember.setSet(pd.getWriteMethod());
+					property.setSet(pd.getWriteMethod());
 				} catch (IntrospectionException e) {
 					log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 					throw new EntityDefinitionError(e);
@@ -92,14 +93,14 @@ public class AnnotationConfigEntityContext {
 				// 如果该字段不映射则跳出
 				Transient trans = field.getAnnotation(Transient.class);
 				if (trans != null) {
-					entityInfo.getTransientPropertyMembers().add(propertyMember);
+					entityInfo.getTransientPropertyMembers().add(property);
 					continue;
 				}
 				Id id = field.getAnnotation(Id.class);
 				if (id != null) {
 					if (id.value() == GeneratedValue.UID) {
 						if (!DataTypeValidation.isString
-								.contains(propertyMember.getReturnTypeName())) {
+								.contains(property.getReturnTypeName())) {
 							String message=Message.getMessage(Message.PM_3016,
 									entityName, field.getName());
 							throw new AnnoationError(message);
@@ -107,9 +108,9 @@ public class AnnotationConfigEntityContext {
 					}
 					if (entityInfo.getPrimaryKeyMember() == null) {
 						if (!id.name().isEmpty()) {
-							propertyMember.setFieldName(id.name());
+							property.setFieldName(id.name());
 						}
-						entityInfo.setPrimaryKeyMember(propertyMember);
+						entityInfo.setPrimaryKeyMember(property);
 					} else {
 						String message=Message.getMessage(Message.PM_3002,
 								entityInfo.getEntityName());
@@ -120,35 +121,35 @@ public class AnnotationConfigEntityContext {
 				Column column = field.getAnnotation(Column.class);
 				if (column != null) {
 					if (DataTypeValidation.isDate
-							.contains(propertyMember.getReturnTypeName())) {
+							.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3012,
 								entityName, field.getName());
 						throw new AnnoationError(message);
 					}
 					if (!column.name().isEmpty()) {
-						propertyMember.setFieldName(column.name());
+						property.setFieldName(column.name());
 					}
-					entityInfo.getPropertyMembers().add(propertyMember);
+					entityInfo.getPropertyMembers().add(property);
 					continue;
 				}
 				Temporal temporal = field.getAnnotation(Temporal.class);
 				if (temporal != null) {
 					if (!DataTypeValidation.isString
-							.contains(propertyMember.getReturnTypeName())
+							.contains(property.getReturnTypeName())
 							&& !DataTypeValidation.isDate
-									.contains(propertyMember.getReturnTypeName())) {
+									.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3013,
 								entityName, field.getName());
 						throw new AnnoationError(message);
 					}
 					if (!temporal.name().isEmpty()) {
-						propertyMember.setFieldName(temporal.name());
+						property.setFieldName(temporal.name());
 					}
-					entityInfo.getPropertyMembers().add(propertyMember);
+					entityInfo.getPropertyMembers().add(property);
 					continue;
 				} else {
 					if (DataTypeValidation.isDate
-							.contains(propertyMember.getReturnTypeName())) {
+							.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3011,
 								entityName, field.getName());
 						throw new AnnoationError(message);
@@ -157,16 +158,16 @@ public class AnnotationConfigEntityContext {
 				Lob lob = field.getAnnotation(Lob.class);
 				if (lob != null) {
 					if (!DataTypeValidation.isString
-							.contains(propertyMember.getReturnTypeName())) {
+							.contains(property.getReturnTypeName())) {
 						String message=Message.getMessage(Message.PM_3014,
 								entityName, field.getName());
 						throw new AnnoationError(message);
 					}
 					if (!lob.name().isEmpty()) {
-						propertyMember.setFieldName(lob.name());
+						property.setFieldName(lob.name());
 					}
 				}
-				entityInfo.getPropertyMembers().add(propertyMember);
+				entityInfo.getPropertyMembers().add(property);
 			}
 			// 获取超类
 			clasz = clasz.getSuperclass();

@@ -25,8 +25,8 @@ public class ParametersInterceptor extends InterceptorHandler {
 	private final static Logger log=LoggerFactory.getLogger(ParametersInterceptor.class);
 	
 	@Override
-	public void intercept(ActionSupport action) throws Exception{
-		HttpServletRequest request=action.request();
+	public void intercept(ActionSupport support) throws Exception{
+		HttpServletRequest request=support.request();
 		try{
 			if(!MULTIPARTFORMDATA.equals(request.getContentType())){
 				Map<String,String> params=new HashMap<String,String>();
@@ -40,14 +40,14 @@ public class ParametersInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(Arrays.asList(parameterValues)));
 					}
 				}
-				RequestParameterInject.injectParameter(action,params);
+				RequestParameterInject.injectParameter(support.getAction(),params);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | ParseException e) {
 			log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 			throw new ActionException(e);
 		}finally{
 			// 继续执行下一个拦截器
-			doInterceptor(action);
+			doInterceptor(support);
 		}
 	}
 
