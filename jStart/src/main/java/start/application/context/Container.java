@@ -8,6 +8,7 @@ import java.util.Map;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
+import start.application.context.annotation.Component;
 import start.application.context.config.ConfigImpl;
 import start.application.context.config.ConfigInfo;
 import start.application.context.config.ConstantConfig;
@@ -103,16 +104,24 @@ public class Container implements Closeable {
 		//2、扫描包下所有的类
 		for (String packageName : ConstantConfig.CLASSSCANPATH.split(Constant.COMMA)) {
 			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
-				//2.1注册Bean
-				BeanDefinition bean=AnnotationConfigContext.analysisBean(clasz);
-				if(bean!=null){
-					ContextObject.registerBean(bean,false);
+				//2.1组件不归入Bean容器管理
+				Component component = clasz.getAnnotation(Component.class);
+				if (component != null) {
+					BeanDefinition bean=new BeanDefinition();
+					bean.setPrototype(clasz.getName());
+					ContextObject.registerBean(bean, true);
 					continue;
 				}
 				//2.2注册实体类
 				EntityInfo entity =AnnotationConfigContext.analysisEntity(clasz);
 				if(entity!=null){
 					ContextObject.registerEntity(entity);
+					continue;
+				}
+				//2.3注册Bean
+				BeanDefinition bean=AnnotationConfigContext.analysisBean(clasz);
+				if(bean!=null){
+					ContextObject.registerBean(bean,false);
 					continue;
 				}
 			}
