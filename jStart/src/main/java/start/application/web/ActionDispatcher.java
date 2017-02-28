@@ -52,12 +52,13 @@ public final class ActionDispatcher {
 		}
 		try(ApplicationContext application=new ApplicationContext()){
 			Action action = (Action)application.getBean(bean.getName());
-			ActionSupport support=new ActionSupport();
-			support.setAction(action);
-			support.setRequest(this.mRequest);
-			support.setResponse(this.mResponse);
-			support.setFilterHostConfig(this.mFilterHostConfig);
-			support.setApplicationContext(application);
+			ActionSupport support=new ActionSupport(
+					action,
+					this.mRequest,
+					this.mResponse,
+					this.mFilterHostConfig,
+					application,
+					bean);
 			if(!ContextObject.getInterceptors().isEmpty()){
 				//责任链模式执行拦截器
 				InterceptorHandler handler=null;

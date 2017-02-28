@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import start.application.context.ApplicationContext;
+import start.application.core.beans.BeanDefinition;
 import start.application.web.utils.ApplicationMap;
 import start.application.web.utils.FilterHostConfig;
 import start.application.web.utils.RequestMap;
@@ -16,33 +17,31 @@ public class ActionSupport{
 	private HttpServletResponse response;
 	private FilterHostConfig filterHostConfig;
 	private ApplicationContext applicationContext;
+	private BeanDefinition bean;
 	
 	private RequestMap requestMap;
 	private SessionMap<String, Object> sessionMap;
 	private ApplicationMap applicationMap;
 
+	public ActionSupport(
+			Action action,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			FilterHostConfig filterHostConfig,
+			ApplicationContext applicationContext,
+			BeanDefinition bean
+			){
+		this.action=action;
+		this.request=request;
+		this.response=response;
+		this.filterHostConfig=filterHostConfig;
+		this.applicationContext=applicationContext;
+		this.bean=bean;
+	}
+	
+	
 	public Action getAction() {
 		return action;
-	}
-
-	public void setAction(Action action) {
-		this.action = action;
-	}
-
-	public void setRequest(HttpServletRequest request) {
-		this.request = request;
-	}
-
-	public void setResponse(HttpServletResponse response) {
-		this.response = response;
-	}
-
-	public void setFilterHostConfig(FilterHostConfig filterHostConfig) {
-		this.filterHostConfig = filterHostConfig;
-	}
-
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
 	}
 	
 	public HttpServletRequest request() {
@@ -63,6 +62,10 @@ public class ActionSupport{
 	
 	public Object getBean(Class<?> prototype){
 		return applicationContext.getBean(prototype);
+	}
+
+	public BeanDefinition getBean() {
+		return bean;
 	}
 
 	/**

@@ -26,8 +26,12 @@ public class ParametersInterceptor extends InterceptorHandler {
 	
 	@Override
 	public void intercept(ActionSupport support) throws Exception{
-		HttpServletRequest request=support.request();
+		if(support.getBean().isSingleton()){
+			doInterceptor(support);
+			return;
+		}
 		try{
+			HttpServletRequest request=support.request();
 			if(!MULTIPARTFORMDATA.equals(request.getContentType())){
 				Map<String,String> params=new HashMap<String,String>();
 				Enumeration<String> enumerations = request.getParameterNames();

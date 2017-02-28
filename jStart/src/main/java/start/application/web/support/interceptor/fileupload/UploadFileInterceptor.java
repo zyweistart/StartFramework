@@ -53,6 +53,10 @@ public class UploadFileInterceptor extends InterceptorHandler {
 
 	@Override
 	public void intercept(ActionSupport support) throws Exception {
+		if(support.getBean().isSingleton()){
+			doInterceptor(support);
+			return;
+		}
 		try {
 			HttpServletRequest request = support.request();
 			String contentType = request.getContentType();
