@@ -3,14 +3,9 @@ package start.application.orm.support.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
-import start.application.core.utils.StackTraceInfo;
 import start.application.orm.exceptions.RepositoryException;
 
 public class Transaction {
-	
-	private final static Logger log=LoggerFactory.getLogger(Transaction.class);
 	
 	private Connection mConnection;
 	
@@ -34,7 +29,6 @@ public class Transaction {
 			getConnection().setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 			getConnection().setAutoCommit(false);
 		}catch(SQLException e){
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 	}
@@ -47,7 +41,6 @@ public class Transaction {
 			getConnection().commit();
 			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}finally{
 			SessionManager.closeConnection();
@@ -62,7 +55,6 @@ public class Transaction {
 			getConnection().rollback();
 			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}finally{
 			SessionManager.closeConnection();

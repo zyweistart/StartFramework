@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.core.utils.StackTraceInfo;
 import start.application.orm.exceptions.RepositoryException;
 
 public class SessionManager {
@@ -115,7 +114,6 @@ public class SessionManager {
 			getConnection().setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 			getConnection().setAutoCommit(false);
 		}catch(SQLException e){
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 	}
@@ -128,7 +126,6 @@ public class SessionManager {
 			getConnection().commit();
 			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}finally{
 			SessionManager.closeConnection();
@@ -143,7 +140,6 @@ public class SessionManager {
 			getConnection().rollback();
 			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}finally{
 			SessionManager.closeConnection();
@@ -159,7 +155,6 @@ public class SessionManager {
 					rset.close();
 				}
 			} catch (SQLException e) {
-				log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 	     		throw new RepositoryException(e);
 			}finally{
 				rset = null;
@@ -174,7 +169,6 @@ public class SessionManager {
 					stmt.close();
 				}
 			} catch (SQLException e) {
-				log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 	     		throw new RepositoryException(e);
 			}finally{
 				stmt = null;
@@ -189,7 +183,6 @@ public class SessionManager {
 					pstmt.close();
 				}
 			} catch (SQLException e) {
-				log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 	     		throw new RepositoryException(e);
 			}finally{
 				pstmt = null;
@@ -209,7 +202,6 @@ public class SessionManager {
 					conectionSession.remove();
 				}
 			} catch (SQLException e) {
-				log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 	     		throw new RepositoryException(e);
 			}finally{
 				conn = null;

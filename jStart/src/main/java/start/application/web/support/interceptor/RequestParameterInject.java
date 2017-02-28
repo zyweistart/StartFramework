@@ -6,11 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
 import start.application.context.ContextDataReadWrite;
 import start.application.core.Message;
-import start.application.core.utils.StackTraceInfo;
 import start.application.web.exceptions.ActionException;
 import start.application.web.support.interceptor.fileupload.UpLoadFile;
 
@@ -20,8 +17,6 @@ import start.application.web.support.interceptor.fileupload.UpLoadFile;
  * @author Start
  */
 public final class RequestParameterInject {
-	
-	private final static Logger log=LoggerFactory.getLogger(RequestParameterInject.class);
 	
 	public static void injectParameter(Object entity,Map<String,String> bundle) throws IllegalArgumentException, IllegalAccessException, InstantiationException, ParseException{
 		Map<String,String> fieldMap=new HashMap<String,String>();
@@ -39,7 +34,6 @@ public final class RequestParameterInject {
 				clsMap.put(params[0], vMap);
 			}else{
 				String message=Message.getMessage(Message.PM_4006, key);
-				log.error(StackTraceInfo.getTraceInfo() + message);
 				throw new ActionException(message);
 			}
 		}

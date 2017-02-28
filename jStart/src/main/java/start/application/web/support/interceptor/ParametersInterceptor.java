@@ -8,9 +8,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
-import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
@@ -22,7 +19,6 @@ import start.application.web.interceptor.InterceptorHandler;
 public class ParametersInterceptor extends InterceptorHandler {
 
 	private final static String MULTIPARTFORMDATA="multipart/form-data";
-	private final static Logger log=LoggerFactory.getLogger(ParametersInterceptor.class);
 	
 	@Override
 	public void intercept(ActionSupport support) throws Exception{
@@ -47,7 +43,6 @@ public class ParametersInterceptor extends InterceptorHandler {
 				RequestParameterInject.injectParameter(support.getAction(),params);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | ParseException e) {
-			log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 			throw new ActionException(e);
 		}finally{
 			// 继续执行下一个拦截器

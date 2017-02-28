@@ -3,7 +3,6 @@ package start.application.core.beans;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.exceptions.ApplicationException;
-import start.application.core.utils.StackTraceInfo;
 
 public class BeanContextFactory {
 	
@@ -21,7 +20,6 @@ public class BeanContextFactory {
 				builder=(BeanBuilder)prototype.newInstance();
 				log.info("BeanBuilder容器对象："+prototype.getName()+",初始化完成");
 			} catch (InstantiationException | IllegalAccessException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new ApplicationException(e);
 			}
 		}

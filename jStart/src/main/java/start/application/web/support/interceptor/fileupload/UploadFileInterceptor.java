@@ -16,7 +16,6 @@ import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.context.config.ConstantConfig;
 import start.application.core.utils.FileHelper;
-import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
@@ -200,7 +199,6 @@ public class UploadFileInterceptor extends InterceptorHandler {
 				RequestParameterInject.injectObject(support.getAction(), fileParams);
 			}
 		} catch (Exception e) {
-			log.error(StackTraceInfo.getTraceInfo()+e.getMessage());
 			throw new ActionException(e);
 		} finally {
 			// 继续执行下一个拦截器

@@ -17,10 +17,9 @@ import com.mongodb.client.result.UpdateResult;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.context.ContextObject;
 import start.application.context.ContextDataReadWrite;
+import start.application.context.ContextObject;
 import start.application.core.Message;
-import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.StringHelper;
 import start.application.orm.AbstractEntityManager;
 import start.application.orm.annotation.GeneratedValue;
@@ -32,7 +31,6 @@ import start.application.orm.exceptions.RepositoryException;
 public class EntityMongoDBManager implements AbstractEntityManager {
 
 	private final static Logger log=LoggerFactory.getLogger(EntityMongoDBManager.class);
-
 	private MongoDBDatasource session;
 
 	@Override
@@ -49,7 +47,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			try {
 				entityMember.getPrimaryKeyMember().getSet().invoke(entity, primaryKeyValue);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 		} else if (id.value() == GeneratedValue.NONE) {
@@ -57,14 +54,12 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			try {
 				primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		} else {
 			// 主键字段
@@ -77,7 +72,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			try {
 				value = propertyMember.getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 			// 为空则不插入
@@ -97,13 +91,11 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		}
 		MongoCollection<Document> dbCollection = getSession().getDataBase()
@@ -116,7 +108,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			try {
 				value = propertyMember.getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 			// 为空则不插入
@@ -141,13 +132,11 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		}
 		MongoCollection<Document> dbCollection = getSession().getDataBase()
@@ -165,7 +154,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		}
 		Document doc = new Document();
@@ -192,7 +180,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			try {
 				obj = prototype.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 			// 主键
@@ -202,7 +189,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 				try {
 					entityMember.getPrimaryKeyMember().getSet().invoke(obj, tarValue);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 					throw new RepositoryException(e);
 				}
 			}
@@ -214,7 +200,6 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 					try {
 						propertyMember.getSet().invoke(obj, tarValue);
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 						throw new RepositoryException(e);
 					}
 				}

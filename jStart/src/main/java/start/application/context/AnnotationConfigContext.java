@@ -4,8 +4,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
 import start.application.context.annotation.Controller;
 import start.application.context.annotation.Entity;
 import start.application.context.annotation.Repository;
@@ -15,7 +13,6 @@ import start.application.context.exceptions.EntityDefinitionError;
 import start.application.core.Message;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.utils.ReflectUtils;
-import start.application.core.utils.StackTraceInfo;
 import start.application.orm.annotation.Column;
 import start.application.orm.annotation.GeneratedValue;
 import start.application.orm.annotation.Id;
@@ -29,8 +26,6 @@ import start.application.orm.entity.EntityProperty;
 import start.application.web.action.Action;
 
 public class AnnotationConfigContext {
-	
-	private final static Logger log=LoggerFactory.getLogger(AnnotationConfigContext.class);
 	
 	/**
 	 * 解析Bean对象
@@ -130,7 +125,6 @@ public class AnnotationConfigContext {
 					// 当前有字段的set方法
 					property.setSet(pd.getWriteMethod());
 				} catch (IntrospectionException e) {
-					log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 					throw new EntityDefinitionError(e);
 				}
 				// 如果该字段不映射则跳出

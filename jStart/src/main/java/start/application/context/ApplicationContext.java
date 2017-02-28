@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
 import start.application.context.annotation.Constant;
 import start.application.context.annotation.Qualifier;
 import start.application.context.annotation.Resource;
@@ -22,15 +20,12 @@ import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ReflectUtils;
-import start.application.core.utils.StackTraceInfo;
 
 /**
  * 容器参数注入
  * @author Start
  */
 public class ApplicationContext implements Closeable{
-	
-	private final static Logger log=LoggerFactory.getLogger(ApplicationContext.class);
 	
 	private Map<String,Object> contextObjectHolder=new HashMap<String,Object>();
 	
@@ -104,7 +99,6 @@ public class ApplicationContext implements Closeable{
 					break;
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
-					log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 					throw new ApplicationException(e);
 				}
 			}
@@ -132,7 +126,6 @@ public class ApplicationContext implements Closeable{
 					try {
 						field.set(instance,ContextDataReadWrite.convertReadIn(field, ConstantConfig.getString(name)));
 					} catch (IllegalArgumentException | IllegalAccessException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 						throw new ApplicationException(e);
 					}
 					continue;
@@ -148,7 +141,6 @@ public class ApplicationContext implements Closeable{
 							field.set(instance,getBean(resource.value(),field.getType()));
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 						throw new ApplicationException(e);
 					}
 					continue;
@@ -167,7 +159,6 @@ public class ApplicationContext implements Closeable{
 					try {
 						method.invoke(instance, ContextDataReadWrite.convertReadIn(null,type,ConstantConfig.get(bean.getValues().get(name))));
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 						throw new ApplicationException(e);
 					}
 					continue;
@@ -177,7 +168,6 @@ public class ApplicationContext implements Closeable{
 					try {
 						method.invoke(instance, getBean(bean.getRefs().get(name)));
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 						throw new ApplicationException(e);
 					}
 					continue;

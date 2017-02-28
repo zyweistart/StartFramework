@@ -12,12 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
-import start.application.context.ContextObject;
 import start.application.context.ContextDataReadWrite;
+import start.application.context.ContextObject;
 import start.application.core.Message;
-import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.StringHelper;
 import start.application.orm.AbstractEntityManager;
 import start.application.orm.annotation.GeneratedValue;
@@ -32,8 +29,6 @@ import start.application.orm.exceptions.RepositoryException;
  * @author Start
  */
 public class EntityJDBCManager implements AbstractEntityManager {
-
-	private final static Logger log=LoggerFactory.getLogger(EntityJDBCManager.class);
 
 	private static final String INSERT="INSERT INTO %s(%s) VALUES(%s)";
 	private static final String UPDATE="UPDATE %s SET %s WHERE %s";
@@ -57,7 +52,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			try {
 				entityMember.getPrimaryKeyMember().getSet().invoke(entity, primaryKeyValue);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 		} else if (id.value() == GeneratedValue.NONE) {
@@ -65,14 +59,12 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			try {
 				primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		} else {
 			// 主键字段
@@ -87,7 +79,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			try {
 				value = propertyMember.getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 			// 为空则不插入
@@ -104,7 +95,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		try {
 			getSession().executeUpdate(SQL, parameters.toArray());
 		} catch (SQLException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 	}
@@ -116,13 +106,11 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		}
 		List<String> fieldNames = new ArrayList<String>();
@@ -134,7 +122,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			try {
 				value = propertyMember.getGet().invoke(entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new RepositoryException(e);
 			}
 			// 为空则不插入
@@ -153,7 +140,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		try {
 			return getSession().executeUpdate(SQL, parameters.toArray());
 		} catch (SQLException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 	}
@@ -166,13 +152,11 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		}
 		// 主键字段
@@ -186,7 +170,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		try {
 			return getSession().executeUpdate(SQL, primaryKeyValue);
 		} catch (SQLException e) {
-			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			throw new RepositoryException(e);
 		}
 	}
@@ -197,7 +180,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		EntityInfo entityMember = ContextObject.getEntity(prototype);
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		}
 		// 主键字段
@@ -242,7 +224,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			return entitys;
 		} catch (SQLException e) {
 			String message=Message.getMessage(Message.PM_5009, sql, e.getMessage()); 
-			log.error(StackTraceInfo.getTraceInfo() + message);
 			throw new RepositoryException(message);
 		} finally {
 			SessionManager.closeResultSet(rSet);
@@ -266,7 +247,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 				obj = prototype.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				String message=Message.getMessage(Message.PM_5009, sql, e.getMessage()); 
-				log.error(StackTraceInfo.getTraceInfo() + message);
 				throw new RepositoryException(message);
 			}
 			// 主键
@@ -277,7 +257,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 					entityMember.getPrimaryKeyMember().getSet().invoke(obj, tarValue);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					String message=Message.getMessage(Message.PM_5009, sql, e.getMessage()); 
-					log.error(StackTraceInfo.getTraceInfo() + message);
 					throw new RepositoryException(message);
 				}
 			}
@@ -290,7 +269,6 @@ public class EntityJDBCManager implements AbstractEntityManager {
 						propertyMember.getSet().invoke(obj, tarValue);
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 						String message=Message.getMessage(Message.PM_5009, sql, e.getMessage()); 
-						log.error(StackTraceInfo.getTraceInfo() + message);
 						throw new RepositoryException(message);
 					}
 				}

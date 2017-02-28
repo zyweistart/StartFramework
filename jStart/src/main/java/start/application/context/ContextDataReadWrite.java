@@ -7,12 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
 import start.application.context.config.ConstantConfig;
 import start.application.core.Constant;
 import start.application.core.exceptions.ApplicationException;
-import start.application.core.utils.StackTraceInfo;
 import start.application.core.utils.StringHelper;
 import start.application.orm.annotation.Temporal;
 
@@ -23,8 +20,6 @@ import start.application.orm.annotation.Temporal;
  */
 public final class ContextDataReadWrite {
 
-	private final static Logger log=LoggerFactory.getLogger(ContextDataReadWrite.class);
-	
 	/**
 	 * 判断字段定义的数据类型容器是否支持
 	 * @param entityName
@@ -73,7 +68,6 @@ public final class ContextDataReadWrite {
 			try {
 				return sdf.parse(value);
 			} catch (ParseException e) {
-				log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 				throw new ApplicationException(e);
 			}
 		}else if(type.isEnum()){
