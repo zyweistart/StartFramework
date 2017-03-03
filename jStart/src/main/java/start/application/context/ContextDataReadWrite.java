@@ -135,7 +135,7 @@ public final class ContextDataReadWrite {
 			}
 			return StringHelper.listToString(lists);
 		}else if(DataTypeValidation.isBoolean.contains(typeName)){
-			return Boolean.parseBoolean(tarValue)?Constant.TRUE:Constant.FALSE;
+			return Boolean.parseBoolean(tarValue)?1:0;
 		}else if(DataTypeValidation.isShort.contains(typeName)||
 				DataTypeValidation.isInteger.contains(typeName)||
 				DataTypeValidation.isLong.contains(typeName)||

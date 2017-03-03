@@ -14,9 +14,9 @@
 	<!-- 默认日期时间格式 -->
 	<constant name="DATAFORMAT" value="yyyyMMddHHmmss"/>
 	<!-- 数据保存主路径 -->
-	<constant name="ROOTPATH" value="/Data/"/>
+	<constant name="ROOTPATH" value="/Root/Data/"/>
 	<!--文件临时存放的目录-->
-	<constant name="TMPPATH" value="/Temp/"/>
+	<constant name="TMPPATH" value="/Root/Temp/"/>
 	<!--文件上传文件大小默认1G-->
 	<constant name="MAXUPLOADSIZE" value="1073741824"/>
 	<!--允许上传的类型-->

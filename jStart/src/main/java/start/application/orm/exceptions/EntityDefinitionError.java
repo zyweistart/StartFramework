@@ -1,4 +1,4 @@
-package start.application.context.exceptions;
+package start.application.orm.exceptions;
 
 /**
  * 实体类定义错误，出错则无法继续

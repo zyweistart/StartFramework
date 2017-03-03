@@ -8,8 +8,6 @@ import start.application.context.annotation.Controller;
 import start.application.context.annotation.Entity;
 import start.application.context.annotation.Repository;
 import start.application.context.annotation.Service;
-import start.application.context.exceptions.AnnoationError;
-import start.application.context.exceptions.EntityDefinitionError;
 import start.application.core.Message;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.utils.ReflectUtils;
@@ -23,6 +21,8 @@ import start.application.orm.annotation.Temporal;
 import start.application.orm.annotation.Transient;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
+import start.application.orm.exceptions.AnnoationError;
+import start.application.orm.exceptions.EntityDefinitionError;
 import start.application.web.action.Action;
 
 public class AnnotationConfigContext {

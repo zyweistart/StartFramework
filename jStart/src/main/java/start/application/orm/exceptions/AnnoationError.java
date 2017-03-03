@@ -1,4 +1,4 @@
-package start.application.context.exceptions;
+package start.application.orm.exceptions;
 
 /**
  * 注解定义出错，出错则无法继续

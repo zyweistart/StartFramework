@@ -38,10 +38,6 @@ public final class Message {
 	
 	//Context
 	/**
-	 * 初始化容器，请稍候....
-	 */
-	public final static Integer PM_1000=1000;
-	/**
 	 * 容器中不存在该%s对象!
 	 */
 	public final static Integer PM_1003=1003;
