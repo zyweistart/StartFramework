@@ -71,7 +71,11 @@ public final class ContextDataReadWrite {
 				throw new ApplicationException(e);
 			}
 		}else if(type.isEnum()){
-			return type.getEnumConstants()[Integer.parseInt(value)];
+			int index=Integer.parseInt(value);
+			if(type.getEnumConstants().length<=index){
+				throw new IllegalArgumentException("枚举类型"+type+"下标数组越界:"+value);
+			}
+			return type.getEnumConstants()[index];
 		}else if(type.isArray()){
 			//字符串用逗号分隔转成数组
 			String[] values=value.split(Constant.COMMA);

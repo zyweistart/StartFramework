@@ -47,9 +47,9 @@ public final class RequestParameterInject {
 				continue;
 			}
 			//已注入没有注解的字段
-			if(field.getAnnotations().length>0){
-				continue;
-			}
+//			if(field.getAnnotations().length>0){
+//				continue;
+//			}
 			String fieldName=field.getName();
 			String value=fieldMap.get(fieldName);
 			if(value!=null){

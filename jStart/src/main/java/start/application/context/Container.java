@@ -112,7 +112,7 @@ public class Container implements Closeable {
 					ContextObject.registerBean(bean, true);
 					continue;
 				}
-				//2.2注册实体类
+				//2.2注册JDBC实体类
 				EntityInfo entity =AnnotationConfigContext.analysisEntity(clasz);
 				if(entity!=null){
 					ContextObject.registerEntity(entity);

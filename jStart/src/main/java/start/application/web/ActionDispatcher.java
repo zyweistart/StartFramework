@@ -14,7 +14,6 @@ import start.application.web.action.Action;
 import start.application.web.action.ActionResult;
 import start.application.web.action.ActionSupport;
 import start.application.web.interceptor.InterceptorHandler;
-import start.application.web.utils.FilterHostConfig;
 
 
 /**
@@ -26,12 +25,10 @@ public final class ActionDispatcher {
 	
 	private final HttpServletRequest mRequest;
 	private final HttpServletResponse mResponse;
-	private final FilterHostConfig mFilterHostConfig;
 
-	public ActionDispatcher(HttpServletRequest request, HttpServletResponse response, FilterHostConfig fhostConfig) {
+	public ActionDispatcher(HttpServletRequest request, HttpServletResponse response) {
 		this.mRequest = request;
 		this.mResponse = response;
-		this.mFilterHostConfig = fhostConfig;
 	}
 
 	/**
@@ -56,8 +53,6 @@ public final class ActionDispatcher {
 					action,
 					this.mRequest,
 					this.mResponse,
-					this.mFilterHostConfig,
-					application,
 					bean);
 			if(!ContextObject.getInterceptors().isEmpty()){
 				//责任链模式执行拦截器
