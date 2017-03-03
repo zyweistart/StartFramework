@@ -3,7 +3,7 @@ package start.application.core.beans;
 import java.util.HashMap;
 import java.util.Map;
 
-import start.application.context.annotation.Scope;
+import start.application.core.annotation.Scope;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.StringHelper;
 

@@ -4,14 +4,13 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 
-import start.application.context.annotation.Controller;
-import start.application.context.annotation.Entity;
-import start.application.context.annotation.Repository;
-import start.application.context.annotation.Service;
 import start.application.core.Message;
+import start.application.core.annotation.Repository;
+import start.application.core.annotation.Service;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.utils.ReflectUtils;
 import start.application.orm.annotation.Column;
+import start.application.orm.annotation.Entity;
 import start.application.orm.annotation.GeneratedValue;
 import start.application.orm.annotation.Id;
 import start.application.orm.annotation.Lob;
@@ -24,6 +23,7 @@ import start.application.orm.entity.EntityProperty;
 import start.application.orm.exceptions.AnnoationError;
 import start.application.orm.exceptions.EntityDefinitionError;
 import start.application.web.action.Action;
+import start.application.web.annotation.Controller;
 
 public class AnnotationConfigContext {
 	

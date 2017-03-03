@@ -1,4 +1,4 @@
-package start.application.context.config;
+package start.application.core.config;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -14,8 +14,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import start.application.context.exceptions.ConfigError;
 import start.application.core.utils.ClassLoaderUtils;
+import start.application.orm.exceptions.ConfigError;
 /**
  * 全局配置
  * @author Start

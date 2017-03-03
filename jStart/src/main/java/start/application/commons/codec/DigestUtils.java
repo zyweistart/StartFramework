@@ -8,7 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import start.application.context.config.ConstantConfig;
+import start.application.core.config.ConstantConfig;
 
 public class DigestUtils {
 	

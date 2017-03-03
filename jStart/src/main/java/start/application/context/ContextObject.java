@@ -8,13 +8,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import start.application.context.annotation.Entity;
-import start.application.context.config.XmlTag;
 import start.application.core.Message;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.config.XmlTag;
 import start.application.core.utils.ReflectUtils;
+import start.application.orm.annotation.Entity;
 import start.application.orm.entity.EntityInfo;
 import start.application.web.interceptor.InterceptorHandler;
 

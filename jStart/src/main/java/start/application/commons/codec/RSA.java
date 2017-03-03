@@ -11,7 +11,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
 
-import start.application.context.config.ConstantConfig;
+import start.application.core.config.ConstantConfig;
 
 public class RSA {
 

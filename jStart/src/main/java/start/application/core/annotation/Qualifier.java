@@ -1,4 +1,4 @@
-package start.application.context.annotation;
+package start.application.core.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 自动注入,一般注入的名称为Repository和Service注解的对象类
+ * 自动注入,构造函数参数有且只能有一个
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Resource {
-	String value() default "";
+public @interface Qualifier {
+	String value();
 }

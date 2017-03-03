@@ -1,4 +1,4 @@
-package start.application.context.config;
+package start.application.core.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;

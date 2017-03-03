@@ -1,4 +1,4 @@
-package start.application.context.config;
+package start.application.core.config;
 
 import start.application.context.ContextObject;
 import start.application.core.utils.StringHelper;

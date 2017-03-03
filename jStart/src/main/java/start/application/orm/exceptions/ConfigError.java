@@ -1,4 +1,4 @@
-package start.application.context.exceptions;
+package start.application.orm.exceptions;
 
 /**
  * 配置文件出错，出错则无法继续
