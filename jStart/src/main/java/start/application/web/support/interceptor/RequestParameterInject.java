@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import start.application.context.ContextDataReadWrite;
+import start.application.context.ApplicationIO;
 import start.application.core.Message;
 import start.application.web.exceptions.ActionException;
 import start.application.web.support.interceptor.fileupload.UpLoadFile;
@@ -43,7 +43,7 @@ public final class RequestParameterInject {
 	private static void injectObject(Object entity,Map<String,String> fieldMap,Map<String,Map<String,String>> clsMap) throws IllegalArgumentException, IllegalAccessException, InstantiationException, ParseException{
 		Field[] fields=entity.getClass().getDeclaredFields();
 		for(Field field:fields){
-			if(!ContextDataReadWrite.isDataTypeSupport(field)){
+			if(!ApplicationIO.isDataTypeSupport(field)){
 				continue;
 			}
 			//已注入没有注解的字段
@@ -54,7 +54,7 @@ public final class RequestParameterInject {
 			String value=fieldMap.get(fieldName);
 			if(value!=null){
 				field.setAccessible(true);
-				field.set(entity, ContextDataReadWrite.convertReadIn(field,value));
+				field.set(entity, ApplicationIO.read(field,value));
 			}else if(clsMap!=null&&clsMap.size()>0){
 				Map<String,String> vData=clsMap.get(fieldName);
 				if(vData!=null){

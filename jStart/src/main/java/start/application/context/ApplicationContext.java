@@ -38,7 +38,7 @@ public class ApplicationContext implements Closeable{
 		BeanDefinition bean=ContextObject.getBeanInfo(prototype.getName());
 		if(bean==null){
 			//如果当前类对象不是定义的Bean对象则创建一个临时的Bean对象
-			bean=AnnotationConfigContext.analysisBean(prototype);
+			bean=AnnotationContext.analysis(prototype);
 			if(bean==null){
 				bean=new BeanDefinition();
 				bean.setName(prototype.getName());
@@ -52,7 +52,7 @@ public class ApplicationContext implements Closeable{
 		if(ContextObject.isBeanExistence(name)){
 			return getBean(ContextObject.getBean(name));
 		}else{
-			BeanDefinition bean=AnnotationConfigContext.analysisBean(prototype);
+			BeanDefinition bean=AnnotationContext.analysis(prototype);
 			if(bean==null){
 				bean=new BeanDefinition();
 				bean.setName(name);
@@ -124,7 +124,7 @@ public class ApplicationContext implements Closeable{
 					String name=constant.value().isEmpty()?field.getName():constant.value();
 					field.setAccessible(true);
 					try {
-						field.set(instance,ContextDataReadWrite.convertReadIn(field, ConstantConfig.getString(name)));
+						field.set(instance,ApplicationIO.read(field, ConstantConfig.getString(name)));
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						throw new ApplicationException(e);
 					}
@@ -157,7 +157,7 @@ public class ApplicationContext implements Closeable{
 				if(value!=null){
 					Class<?> type=method.getParameterTypes()[0];
 					try {
-						method.invoke(instance, ContextDataReadWrite.convertReadIn(null,type,ConstantConfig.get(bean.getValues().get(name))));
+						method.invoke(instance, ApplicationIO.read(null,type,ConstantConfig.get(bean.getValues().get(name))));
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 						throw new ApplicationException(e);
 					}

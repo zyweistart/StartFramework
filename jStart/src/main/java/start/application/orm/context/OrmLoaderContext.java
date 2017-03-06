@@ -1,14 +1,15 @@
-package start.application.context;
+package start.application.orm.context;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 
+import start.application.context.ApplicationIO;
+import start.application.context.ContextObject;
+import start.application.context.DataTypeValidation;
 import start.application.core.Message;
-import start.application.core.annotation.Repository;
-import start.application.core.annotation.Service;
-import start.application.core.beans.BeanDefinition;
-import start.application.core.utils.ReflectUtils;
+import start.application.core.context.LoaderHandler;
+import start.application.core.exceptions.AnnoationError;
 import start.application.orm.annotation.Column;
 import start.application.orm.annotation.Entity;
 import start.application.orm.annotation.GeneratedValue;
@@ -20,52 +21,18 @@ import start.application.orm.annotation.Temporal;
 import start.application.orm.annotation.Transient;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
-import start.application.orm.exceptions.AnnoationError;
 import start.application.orm.exceptions.EntityDefinitionError;
-import start.application.web.action.Action;
-import start.application.web.annotation.Controller;
 
-public class AnnotationConfigContext {
-	
-	/**
-	 * 解析Bean对象
-	 * @param prototype
-	 * @return
-	 */
-	public static BeanDefinition analysisBean(Class<?> prototype){
-		BeanDefinition bean=null;
-		// 控制层
-		Controller controller = prototype.getAnnotation(Controller.class);
-		if (controller != null) {
-			if(!ReflectUtils.isInterface(prototype, Action.class)){
-				String message = Message.getMessage(Message.PM_4005, prototype.getName());
-				throw new AnnoationError(message);
-			}
-			bean=new BeanDefinition();
-			bean.setName(controller.value());
-			bean.setInit(controller.init());
-			bean.setDestory(controller.destory());
+public class OrmLoaderContext extends LoaderHandler {
+
+	@Override
+	public void load(Class<?> prototype) {
+		EntityInfo entity =analysisEntity(prototype);
+		if(entity!=null){
+			ContextObject.registerEntity(entity);
+			return;
 		}
-		// 服务层
-		Service service = prototype.getAnnotation(Service.class);
-		if (service != null) {
-			bean=new BeanDefinition();
-			bean.setName(service.value());
-			bean.setInit(service.init());
-			bean.setDestory(service.destory());
-		}
-		// 数据访问层
-		Repository repository = prototype.getAnnotation(Repository.class);
-		if (repository != null) {
-			bean=new BeanDefinition();
-			bean.setName(repository.value());
-			bean.setInit(repository.init());
-			bean.setDestory(repository.destory());
-		}
-		if(bean!=null){
-			bean.setPrototype(prototype.getName());
-		}
-		return bean;
+		this.doLoadContext(prototype);
 	}
 	
 	/**
@@ -105,7 +72,7 @@ public class AnnotationConfigContext {
 					continue;
 				}
 				//判断是否为支持的数据类型
-				if(!ContextDataReadWrite.isDataTypeSupport(field)){
+				if(!ApplicationIO.isDataTypeSupport(field)){
 					String message=Message.getMessage(Message.PM_5019,entityInfo.getEntityName(),
 							field.getName(), field.getType().getName());
 					throw new AnnoationError(message);
@@ -216,5 +183,5 @@ public class AnnotationConfigContext {
 		}
 		return entityInfo;
 	}
-	
+
 }

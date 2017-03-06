@@ -17,7 +17,7 @@ import com.mongodb.client.result.UpdateResult;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.context.ContextDataReadWrite;
+import start.application.context.ApplicationIO;
 import start.application.context.ContextObject;
 import start.application.core.Message;
 import start.application.core.utils.StringHelper;
@@ -64,7 +64,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		} else {
 			// 主键字段
 			doc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-					ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+					ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		}
 		// 其它字段
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
@@ -78,7 +78,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			if (value == null) {
 				continue;
 			}
-			doc.put(propertyMember.getFieldName(), ContextDataReadWrite.convertWriteOut(propertyMember.getField(), value));
+			doc.put(propertyMember.getFieldName(), ApplicationIO.write(propertyMember.getField(), value));
 		}
 		logDocument(doc);
 		dbCollection.insertOne(doc);
@@ -114,10 +114,10 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			if (value == null) {
 				continue;
 			}
-			updateDoc.put(propertyMember.getFieldName(), ContextDataReadWrite.convertWriteOut(propertyMember.getField(), value));
+			updateDoc.put(propertyMember.getFieldName(), ApplicationIO.write(propertyMember.getField(), value));
 		}
 		whereDoc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-				ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		logDocument(whereDoc);
 		logDocument(updateDoc);
 		UpdateResult result=dbCollection.updateOne(whereDoc, new Document("$set",updateDoc));
@@ -143,7 +143,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 				.getCollection(entityMember.getTableName());
 		Document doc = new Document();
 		doc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-				ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		logDocument(doc);
 		DeleteResult result=dbCollection.deleteOne(doc);
 		return result.getDeletedCount();
@@ -184,7 +184,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			}
 			// 主键
 			String value = en.get(entityMember.getPrimaryKeyMember().getFieldName());
-			Object tarValue = ContextDataReadWrite.convertReadIn(entityMember.getPrimaryKeyMember().getField(), value);
+			Object tarValue = ApplicationIO.read(entityMember.getPrimaryKeyMember().getField(), value);
 			if (tarValue != null) {
 				try {
 					entityMember.getPrimaryKeyMember().getSet().invoke(obj, tarValue);
@@ -195,7 +195,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			// 类字段成员
 			for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
 				value = en.get(propertyMember.getFieldName());
-				tarValue = ContextDataReadWrite.convertReadIn(propertyMember.getField(), value);
+				tarValue = ApplicationIO.read(propertyMember.getField(), value);
 				if (tarValue != null) {
 					try {
 						propertyMember.getSet().invoke(obj, tarValue);

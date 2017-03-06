@@ -26,6 +26,4 @@
 	<!-- <bean name="parametersInterceptor" class="start.application.web.support.interceptor.ParametersInterceptor"/> -->
 	<!-- <bean name="uploadFileInterceptor" class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/> -->
 	
-	<bean class="start.application.orm.OrmLoaderContext"/>
-	
 </jstart>

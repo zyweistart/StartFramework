@@ -3,23 +3,26 @@ package start.application.context;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
-import start.application.core.annotation.Component;
 import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.ConstantConfig;
 import start.application.core.config.XmlTag;
+import start.application.core.context.BeanLoaderContext;
+import start.application.core.context.LoaderHandler;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
-import start.application.orm.entity.EntityInfo;
+import start.application.orm.context.OrmLoaderContext;
+import start.application.web.context.WebLoaderContext;
 
 public class Container implements Closeable {
 	
@@ -101,29 +104,26 @@ public class Container implements Closeable {
 			log.warn("扫描的类路径为空，请配置CLASSSCANPATH常量,需要扫描的类路径");
 			return;
 		}
+		
+		List<LoaderHandler> loaders=new ArrayList<LoaderHandler>();
+		//1、Web控制器解析
+		loaders.add(new WebLoaderContext());
+		//2、Bean对象解析 
+		loaders.add(new BeanLoaderContext());
+		//3、ORM实体解析
+		loaders.add(new OrmLoaderContext());
+		Iterator<LoaderHandler> interceptors = loaders.iterator();
+		LoaderHandler handler=null;
+		while(interceptors.hasNext()){
+			LoaderHandler currentHandler=interceptors.next();
+			currentHandler.setHandler(handler);
+			handler=currentHandler;
+		}
 		//2、扫描包下所有的类
 		for (String packageName : ConstantConfig.CLASSSCANPATH.split(Constant.COMMA)) {
 			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
-				//2.1组件不归入Bean容器管理
-				Component component = clasz.getAnnotation(Component.class);
-				if (component != null) {
-					BeanDefinition bean=new BeanDefinition();
-					bean.setPrototype(clasz.getName());
-					ContextObject.registerBean(bean, true);
-					continue;
-				}
-				//2.2注册JDBC实体类
-				EntityInfo entity =AnnotationConfigContext.analysisEntity(clasz);
-				if(entity!=null){
-					ContextObject.registerEntity(entity);
-					continue;
-				}
-				//2.3注册Bean
-				BeanDefinition bean=AnnotationConfigContext.analysisBean(clasz);
-				if(bean!=null){
-					ContextObject.registerBean(bean,false);
-					continue;
-				}
+				handler.reset();
+				handler.load(clasz);
 			}
 		}
 		//3、初始化Bean容器

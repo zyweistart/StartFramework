@@ -18,7 +18,7 @@ import start.application.orm.annotation.Temporal;
  * @author Start
  *
  */
-public final class ContextDataReadWrite {
+public final class ApplicationIO {
 
 	/**
 	 * 判断字段定义的数据类型容器是否支持
@@ -43,11 +43,11 @@ public final class ContextDataReadWrite {
 	/**
 	 * 外部值转化到内部字段类型
 	 */
-	public static Object convertReadIn(Field field,String value){
-		return convertReadIn(field, field.getType(),value);
+	public static Object read(Field field,String value){
+		return read(field, field.getType(),value);
 	}
 	
-	public static Object convertReadIn(Field field,Class<?> type,String value){
+	public static Object read(Field field,Class<?> type,String value){
 		String typeName=type.getName();
 		if(StringHelper.isEmpty(value)){
 			if(DataTypeValidation.isString.contains(typeName)){
@@ -110,7 +110,7 @@ public final class ContextDataReadWrite {
 	 * 内部字段类型转化输出到外部
 	 */
 	@SuppressWarnings("rawtypes")
-	public static Object convertWriteOut(Field field,Object value){
+	public static Object write(Field field,Object value){
 		if(StringHelper.isEmpty(value)){
 			return "";
 		}

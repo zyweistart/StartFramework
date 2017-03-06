@@ -2,6 +2,6 @@ package start.application.core.context;
 
 public interface LoaderContext {
 	
-	void load();
+	void load(Class<?> prototype);
 	
 }

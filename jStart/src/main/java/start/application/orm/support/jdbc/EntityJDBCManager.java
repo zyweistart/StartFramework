@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import start.application.context.ContextDataReadWrite;
+import start.application.context.ApplicationIO;
 import start.application.context.ContextObject;
 import start.application.core.Message;
 import start.application.core.utils.StringHelper;
@@ -71,7 +71,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			fieldNames.add(entityMember.getPrimaryKeyMember().getFieldName());
 			positions.add("?");
 			parameters.add(
-					ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+					ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		}
 		// 其它字段
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
@@ -87,7 +87,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			}
 			fieldNames.add(propertyMember.getFieldName());
 			positions.add("?");
-			parameters.add(ContextDataReadWrite.convertWriteOut(propertyMember.getField(), value));
+			parameters.add(ApplicationIO.write(propertyMember.getField(), value));
 		}
 		// 生成语句
 		String SQL = String.format(INSERT, entityMember.getTableName(),
@@ -129,11 +129,11 @@ public class EntityJDBCManager implements AbstractEntityManager {
 				continue;
 			}
 			fieldNames.add(propertyMember.getFieldName() + "=?");
-			parameters.add(ContextDataReadWrite.convertWriteOut(propertyMember.getField(), value));
+			parameters.add(ApplicationIO.write(propertyMember.getField(), value));
 		}
 		// 主键字段
 		whereFieldNames.add(entityMember.getPrimaryKeyMember().getFieldName() + "=?");
-		parameters.add(ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+		parameters.add(ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		// 生成语句
 		String SQL = String.format(UPDATE, entityMember.getTableName(),
 				StringHelper.listToString(fieldNames), StringHelper.listToString(whereFieldNames));
@@ -165,7 +165,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		// 生成语句
 		String SQL = String.format(DELETE, entityMember.getTableName(),
 				StringHelper.listToString(whereFieldNames));
-		primaryKeyValue = ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(),
+		primaryKeyValue = ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(),
 				primaryKeyValue);
 		try {
 			return getSession().executeUpdate(SQL, primaryKeyValue);
@@ -189,7 +189,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		String SQL = String.format(SELECT, entityMember.getTableName(),
 				StringHelper.listToString(whereFieldNames));
 		List<T> entitys = getListEntityBySQL(prototype, SQL,
-				ContextDataReadWrite.convertWriteOut(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		if (entitys.size() > 0) {
 			return entitys.get(0);
 		} else {
@@ -251,7 +251,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			}
 			// 主键
 			String value = en.get(entityMember.getPrimaryKeyMember().getFieldName());
-			Object tarValue = ContextDataReadWrite.convertReadIn(entityMember.getPrimaryKeyMember().getField(), value);
+			Object tarValue = ApplicationIO.read(entityMember.getPrimaryKeyMember().getField(), value);
 			if (tarValue != null) {
 				try {
 					entityMember.getPrimaryKeyMember().getSet().invoke(obj, tarValue);
@@ -263,7 +263,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			// 类字段成员
 			for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
 				value = en.get(propertyMember.getFieldName());
-				tarValue = ContextDataReadWrite.convertReadIn(propertyMember.getField(), value);
+				tarValue = ApplicationIO.read(propertyMember.getField(), value);
 				if (tarValue != null) {
 					try {
 						propertyMember.getSet().invoke(obj, tarValue);

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 用于实现组件功能不归入Bean容器进行管理
+ * 用于实现组件功能不归入Bean容器进行管理，定义该注解的类须实现相应接口
  * @author zhenyao
  *
  */
