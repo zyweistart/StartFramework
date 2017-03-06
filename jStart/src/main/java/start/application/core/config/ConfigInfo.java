@@ -28,6 +28,7 @@ public final class ConfigInfo {
 	public static final String BEAN="bean";
 	public static final String PATH="path";
 	public static final String CONFIG="config";
+	public static final String PLUGIN="plugin";
 	
 	private DocumentBuilder builder;
 	private ConfigImpl impl;

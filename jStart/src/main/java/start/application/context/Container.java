@@ -10,7 +10,8 @@ import java.util.Map;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
-import start.application.core.beans.BeanContextFactory;
+import start.application.core.Plugin;
+import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
@@ -44,7 +45,9 @@ public class Container implements Closeable {
 	public void init() {
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
-			
+			//插件列表
+			private Map<String,Plugin> plugins = new HashMap<String,Plugin>();
+			//注册Bean对象
 			private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();
 			
 			@Override
@@ -84,6 +87,14 @@ public class Container implements Closeable {
 					}
 					//注册Bean
 					registerBeans.add(bean);
+				}else if(ConfigInfo.PLUGIN.equalsIgnoreCase(xml.getName())){
+					String name=xml.getAttributes().get("name");
+					String className=xml.getAttributes().get("class");
+					try {
+						plugins.put(name, (Plugin)(Class.forName(className).newInstance()));
+					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+						e.printStackTrace();
+					}
 				}else{
 					//注册自定义标签
 					ContextObject.registerCustom(xml.getName(), xml);
@@ -95,6 +106,12 @@ public class Container implements Closeable {
 				//读取完成后执行注册加载操作
 				for(BeanDefinition bean:registerBeans){
 					ContextObject.registerBean(bean,true);
+				}
+				for(String name:plugins.keySet()){
+					 Plugin plugin=plugins.get(name);
+					for(XmlTag xmlTag:ContextObject.getCustom(name)){
+						plugin.execute(xmlTag);
+					}
 				}
 			}
 			
@@ -127,7 +144,7 @@ public class Container implements Closeable {
 			}
 		}
 		//3、初始化Bean容器
-		BeanContextFactory.init();
+		BeanBuilderFactory.init();
 	}
 	
 	/**

@@ -4,14 +4,14 @@ import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.exceptions.ApplicationException;
 
-public class BeanContextFactory {
+public class BeanBuilderFactory {
 	
-	private final static Logger log=LoggerFactory.getLogger(BeanContextFactory.class);
+	private final static Logger log=LoggerFactory.getLogger(BeanBuilderFactory.class);
 	
 	private static BeanBuilder builder;
 	
 	public static void init(){
-		init(BeanContext.class);
+		init(DefaultBeanBuilderContext.class);
 	}
 	
 	public static void init(Class<?> prototype){

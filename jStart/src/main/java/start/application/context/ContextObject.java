@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import start.application.core.Message;
 import start.application.core.beans.BeanBuilder;
-import start.application.core.beans.BeanContextFactory;
+import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.XmlTag;
 import start.application.core.utils.ReflectUtils;
@@ -63,7 +63,7 @@ public class ContextObject {
 			}
 			if(analysis){
 				if(ReflectUtils.isInterface(bean.getPrototype(), BeanBuilder.class)){
-					BeanContextFactory.init(bean.getPrototype());
+					BeanBuilderFactory.init(bean.getPrototype());
 					log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
 				}
 				
