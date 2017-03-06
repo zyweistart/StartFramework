@@ -43,10 +43,10 @@ public class Container implements Closeable {
 	 * 容器初始化时调用该方法来加载容器对象
 	 */
 	public void init() {
+		//插件列表
+		Map<String,Class<?>> plugins = new HashMap<String,Class<?>>();
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
-			//插件列表
-			private Map<String,Plugin> plugins = new HashMap<String,Plugin>();
 			//注册Bean对象
 			private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();
 			
@@ -91,8 +91,8 @@ public class Container implements Closeable {
 					String name=xml.getAttributes().get("name");
 					String className=xml.getAttributes().get("class");
 					try {
-						plugins.put(name, (Plugin)(Class.forName(className).newInstance()));
-					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+						plugins.put(name, Class.forName(className));
+					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					}
 				}else{
@@ -106,12 +106,6 @@ public class Container implements Closeable {
 				//读取完成后执行注册加载操作
 				for(BeanDefinition bean:registerBeans){
 					ContextObject.registerBean(bean,true);
-				}
-				for(String name:plugins.keySet()){
-					 Plugin plugin=plugins.get(name);
-					for(XmlTag xmlTag:ContextObject.getCustom(name)){
-						plugin.execute(xmlTag);
-					}
 				}
 			}
 			
@@ -145,6 +139,15 @@ public class Container implements Closeable {
 		}
 		//3、初始化Bean容器
 		BeanBuilderFactory.init();
+		//4、执行自定义插件
+		try(ApplicationContext context=new ApplicationContext();){
+			for(String name:plugins.keySet()){
+				 Plugin plugin=(Plugin)context.getBean(plugins.get(name));
+				for(XmlTag xmlTag:ContextObject.getCustom(name)){
+					plugin.execute(xmlTag);
+				}
+			}
+		}
 	}
 	
 	/**
