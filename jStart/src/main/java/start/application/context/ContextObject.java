@@ -40,6 +40,10 @@ public class ContextObject {
 		}
 	}
 	
+	public static void registerBean(BeanDefinition bean){
+		registerBean(bean, false);
+	}
+	
 	/**
 	 * 注册Bean对象,不定义name不加入Bean容器
 	 * @param bean
@@ -62,8 +66,9 @@ public class ContextObject {
 				}
 			}
 			if(analysis){
-				if(ReflectUtils.isInterface(bean.getPrototype(), BeanBuilder.class)){
-					BeanBuilderFactory.init(bean.getPrototype());
+				if(ReflectUtils.isSuperClass(bean.getPrototype(), BeanBuilder.class)){
+//					BeanBuilderFactory.init(bean.getPrototype());
+					BeanBuilderFactory.registerContext(bean.getPrototype());
 					log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
 				}
 				

@@ -1,19 +1,22 @@
 package start.application.core.beans;
 
-import java.util.List;
+import start.application.context.ContextObject;
 
-public interface BeanBuilder {
-
-	/**
-	 * 注册相应的类名到当前Bean生成中心
-	 */
-	List<String> register();
+public abstract class BeanBuilder {
+	
+	public void registerBeanManager(String beanName,String className){
+		BeanDefinition bd=new BeanDefinition();
+		bd.setName(beanName);
+		bd.setPrototype(className);
+		bd.setContextName(this);
+		ContextObject.registerBean(bd);
+	}
 	
 	/**
 	 * 根据类名获取对象
 	 * @param bean
 	 * @return
 	 */
-	Object getBean(BeanDefinition bean);
+	public abstract Object getBean(BeanDefinition bean);
 
 }

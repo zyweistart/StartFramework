@@ -10,8 +10,6 @@ import java.util.Map;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
-import start.application.core.Plugin;
-import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
@@ -43,8 +41,6 @@ public class Container implements Closeable {
 	 * 容器初始化时调用该方法来加载容器对象
 	 */
 	public void init() {
-		//插件列表
-		Map<String,Class<?>> plugins = new HashMap<String,Class<?>>();
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
 			//注册Bean对象
@@ -87,14 +83,6 @@ public class Container implements Closeable {
 					}
 					//注册Bean
 					registerBeans.add(bean);
-				}else if(ConfigInfo.PLUGIN.equalsIgnoreCase(xml.getName())){
-					String name=xml.getAttributes().get("name");
-					String className=xml.getAttributes().get("class");
-					try {
-						plugins.put(name, Class.forName(className));
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					}
 				}else{
 					//注册自定义标签
 					ContextObject.registerCustom(xml.getName(), xml);
@@ -133,19 +121,12 @@ public class Container implements Closeable {
 		//2、扫描包下所有的类
 		for (String packageName : ConstantConfig.CLASSSCANPATH.split(Constant.COMMA)) {
 			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
-				handler.reset();
-				handler.load(clasz);
-			}
-		}
-		//3、初始化Bean容器
-		BeanBuilderFactory.init();
-		//4、执行自定义插件
-		try(ApplicationContext context=new ApplicationContext();){
-			for(String name:plugins.keySet()){
-				 Plugin plugin=(Plugin)context.getBean(plugins.get(name));
-				for(XmlTag xmlTag:ContextObject.getCustom(name)){
-					plugin.execute(xmlTag);
+				//不解析接口类
+				if(clasz.isInterface()){
+					continue;
 				}
+				handler.load(clasz);
+				handler.reset();
 			}
 		}
 	}

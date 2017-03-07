@@ -15,6 +15,7 @@ import start.application.core.Message;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;
 import start.application.core.annotation.Resource;
+import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConstantConfig;
@@ -105,7 +106,16 @@ public class ApplicationContext implements Closeable{
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
-			instance = BeanBuilderFactory.getInstanceBuilder().getBean(bean);
+			BeanBuilder builder=BeanBuilderFactory.getContext(bean.getContextName());
+			if(builder==null){
+				try {
+					instance =bean.getPrototype().newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					throw new ApplicationException(e);
+				}
+			}else{
+				instance = builder.getBean(bean);
+			}
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();

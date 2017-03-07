@@ -30,6 +30,8 @@ public class BeanDefinition {
 	private Map<String,String> refs;
 	
 	private Map<String,String> attributes;
+	
+	private String contextName;
 
 	public String getName() {
 		if(name==null){
@@ -123,6 +125,13 @@ public class BeanDefinition {
 	public void setSingleton(Boolean singleton) {
 		this.singleton = singleton;
 	}
-	
+
+	public String getContextName() {
+		return contextName;
+	}
+
+	public void setContextName(BeanBuilder builder) {
+		this.contextName = builder.getClass().getName();
+	}
 	
 }
