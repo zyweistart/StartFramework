@@ -18,6 +18,7 @@ import start.application.core.annotation.Resource;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.ClosedBean;
 import start.application.core.beans.factory.DisposableBean;
 import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
@@ -220,6 +221,13 @@ public class ApplicationContext implements Closeable{
 				BeanDefinition bean=ContextObject.getBean(name);
 				Object instance=getContextObjectHolder().get(name);
 				ReflectUtils.invokeMethod(instance,bean.getDestory());
+				if(instance instanceof ClosedBean){
+					try {
+						((ClosedBean)instance).close();
+					} catch (Exception e) {
+						throw new ApplicationException(e);
+					}
+				}
 				if(instance instanceof DisposableBean){
 					try {
 						((DisposableBean)instance).destroy();
@@ -230,6 +238,19 @@ public class ApplicationContext implements Closeable{
 			}
 		}
 		this.contextObjectHolder=null;
+		//关闭资源
+		for(String name:Container.getSingletonBeans().keySet()){
+			if(ContextObject.isBeanExistence(name)){
+				Object instance=Container.getSingletonBeans().get(name);
+				if(instance instanceof ClosedBean){
+					try {
+						((ClosedBean)instance).close();
+					} catch (Exception e) {
+						throw new ApplicationException(e);
+					}
+				}
+			}
+		}
 	}
 
 	public Map<String, Object> getContextObjectHolder() {

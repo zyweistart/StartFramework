@@ -108,10 +108,10 @@ public class Container implements Closeable {
 			return;
 		}
 		List<LoaderHandler> loaders=new ArrayList<LoaderHandler>();
-		//1、Web控制器解析
-		loaders.add(new WebLoaderContext());
-		//2、Bean对象解析 
+		//1、Bean对象解析 
 		loaders.add(new BeanLoaderContext());
+		//2、Web控制器解析
+		loaders.add(new WebLoaderContext());
 		//3、ORM实体解析
 		loaders.add(new OrmLoaderContext());
 		Iterator<LoaderHandler> interceptors = loaders.iterator();

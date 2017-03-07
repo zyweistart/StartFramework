@@ -38,8 +38,6 @@ public class WebLoaderContext extends LoaderHandler {
 			}
 			bean=new BeanDefinition();
 			bean.setName(controller.value());
-		}
-		if(bean!=null){
 			bean.setPrototype(prototype.getName());
 		}
 		return bean;

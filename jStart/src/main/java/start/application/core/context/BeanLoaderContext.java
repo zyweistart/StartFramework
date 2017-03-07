@@ -39,14 +39,13 @@ public class BeanLoaderContext extends LoaderHandler{
 		if (service != null) {
 			bean=new BeanDefinition();
 			bean.setName(service.value());
+			bean.setPrototype(prototype.getName());
 		}
 		// 数据访问层
 		Repository repository = prototype.getAnnotation(Repository.class);
 		if (repository != null) {
 			bean=new BeanDefinition();
 			bean.setName(repository.value());
-		}
-		if(bean!=null){
 			bean.setPrototype(prototype.getName());
 		}
 		return bean;

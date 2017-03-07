@@ -16,16 +16,20 @@ import start.application.core.Constant;
 import start.application.core.annotation.Repository;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.ClosedBean;
+import start.application.core.beans.factory.DisposableBean;
+import start.application.core.beans.factory.InitializingBean;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
-public class MybatisManager extends BeanBuilder {
+public class MybatisManager extends BeanBuilder implements InitializingBean,ClosedBean,DisposableBean {
 	
 	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
 	
 	private SqlSessionFactory sqlSessionFactory;
 	private DataSource dataSource;
 	private String basePackage;
+	private ThreadLocal<SqlSession> holder=new ThreadLocal<SqlSession>();
 
 	public DataSource getDataSource() {
 		return dataSource;
@@ -42,8 +46,9 @@ public class MybatisManager extends BeanBuilder {
 	public void setBasePackage(String basePackage) {
 		this.basePackage = basePackage;
 	}
-	
-	public void init(){
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		if(StringHelper.isEmpty(getBasePackage())){
 			log.warn("Mybatis映射扫描包路径为空!");
 			return;
@@ -69,9 +74,25 @@ public class MybatisManager extends BeanBuilder {
 
 	@Override
 	public Object getBean(BeanDefinition bean) {
-		System.out.println("调用了mybatis"+bean.getPrototypeString());
-		SqlSession session = sqlSessionFactory.openSession();
-		return session.getMapper(bean.getPrototype());
+		holder.set(sqlSessionFactory.openSession());
+		return holder.get().getMapper(bean.getPrototype());
+	}
+
+	@Override
+	public void close() throws Exception {
+		//如果存在连接资源则关闭连接对象
+		SqlSession session=holder.get();
+		if(session!=null){
+			session.commit();
+			session.close();
+			//关闭对象后释放连接资源
+			holder.remove();
+		}
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		close();
 	}
 
 }
