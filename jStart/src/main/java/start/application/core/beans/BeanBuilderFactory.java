@@ -5,7 +5,7 @@ import java.util.Map;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.core.exceptions.ApplicationException;
+import start.application.context.ApplicationContext;
 
 public class BeanBuilderFactory {
 	
@@ -18,11 +18,9 @@ public class BeanBuilderFactory {
 		if(CONTEXTMAP.containsKey(name)){
 			throw new IllegalArgumentException(name+"容器对象已存在!");
 		}
-		try {
-			CONTEXTMAP.put(name, (BeanBuilder)prototype.newInstance());
+		try(ApplicationContext application=new ApplicationContext();) {
+			CONTEXTMAP.put(name, (BeanBuilder)application.getBean(prototype));
 			log.info("BeanBuilder容器对象："+prototype.getName()+",初始化完成");
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new ApplicationException(e);
 		}
 	}
 	

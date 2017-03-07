@@ -2,7 +2,7 @@
 <!--默认配置文件-->
 <jstart>
 
-	<import path="ApplicationConfig.xml"/>
+	<import path="ApplicationConfig"/>
 	
 	<!-- 常量 -->
 	<!--需扫描的包-->

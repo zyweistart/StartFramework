@@ -4,6 +4,11 @@ import start.application.context.ContextObject;
 
 public abstract class BeanBuilder {
 	
+	/**
+	 * 注册Bean对象到管理中心
+	 * @param beanName 名称
+	 * @param className  全类名
+	 */
 	public void registerBeanManager(String beanName,String className){
 		BeanDefinition bd=new BeanDefinition();
 		bd.setName(beanName);

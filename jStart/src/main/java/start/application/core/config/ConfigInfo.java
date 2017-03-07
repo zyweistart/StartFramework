@@ -46,7 +46,7 @@ public final class ConfigInfo {
 	 * 解析框架默认的配置文件
 	 */
 	public void loadConfigFile() {
-		loadConfigFile("StartConfig.xml");
+		loadConfigFile("StartConfig");
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public final class ConfigInfo {
 	 */
 	private void readXml(String classpath){
 		try{
-			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,getClass())));
+			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath+".xml",getClass())));
 		} catch (Exception e) {
 			throw new ConfigError(classpath+"打开失败， 请检查XML配置文件，错误信息："+e.getMessage());
 		}

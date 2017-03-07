@@ -99,11 +99,11 @@ public class Container implements Closeable {
 			
 		});
 		configInfo.loadConfigFile();
+		
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
 			log.warn("扫描的类路径为空，请配置CLASSSCANPATH常量,需要扫描的类路径");
 			return;
 		}
-		
 		List<LoaderHandler> loaders=new ArrayList<LoaderHandler>();
 		//1、Web控制器解析
 		loaders.add(new WebLoaderContext());

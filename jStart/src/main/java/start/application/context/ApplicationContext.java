@@ -81,8 +81,13 @@ public class ApplicationContext implements Closeable{
 			for(Parameter param:constructor.getParameters()){
 				if(param.isAnnotationPresent(Qualifier.class)){
 					Qualifier qualifier=param.getAnnotation(Qualifier.class);
+					Class<?> type=param.getType();
 					if(qualifier.value().isEmpty()){
-						initTargs.add(getBean(param.getName(),param.getType()));
+						if(ContextObject.getBeanInfo(type.getName())==null){
+							initTargs.add(getBean(param.getName(),type));
+						}else{
+							initTargs.add(getBean(type));
+						}
 					}else{
 						initTargs.add(getBean(qualifier.value(),param.getType()));
 					}
@@ -145,10 +150,15 @@ public class ApplicationContext implements Closeable{
 				if (resource!=null) {
 					field.setAccessible(true);
 					try {
+						Class<?> type=field.getType();
 						if(resource.value().isEmpty()){
-							field.set(instance,getBean(field.getName(),field.getType()));
+							if(ContextObject.getBeanInfo(type.getName())==null){
+								field.set(instance,getBean(field.getName(),type));
+							}else{
+								field.set(instance,getBean(type));
+							}
 						}else{
-							field.set(instance,getBean(resource.value(),field.getType()));
+							field.set(instance,getBean(resource.value(),type));
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						throw new ApplicationException(e);
