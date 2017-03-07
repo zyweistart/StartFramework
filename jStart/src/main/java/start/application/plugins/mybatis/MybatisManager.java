@@ -10,8 +10,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
 import start.application.core.annotation.Repository;
 import start.application.core.beans.BeanBuilder;
@@ -19,16 +17,17 @@ import start.application.core.beans.BeanDefinition;
 import start.application.core.beans.factory.ClosedBean;
 import start.application.core.beans.factory.DisposableBean;
 import start.application.core.beans.factory.InitializingBean;
+import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
 public class MybatisManager extends BeanBuilder implements InitializingBean,ClosedBean,DisposableBean {
 	
-	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
+//	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
 	
-	private SqlSessionFactory sqlSessionFactory;
-	private DataSource dataSource;
 	private String basePackage;
+	private DataSource dataSource;
+	private SqlSessionFactory sqlSessionFactory;
 	private ThreadLocal<SqlSession> holder=new ThreadLocal<SqlSession>();
 
 	public DataSource getDataSource() {
@@ -50,8 +49,7 @@ public class MybatisManager extends BeanBuilder implements InitializingBean,Clos
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if(StringHelper.isEmpty(getBasePackage())){
-			log.warn("Mybatis映射扫描包路径为空!");
-			return;
+			throw new ApplicationException("Mybatis映射扫描包路径为空!");
 		}
 		TransactionFactory transactionFactory = new JdbcTransactionFactory();
 		Environment environment = new Environment("development", transactionFactory, getDataSource());
