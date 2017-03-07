@@ -13,6 +13,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Service {
 	String value();
-	String init() default "";
-	String destory() default "";
 }

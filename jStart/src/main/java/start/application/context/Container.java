@@ -11,12 +11,14 @@ import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.DisposableBean;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.ConstantConfig;
 import start.application.core.config.XmlTag;
 import start.application.core.context.BeanLoaderContext;
 import start.application.core.context.LoaderHandler;
+import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
@@ -43,6 +45,7 @@ public class Container implements Closeable {
 	public void init() {
 		//1、解析配置文件
 		ConfigInfo configInfo=new ConfigInfo(new ConfigImpl() {
+			
 			//注册Bean对象
 			private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();
 			
@@ -93,7 +96,7 @@ public class Container implements Closeable {
 			public void finish() {
 				//读取完成后执行注册加载操作
 				for(BeanDefinition bean:registerBeans){
-					ContextObject.registerBean(bean,true);
+					ContextObject.registerBean(bean);
 				}
 			}
 			
@@ -141,6 +144,13 @@ public class Container implements Closeable {
 				BeanDefinition bean=ContextObject.getBean(name);
 				Object instance=getSingletonBeans().get(name);
 				ReflectUtils.invokeMethod(instance,bean.getDestory());
+				if(instance instanceof DisposableBean){
+					try {
+						((DisposableBean)instance).destroy();
+					} catch (Exception e) {
+						throw new ApplicationException(e);
+					}
+				}
 			}
 		}
 	}

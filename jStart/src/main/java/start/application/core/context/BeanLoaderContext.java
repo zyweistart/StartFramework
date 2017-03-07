@@ -15,13 +15,13 @@ public class BeanLoaderContext extends LoaderHandler{
 		if (component != null) {
 			BeanDefinition bean=new BeanDefinition();
 			bean.setPrototype(prototype.getName());
-			ContextObject.registerBean(bean, true);
+			ContextObject.registerBean(bean);
 			return;
 		}
 		//注册Bean
 		BeanDefinition bean=analysisBean(prototype);
 		if(bean!=null){
-			ContextObject.registerBean(bean,false);
+			ContextObject.registerBean(bean);
 			return;
 		}
 		this.doLoadContext(prototype);
@@ -39,16 +39,12 @@ public class BeanLoaderContext extends LoaderHandler{
 		if (service != null) {
 			bean=new BeanDefinition();
 			bean.setName(service.value());
-			bean.setInit(service.init());
-			bean.setDestory(service.destory());
 		}
 		// 数据访问层
 		Repository repository = prototype.getAnnotation(Repository.class);
 		if (repository != null) {
 			bean=new BeanDefinition();
 			bean.setName(repository.value());
-			bean.setInit(repository.init());
-			bean.setDestory(repository.destory());
 		}
 		if(bean!=null){
 			bean.setPrototype(prototype.getName());

@@ -18,6 +18,8 @@ import start.application.core.annotation.Resource;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.DisposableBean;
+import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ReflectUtils;
@@ -133,7 +135,7 @@ public class ApplicationContext implements Closeable{
 						&& field.getModifiers() != 4) {
 					continue;
 				}
-				//常量
+				//设置常量
 				Constant constant=field.getAnnotation(Constant.class);
 				if (constant!=null) {
 					String name=constant.value().isEmpty()?field.getName():constant.value();
@@ -145,7 +147,7 @@ public class ApplicationContext implements Closeable{
 					}
 					continue;
 				}
-				//对象
+				//设置对象
 				Resource resource=field.getAnnotation(Resource.class);
 				if (resource!=null) {
 					field.setAccessible(true);
@@ -195,6 +197,13 @@ public class ApplicationContext implements Closeable{
 			}
 		}
 		//执行初始化方法
+		if(instance instanceof InitializingBean){
+			try {
+				((InitializingBean)instance).afterPropertiesSet();
+			} catch (Exception e) {
+				throw new ApplicationException(e);
+			}
+		}
 		ReflectUtils.invokeMethod(instance,bean.getInit());
 		if(bean.isSingleton()){
 			Container.getSingletonBeans().put(bean.getName(), instance);
@@ -211,6 +220,13 @@ public class ApplicationContext implements Closeable{
 				BeanDefinition bean=ContextObject.getBean(name);
 				Object instance=getContextObjectHolder().get(name);
 				ReflectUtils.invokeMethod(instance,bean.getDestory());
+				if(instance instanceof DisposableBean){
+					try {
+						((DisposableBean)instance).destroy();
+					} catch (Exception e) {
+						throw new ApplicationException(e);
+					}
+				}
 			}
 		}
 		this.contextObjectHolder=null;

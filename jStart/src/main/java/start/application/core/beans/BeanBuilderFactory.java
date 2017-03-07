@@ -20,7 +20,7 @@ public class BeanBuilderFactory {
 		}
 		try(ApplicationContext application=new ApplicationContext();) {
 			CONTEXTMAP.put(name, (BeanBuilder)application.getBean(prototype));
-			log.info("BeanBuilder容器对象："+prototype.getName()+",初始化完成");
+			log.info("自定义BeanBuilder容器对象："+prototype.getName()+"，加载成功~~~");
 		}
 	}
 	

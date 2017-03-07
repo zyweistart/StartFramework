@@ -16,7 +16,7 @@ public class WebLoaderContext extends LoaderHandler {
 		//2.2注册Bean
 		BeanDefinition bean=analysisBean(prototype);
 		if(bean!=null){
-			ContextObject.registerBean(bean,false);
+			ContextObject.registerBean(bean);
 			return;
 		}
 		doLoadContext(prototype);
@@ -38,8 +38,6 @@ public class WebLoaderContext extends LoaderHandler {
 			}
 			bean=new BeanDefinition();
 			bean.setName(controller.value());
-			bean.setInit(controller.init());
-			bean.setDestory(controller.destory());
 		}
 		if(bean!=null){
 			bean.setPrototype(prototype.getName());

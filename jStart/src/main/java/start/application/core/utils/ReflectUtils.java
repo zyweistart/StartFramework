@@ -20,7 +20,7 @@ public class ReflectUtils {
 		}
 	}
 
-	/*
+	/**
 	 * 判断类是否实现了某接口
 	 */
 	public static boolean isInterface(Class<?> c, Class<?> szInterface) {
@@ -46,15 +46,16 @@ public class ReflectUtils {
 	}
 	
 	public static boolean isSuperClass(Class<?> c, Class<?> cls) {
-		Class<?> superClass=c.getSuperclass();
-		if(superClass==null){
-			return false;
-		}
-		if(superClass.equals(cls)){
-			return true;
-		}else{
-			return isSuperClass(superClass, cls);
-		}
+//		Class<?> superClass=c.getSuperclass();
+//		if(superClass==null){
+//			return false;
+//		}
+//		if(superClass.equals(cls)){
+//			return true;
+//		}else{
+//			return isSuperClass(superClass, cls);
+//		}
+		return cls.isAssignableFrom(c);
 	}
 
 }

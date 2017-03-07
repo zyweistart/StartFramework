@@ -40,16 +40,12 @@ public class ContextObject {
 		}
 	}
 	
-	public static void registerBean(BeanDefinition bean){
-		registerBean(bean, false);
-	}
-	
 	/**
 	 * 注册Bean对象,不定义name不加入Bean容器
 	 * @param bean
 	 * @param analysis 是否分析当前类信息
 	 */
-	public static void registerBean(BeanDefinition bean,boolean analysis){
+	public static void registerBean(BeanDefinition bean){
 		if(bean!=null){
 			if(bean.getName()!=null){
 				if (beanPrototypes.containsKey(bean.getName())) {
@@ -65,17 +61,13 @@ public class ContextObject {
 					beans.put(bean.getPrototypeString(), bean);
 				}
 			}
-			if(analysis){
-				if(ReflectUtils.isSuperClass(bean.getPrototype(), BeanBuilder.class)){
-//					BeanBuilderFactory.init(bean.getPrototype());
-					BeanBuilderFactory.registerContext(bean.getPrototype());
-					log.info("自定义BeanBuilder类："+bean.getPrototypeString()+"，加载成功!");
-				}
-				
-				if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
-					registerInterceptors(bean.getName());
-					log.info("自定义Interceptor类："+bean.getPrototypeString()+"，加载成功!");
-				}
+			//Bean容器
+			if(ReflectUtils.isSuperClass(bean.getPrototype(), BeanBuilder.class)){
+				BeanBuilderFactory.registerContext(bean.getPrototype());
+			}
+			//拦截器
+			if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
+				registerInterceptors(bean.getName());
 			}
 		}
 	}
@@ -89,6 +81,7 @@ public class ContextObject {
 				throw new IllegalArgumentException("拦截器:"+name+"未注册为Bean对象");
 			}
 			interceptors.add(name);
+			log.info("Web拦截器Interceptor类："+name+"，加载成功~~~");
 		}
 	}
 	
