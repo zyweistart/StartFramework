@@ -2,7 +2,6 @@ package start.application.context;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +9,8 @@ import java.util.Map;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
+import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
-import start.application.core.beans.factory.DisposableBean;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.ConstantConfig;
@@ -20,7 +19,6 @@ import start.application.core.context.BeanLoaderContext;
 import start.application.core.context.LoaderHandler;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
-import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
 import start.application.orm.context.OrmLoaderContext;
 import start.application.web.context.WebLoaderContext;
@@ -28,16 +26,6 @@ import start.application.web.context.WebLoaderContext;
 public class Container implements Closeable {
 	
 	private final static Logger log=LoggerFactory.getLogger(Container.class);
-	
-	private static Map<String, Object> singletonBeans = new HashMap<String, Object>();
-	
-	/**
-	 * 容器单例Bean
-	 * @return
-	 */
-	public static Map<String, Object> getSingletonBeans() {
-		return singletonBeans;
-	}
 	
 	/**
 	 * 容器初始化时调用该方法来加载容器对象
@@ -139,19 +127,11 @@ public class Container implements Closeable {
 	 */
 	@Override
 	public void close() {
-		for(String name:getSingletonBeans().keySet()){
-			if(ContextObject.isBeanExistence(name)){
-				BeanDefinition bean=ContextObject.getBean(name);
-				Object instance=getSingletonBeans().get(name);
-				ReflectUtils.invokeMethod(instance,bean.getDestory());
-				if(instance instanceof DisposableBean){
-					try {
-						((DisposableBean)instance).destroy();
-					} catch (Exception e) {
-						throw new ApplicationException(e);
-					}
-				}
-			}
+		try {
+			BeanBuilderFactory.close();
+			BeanBuilderFactory.destory();
+		} catch (Exception e) {
+			throw new ApplicationException(e);
 		}
 	}
 	

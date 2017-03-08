@@ -1,15 +1,12 @@
 package start.application.context;
 
-import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import start.application.core.Message;
 import start.application.core.annotation.Constant;
@@ -18,8 +15,8 @@ import start.application.core.annotation.Resource;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
-import start.application.core.beans.factory.ClosedBean;
-import start.application.core.beans.factory.DisposableBean;
+import start.application.core.beans.factory.BeforeBean;
+import start.application.core.beans.factory.CacheBean;
 import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
 import start.application.core.exceptions.ApplicationException;
@@ -29,101 +26,119 @@ import start.application.core.utils.ReflectUtils;
  * 容器参数注入
  * @author Start
  */
-public class ApplicationContext implements Closeable{
+public class ApplicationContext{
 	
-	private Map<String,Object> contextObjectHolder=new HashMap<String,Object>();
-	
-	public Object getBean(String name){
-		BeanDefinition bean=ContextObject.getBean(name);
-		return getBean(bean);
+	public static Object getBean(String name){
+		return getBean(ContextObject.getBean(name));
 	}
 
-	public Object getBean(Class<?> prototype){
+	public static Object getBean(Class<?> prototype){
 		BeanDefinition bean=ContextObject.getBeanInfo(prototype.getName());
 		if(bean==null){
-			//如果当前类对象不是定义的Bean对象则创建一个临时的Bean对象
-			bean=AnnotationContext.analysis(prototype);
-			if(bean==null){
-				bean=new BeanDefinition();
-				bean.setName(prototype.getName());
-				bean.setPrototype(prototype.getName());
-			}
+			bean=new BeanDefinition();
+			bean.setName(prototype.getName());
+			bean.setPrototype(prototype.getName());
 		}
 		return getBean(bean);
 	}
 	
-	public Object getBean(String name,Class<?> prototype){
+	public static Object getBean(String name,Class<?> prototype){
 		if(ContextObject.isBeanExistence(name)){
 			return getBean(ContextObject.getBean(name));
 		}else{
-			BeanDefinition bean=AnnotationContext.analysis(prototype);
-			if(bean==null){
-				bean=new BeanDefinition();
-				bean.setName(name);
-				bean.setPrototype(prototype.getName());
-			}
+			BeanDefinition bean=new BeanDefinition();
+			bean.setName(name);
+			bean.setPrototype(prototype.getName());
 			return getBean(bean);
 		}
 	}
 	
-	private Object getBean(BeanDefinition bean){
+	public static Object getBean(BeanDefinition bean){
+		BeanBuilder builder=BeanBuilderFactory.getBeanContext(bean.getContextName());
+		try {
+			builder.beforeBean(bean);
+		} catch (Exception e) {
+			throw new ApplicationException(e);
+		}
+		Object instance=getBean(bean,builder);
+		//执行初始化方法
+		if(instance instanceof InitializingBean){
+			try {
+				((InitializingBean)instance).afterPropertiesSet();
+			} catch (Exception e) {
+				throw new ApplicationException(e);
+			}
+		}
+		//执行初始化方法
+		ReflectUtils.invokeMethod(instance,bean.getInit());
+		//
+		if(instance instanceof BeforeBean){
+			try {
+				((BeforeBean)instance).beforeBean(bean);
+			} catch (Exception e) {
+				throw new ApplicationException(e);
+			}
+		}
+		return instance;
+	}
+	
+	public static Object getBean(BeanDefinition bean,BeanBuilder builder){
 		Object instance=null;
-		//判断是否为单例模式
-		if(bean.isSingleton()){
-			instance=Container.getSingletonBeans().get(bean.getName());
-		}else{
-			instance=getContextObjectHolder().get(bean.getName());
+		if(builder instanceof CacheBean){
+			instance=((CacheBean)builder).getCache(bean);
 		}
+		boolean isSetConstantValue=true;
 		if(instance!=null){
-			//如果已经存在实例则直接返回
-			return instance;
-		}
-		//构造函数注入
-		for (Constructor<?> constructor : bean.getPrototype().getConstructors()) {
-			List<Object> initTargs=new ArrayList<Object>();
-			for(Parameter param:constructor.getParameters()){
-				if(param.isAnnotationPresent(Qualifier.class)){
-					Qualifier qualifier=param.getAnnotation(Qualifier.class);
-					Class<?> type=param.getType();
-					if(qualifier.value().isEmpty()){
-						if(ContextObject.getBeanInfo(type.getName())==null){
-							initTargs.add(getBean(param.getName(),type));
-						}else{
-							initTargs.add(getBean(type));
-						}
-					}else{
-						initTargs.add(getBean(qualifier.value(),param.getType()));
-					}
-				}else{
-					if(!initTargs.isEmpty()){
-						String message=Message.getMessage(Message.PM_3017, bean.getName());
-						throw new ApplicationException(message);
-					}
-					break;
+			if(instance instanceof BeforeBean){
+				try {
+					((BeforeBean)instance).beforeBean(bean);
+				} catch (Exception e) {
+					throw new ApplicationException(e);
 				}
 			}
-			if(!initTargs.isEmpty()){
-				try {
-					instance=constructor.newInstance(initTargs.toArray());
-					break;
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException e) {
-					throw new ApplicationException(e);
+			isSetConstantValue=false;
+			//如果已经存在实例则直接返回
+//			return instance;
+		}
+		if(instance==null){
+			//构造函数注入
+			for (Constructor<?> constructor : bean.getPrototype().getConstructors()) {
+				List<Object> initTargs=new ArrayList<Object>();
+				for(Parameter param:constructor.getParameters()){
+					if(param.isAnnotationPresent(Qualifier.class)){
+						Qualifier qualifier=param.getAnnotation(Qualifier.class);
+						Class<?> type=param.getType();
+						if(qualifier.value().isEmpty()){
+							if(ContextObject.getBeanInfo(type.getName())==null){
+								initTargs.add(getBean(param.getName(),type));
+							}else{
+								initTargs.add(getBean(type));
+							}
+						}else{
+							initTargs.add(getBean(qualifier.value(),param.getType()));
+						}
+					}else{
+						if(!initTargs.isEmpty()){
+							String message=Message.getMessage(Message.PM_3017, bean.getName());
+							throw new ApplicationException(message);
+						}
+						break;
+					}
+				}
+				if(!initTargs.isEmpty()){
+					try {
+						instance=constructor.newInstance(initTargs.toArray());
+						break;
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException e) {
+						throw new ApplicationException(e);
+					}
 				}
 			}
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
-			BeanBuilder builder=BeanBuilderFactory.getContext(bean.getContextName());
-			if(builder==null){
-				try {
-					instance =bean.getPrototype().newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					throw new ApplicationException(e);
-				}
-			}else{
-				instance = builder.getBean(bean);
-			}
+			instance=builder.getBean(bean);
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();
@@ -136,17 +151,19 @@ public class ApplicationContext implements Closeable{
 						&& field.getModifiers() != 4) {
 					continue;
 				}
-				//设置常量
-				Constant constant=field.getAnnotation(Constant.class);
-				if (constant!=null) {
-					String name=constant.value().isEmpty()?field.getName():constant.value();
-					field.setAccessible(true);
-					try {
-						field.set(instance,ApplicationIO.read(field, ConstantConfig.getString(name)));
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						throw new ApplicationException(e);
+				if(isSetConstantValue){
+					//设置常量
+					Constant constant=field.getAnnotation(Constant.class);
+					if (constant!=null) {
+						String name=constant.value().isEmpty()?field.getName():constant.value();
+						field.setAccessible(true);
+						try {
+							field.set(instance,ApplicationIO.read(field, ConstantConfig.getString(name)));
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							throw new ApplicationException(e);
+						}
+						continue;
 					}
-					continue;
 				}
 				//设置对象
 				Resource resource=field.getAnnotation(Resource.class);
@@ -176,15 +193,19 @@ public class ApplicationContext implements Closeable{
 			String methodName=method.getName();
 			if(methodName.startsWith("set")){
 				String name=methodName.substring(3, 4).toLowerCase()+methodName.substring(4, methodName.length());
-				String value=bean.getValues().get(name);
-				if(value!=null){
-					Class<?> type=method.getParameterTypes()[0];
-					try {
-						method.invoke(instance, ApplicationIO.read(null,type,ConstantConfig.get(bean.getValues().get(name))));
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						throw new ApplicationException(e);
+				String value=null;
+				if(isSetConstantValue){
+					value=bean.getValues().get(name);
+					if(value!=null){
+						Class<?> type=method.getParameterTypes()[0];
+						try {
+							method.invoke(instance, ApplicationIO.read(null,type,ConstantConfig.get(bean.getValues().get(name))));
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							e.printStackTrace();
+							throw new ApplicationException(e);
+						}
+						continue;
 					}
-					continue;
 				}
 				value=bean.getRefs().get(name);
 				if(value!=null){
@@ -197,64 +218,11 @@ public class ApplicationContext implements Closeable{
 				}
 			}
 		}
-		//执行初始化方法
-		if(instance instanceof InitializingBean){
-			try {
-				((InitializingBean)instance).afterPropertiesSet();
-			} catch (Exception e) {
-				throw new ApplicationException(e);
-			}
-		}
-		ReflectUtils.invokeMethod(instance,bean.getInit());
-		if(bean.isSingleton()){
-			Container.getSingletonBeans().put(bean.getName(), instance);
-		}else{
-			getContextObjectHolder().put(bean.getName(), instance);
-		}
 		return instance;
 	}
 	
-	@Override
-	public void close() {
-		for(String name:getContextObjectHolder().keySet()){
-			if(ContextObject.isBeanExistence(name)){
-				BeanDefinition bean=ContextObject.getBean(name);
-				Object instance=getContextObjectHolder().get(name);
-				ReflectUtils.invokeMethod(instance,bean.getDestory());
-				if(instance instanceof ClosedBean){
-					try {
-						((ClosedBean)instance).close();
-					} catch (Exception e) {
-						throw new ApplicationException(e);
-					}
-				}
-				if(instance instanceof DisposableBean){
-					try {
-						((DisposableBean)instance).destroy();
-					} catch (Exception e) {
-						throw new ApplicationException(e);
-					}
-				}
-			}
-		}
-		this.contextObjectHolder=null;
-		//关闭资源
-		for(String name:Container.getSingletonBeans().keySet()){
-			if(ContextObject.isBeanExistence(name)){
-				Object instance=Container.getSingletonBeans().get(name);
-				if(instance instanceof ClosedBean){
-					try {
-						((ClosedBean)instance).close();
-					} catch (Exception e) {
-						throw new ApplicationException(e);
-					}
-				}
-			}
-		}
-	}
-
-	public Map<String, Object> getContextObjectHolder() {
-		return contextObjectHolder;
+	public static void close() throws Exception{
+		BeanBuilderFactory.close();
 	}
 	
 }

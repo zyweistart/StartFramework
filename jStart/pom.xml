@@ -28,7 +28,6 @@
 		<junit.version>4.10</junit.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<mongo-java-driver.version>3.2.0</mongo-java-driver.version>
-		<jedis.version>2.9.0</jedis.version>
 		<commons-logging.version>1.2</commons-logging.version>
 		<log4j.version>1.2.17</log4j.version>
 		<slf4j-api.version>1.7.21</slf4j-api.version>
@@ -55,13 +54,6 @@
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongo-java-driver.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- Redis Driver -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${jedis.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- 通用日志 -->

@@ -61,9 +61,9 @@ public class ContextObject {
 					beans.put(bean.getPrototypeString(), bean);
 				}
 			}
-			//Bean容器
+			//Bean生成容器
 			if(ReflectUtils.isSuperClass(bean.getPrototype(), BeanBuilder.class)){
-				BeanBuilderFactory.registerContext(bean.getPrototype());
+				BeanBuilderFactory.registerContext(bean);
 			}
 			//拦截器
 			if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){

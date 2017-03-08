@@ -14,21 +14,18 @@ import start.application.core.Constant;
 import start.application.core.annotation.Repository;
 import start.application.core.beans.BeanBuilder;
 import start.application.core.beans.BeanDefinition;
-import start.application.core.beans.factory.ClosedBean;
-import start.application.core.beans.factory.DisposableBean;
-import start.application.core.beans.factory.InitializingBean;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
-public class MybatisManager extends BeanBuilder implements InitializingBean,ClosedBean,DisposableBean {
+public class MybatisManager extends BeanBuilder {
 	
 //	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
 	
 	private String basePackage;
 	private DataSource dataSource;
 	private SqlSessionFactory sqlSessionFactory;
-	private ThreadLocal<SqlSession> holder=new ThreadLocal<SqlSession>();
+	private SqlSession session;
 
 	public DataSource getDataSource() {
 		return dataSource;
@@ -59,9 +56,9 @@ public class MybatisManager extends BeanBuilder implements InitializingBean,Clos
 				if(clasz.isInterface()){
 					if(clasz.isAnnotationPresent(Repository.class)){
 						Repository repository=clasz.getAnnotation(Repository.class);
-						registerBeanManager(repository.value(), clasz.getName());
+						registerBeanCenter(repository.value(), clasz.getName());
 					}else{
-						registerBeanManager(clasz.getName(), clasz.getName());
+						registerBeanCenter(clasz.getName(), clasz.getName());
 					}
 					configuration.addMapper(clasz);
 				}
@@ -71,26 +68,28 @@ public class MybatisManager extends BeanBuilder implements InitializingBean,Clos
 	}
 
 	@Override
+	public void beforeBean(BeanDefinition bean) throws Exception {
+		session=sqlSessionFactory.openSession();
+	}
+	
+	@Override
 	public Object getBean(BeanDefinition bean) {
-		holder.set(sqlSessionFactory.openSession());
-		return holder.get().getMapper(bean.getPrototype());
+		Object obj=session.getMapper(bean.getPrototype());
+		System.out.println("sqlsession:"+obj);
+		return obj;
 	}
 
 	@Override
 	public void close() throws Exception {
 		//如果存在连接资源则关闭连接对象
-		SqlSession session=holder.get();
 		if(session!=null){
 			session.commit();
 			session.close();
-			//关闭对象后释放连接资源
-			holder.remove();
 		}
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		close();
 	}
 
 }

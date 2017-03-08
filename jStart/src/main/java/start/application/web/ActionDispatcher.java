@@ -47,8 +47,8 @@ public final class ActionDispatcher {
 		if (this.mRequest.getCharacterEncoding() == null) {
 			this.mRequest.setCharacterEncoding(ConstantConfig.ENCODING);
 		}
-		try(ApplicationContext application=new ApplicationContext()){
-			Action action = (Action)application.getBean(bean.getName());
+		try{
+			Action action = (Action)ApplicationContext.getBean(bean.getName());
 			ActionSupport support=new ActionSupport(
 					action,
 					this.mRequest,
@@ -59,7 +59,7 @@ public final class ActionDispatcher {
 				InterceptorHandler handler=null;
 				Iterator<String> interceptors = ContextObject.getInterceptors().iterator();
 				while(interceptors.hasNext()){
-					InterceptorHandler currentHandler=(InterceptorHandler)application.getBean(interceptors.next());
+					InterceptorHandler currentHandler=(InterceptorHandler)ApplicationContext.getBean(interceptors.next());
 					currentHandler.setHandler(handler);
 					handler=currentHandler;
 				}
@@ -72,6 +72,8 @@ public final class ActionDispatcher {
 				// 返回值必须实现了ActionResult接口
 				result.doExecute(support);
 			}
+		}finally{
+			ApplicationContext.close();
 		}
 	}
 	
