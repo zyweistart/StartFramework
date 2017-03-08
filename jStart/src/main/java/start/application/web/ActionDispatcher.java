@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import start.application.context.ApplicationContext;
 import start.application.context.ContextObject;
+import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConstantConfig;
 import start.application.web.action.Action;
@@ -73,7 +74,7 @@ public final class ActionDispatcher {
 				result.doExecute(support);
 			}
 		}finally{
-			ApplicationContext.close();
+			BeanBuilderFactory.close();
 		}
 	}
 	

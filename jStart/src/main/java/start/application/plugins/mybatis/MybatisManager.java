@@ -74,9 +74,7 @@ public class MybatisManager extends BeanBuilder {
 	
 	@Override
 	public Object getBean(BeanDefinition bean) {
-		Object obj=session.getMapper(bean.getPrototype());
-		System.out.println("sqlsession:"+obj);
-		return obj;
+		return session.getMapper(bean.getPrototype());
 	}
 
 	@Override

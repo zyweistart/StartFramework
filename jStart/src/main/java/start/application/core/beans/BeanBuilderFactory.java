@@ -51,6 +51,10 @@ public class BeanBuilderFactory {
 		return null;
 	}
 	
+	/**
+	 * 关闭连接资源时调用
+	 * @throws Exception
+	 */
 	public static void close() throws Exception{
 		mDefaultBeanBuilder.close();
 		for(BeanBuilder instance:mBeanBuilderCollection.values()){
@@ -58,6 +62,10 @@ public class BeanBuilderFactory {
 		}
 	}
 	
+	/**
+	 * 容器关闭时调用
+	 * @throws Exception
+	 */
 	public static void destory() throws Exception{
 		mDefaultBeanBuilder.destroy();
 		for(BeanBuilder instance:mBeanBuilderCollection.values()){

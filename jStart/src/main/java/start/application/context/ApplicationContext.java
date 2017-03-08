@@ -96,6 +96,7 @@ public class ApplicationContext{
 					throw new ApplicationException(e);
 				}
 			}
+			//对于一些引用型的数据须重新设值
 			isSetConstantValue=false;
 			//如果已经存在实例则直接返回
 //			return instance;
@@ -219,10 +220,6 @@ public class ApplicationContext{
 			}
 		}
 		return instance;
-	}
-	
-	public static void close() throws Exception{
-		BeanBuilderFactory.close();
 	}
 	
 }
