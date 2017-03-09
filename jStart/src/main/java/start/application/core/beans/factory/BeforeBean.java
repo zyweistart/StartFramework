@@ -5,8 +5,8 @@ import start.application.core.beans.BeanDefinition;
 public interface BeforeBean {
 	
 	/**
-	 * 每次获取数据之前调用
+	 * 方法调用之前执行
 	 * @throws Exception
 	 */
-	void beforeBean(BeanDefinition bean) throws Exception;
+	void beforeinvoking(BeanDefinition bean) throws Exception;
 }

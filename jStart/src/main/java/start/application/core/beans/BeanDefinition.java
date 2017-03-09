@@ -31,11 +31,15 @@ public class BeanDefinition {
 	
 	private Map<String,String> attributes;
 	
-	private String contextName;
+	private String beanContextName;
 
 	public String getName() {
 		if(name==null){
 			name=getAttributes().get("name");
+			if(name==null){
+				//默认name为当前类的全名
+				name=getPrototypeString();
+			}
 		}
 		return name;
 	}
@@ -126,12 +130,12 @@ public class BeanDefinition {
 		this.singleton = singleton;
 	}
 
-	public String getContextName() {
-		return contextName;
+	public  String getBeanContextName() {
+		return beanContextName;
 	}
 
-	public void setContextName(BeanBuilder builder) {
-		this.contextName = builder.getClass().getName();
+	public void setBeanContextName( String beanContextName) {
+		this.beanContextName = beanContextName;
 	}
 	
 }

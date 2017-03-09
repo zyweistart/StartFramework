@@ -10,17 +10,19 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
+import start.application.commons.logger.Logger;
+import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
 import start.application.core.annotation.Repository;
-import start.application.core.beans.BeanBuilder;
+import start.application.core.beans.ContextAdvice;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
-public class MybatisManager extends BeanBuilder {
+public class MybatisManager extends ContextAdvice {
 	
-//	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
+	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
 	
 	private String basePackage;
 	private DataSource dataSource;
@@ -57,37 +59,33 @@ public class MybatisManager extends BeanBuilder {
 					if(clasz.isAnnotationPresent(Repository.class)){
 						Repository repository=clasz.getAnnotation(Repository.class);
 						registerBeanCenter(repository.value(), clasz.getName());
-					}else{
-						registerBeanCenter(clasz.getName(), clasz.getName());
+						configuration.addMapper(clasz);
+						log.info("已配置"+clasz+" 加入到MybatisManager中管理~~~~");
 					}
-					configuration.addMapper(clasz);
 				}
 			}
 		}
 		sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
 	}
-
-	@Override
-	public void beforeBean(BeanDefinition bean) throws Exception {
-		session=sqlSessionFactory.openSession();
-	}
 	
 	@Override
-	public Object getBean(BeanDefinition bean) {
+	public Object newBean(BeanDefinition bean) {
+		session=sqlSessionFactory.openSession();
 		return session.getMapper(bean.getPrototype());
 	}
 
-	@Override
-	public void close() throws Exception {
-		//如果存在连接资源则关闭连接对象
-		if(session!=null){
-			session.commit();
-			session.close();
-		}
-	}
+//	@Override
+//	public void closeContext() throws Exception {
+//		//如果存在连接资源则关闭连接对象
+//		if(session!=null){
+//			session.commit();
+//			session.close();
+//		}
+//	}
 
 	@Override
 	public void destroy() throws Exception {
 	}
+
 
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
-import start.application.core.beans.BeanBuilderFactory;
+import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
@@ -89,7 +89,7 @@ public class Container implements Closeable {
 			}
 			
 		});
-		configInfo.loadConfigFile();
+		configInfo.loadConfigFile("StartConfig");
 		
 		if(StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)){
 			log.warn("扫描的类路径为空，请配置CLASSSCANPATH常量,需要扫描的类路径");
@@ -128,8 +128,7 @@ public class Container implements Closeable {
 	@Override
 	public void close() {
 		try {
-			BeanBuilderFactory.close();
-			BeanBuilderFactory.destory();
+			BeanContextFactory.destory();
 		} catch (Exception e) {
 			throw new ApplicationException(e);
 		}

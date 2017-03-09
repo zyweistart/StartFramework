@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import start.application.context.ApplicationContext;
 import start.application.context.ContextObject;
-import start.application.core.beans.BeanBuilderFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConstantConfig;
 import start.application.web.action.Action;
@@ -48,33 +47,29 @@ public final class ActionDispatcher {
 		if (this.mRequest.getCharacterEncoding() == null) {
 			this.mRequest.setCharacterEncoding(ConstantConfig.ENCODING);
 		}
-		try{
-			Action action = (Action)ApplicationContext.getBean(bean.getName());
-			ActionSupport support=new ActionSupport(
-					action,
-					this.mRequest,
-					this.mResponse,
-					bean);
-			if(!ContextObject.getInterceptors().isEmpty()){
-				//责任链模式执行拦截器
-				InterceptorHandler handler=null;
-				Iterator<String> interceptors = ContextObject.getInterceptors().iterator();
-				while(interceptors.hasNext()){
-					InterceptorHandler currentHandler=(InterceptorHandler)ApplicationContext.getBean(interceptors.next());
-					currentHandler.setHandler(handler);
-					handler=currentHandler;
-				}
-				//执行拦截器
-				handler.intercept(support);
+		Action action = (Action)ApplicationContext.getBean(bean.getName());
+		ActionSupport support=new ActionSupport(
+				action,
+				this.mRequest,
+				this.mResponse,
+				bean);
+		if(!ContextObject.getInterceptors().isEmpty()){
+			//责任链模式执行拦截器
+			InterceptorHandler handler=null;
+			Iterator<String> interceptors = ContextObject.getInterceptors().iterator();
+			while(interceptors.hasNext()){
+				InterceptorHandler currentHandler=(InterceptorHandler)ApplicationContext.getBean(interceptors.next());
+				currentHandler.setHandler(handler);
+				handler=currentHandler;
 			}
-			//执行Action
-			ActionResult result=action.execute(support);
-			if (result != null) {
-				// 返回值必须实现了ActionResult接口
-				result.doExecute(support);
-			}
-		}finally{
-			BeanBuilderFactory.close();
+			//执行拦截器
+			handler.intercept(support);
+		}
+		//执行Action
+		ActionResult result=action.execute(support);
+		if (result != null) {
+			// 返回值必须实现了ActionResult接口
+			result.doExecute(support);
 		}
 	}
 	

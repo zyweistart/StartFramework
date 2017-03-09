@@ -9,8 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import start.application.core.Message;
-import start.application.core.beans.BeanBuilder;
-import start.application.core.beans.BeanBuilderFactory;
+import start.application.core.beans.ContextAdvice;
+import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.XmlTag;
 import start.application.core.utils.ReflectUtils;
@@ -47,23 +47,20 @@ public class ContextObject {
 	 */
 	public static void registerBean(BeanDefinition bean){
 		if(bean!=null){
-			if(bean.getName()!=null){
-				if (beanPrototypes.containsKey(bean.getName())) {
-					String message=Message.getMessage(Message.PM_3000, bean.getName());
-					throw new IllegalArgumentException(message);
-				}else{
-					beanPrototypes.put(bean.getName(), bean.getPrototypeString());
-				}
-				if (beans.containsKey(bean.getPrototypeString())) {
-					String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
-					throw new IllegalArgumentException(message);
-				}else{
-					beans.put(bean.getPrototypeString(), bean);
-				}
+			if (beanPrototypes.containsKey(bean.getName())) {
+				String message=Message.getMessage(Message.PM_3000, bean.getName());
+				throw new IllegalArgumentException(message);
+			}else{
+				beanPrototypes.put(bean.getName(), bean.getPrototypeString());
 			}
-			//Bean生成容器
-			if(ReflectUtils.isSuperClass(bean.getPrototype(), BeanBuilder.class)){
-				BeanBuilderFactory.registerContext(bean);
+			if (beans.containsKey(bean.getPrototypeString())) {
+				String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
+				throw new IllegalArgumentException(message);
+			}else{
+				beans.put(bean.getPrototypeString(), bean);
+			}
+			if(ReflectUtils.isSuperClass(bean.getPrototype(), ContextAdvice.class)){
+				BeanContextFactory.registerContext(bean);
 			}
 			//拦截器
 			if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
@@ -149,11 +146,7 @@ public class ContextObject {
 		if(prototypeString==null){
 			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
 		}
-		BeanDefinition bean=beans.get(prototypeString);
-		if(bean==null){
-			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
-		}
-		return bean;
+		return getBeanInfo(prototypeString);
 	}
 	
 	/**
@@ -162,6 +155,9 @@ public class ContextObject {
 	 * @return
 	 */
 	public static BeanDefinition getBeanInfo(String prototypeString) {
+		if(!beans.containsKey(prototypeString)){
+			throw new NullPointerException(Message.getMessage(Message.PM_1003, prototypeString));
+		}
 		return beans.get(prototypeString);
 	}
 	

@@ -12,8 +12,8 @@ import start.application.core.Message;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;
 import start.application.core.annotation.Resource;
-import start.application.core.beans.BeanBuilder;
-import start.application.core.beans.BeanBuilderFactory;
+import start.application.core.beans.ContextAdvice;
+import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.beans.factory.BeforeBean;
 import start.application.core.beans.factory.CacheBean;
@@ -33,102 +33,49 @@ public class ApplicationContext{
 	}
 
 	public static Object getBean(Class<?> prototype){
-		BeanDefinition bean=ContextObject.getBeanInfo(prototype.getName());
-		if(bean==null){
-			bean=new BeanDefinition();
-			bean.setName(prototype.getName());
-			bean.setPrototype(prototype.getName());
-		}
-		return getBean(bean);
-	}
-	
-	public static Object getBean(String name,Class<?> prototype){
-		if(ContextObject.isBeanExistence(name)){
-			return getBean(ContextObject.getBean(name));
-		}else{
-			BeanDefinition bean=new BeanDefinition();
-			bean.setName(name);
-			bean.setPrototype(prototype.getName());
-			return getBean(bean);
-		}
+		return getBean(ContextObject.getBeanInfo(prototype.getName()));
 	}
 	
 	public static Object getBean(BeanDefinition bean){
-		BeanBuilder builder=BeanBuilderFactory.getBeanContext(bean.getContextName());
-		try {
-			builder.beforeBean(bean);
-		} catch (Exception e) {
-			throw new ApplicationException(e);
-		}
-		Object instance=getBean(bean,builder);
-		//执行初始化方法
-		if(instance instanceof InitializingBean){
-			try {
-				((InitializingBean)instance).afterPropertiesSet();
-			} catch (Exception e) {
-				throw new ApplicationException(e);
-			}
-		}
-		//执行初始化方法
-		ReflectUtils.invokeMethod(instance,bean.getInit());
-		//
-		if(instance instanceof BeforeBean){
-			try {
-				((BeforeBean)instance).beforeBean(bean);
-			} catch (Exception e) {
-				throw new ApplicationException(e);
-			}
-		}
-		return instance;
-	}
-	
-	public static Object getBean(BeanDefinition bean,BeanBuilder builder){
+		ContextAdvice builder=BeanContextFactory.getBeanContext(bean.getBeanContextName());
 		Object instance=null;
 		if(builder instanceof CacheBean){
 			instance=((CacheBean)builder).getCache(bean);
 		}
-		boolean isSetConstantValue=true;
+		//常量值是否更新
+		boolean isNewObject=true;
 		if(instance!=null){
-			if(instance instanceof BeforeBean){
-				try {
-					((BeforeBean)instance).beforeBean(bean);
-				} catch (Exception e) {
-					throw new ApplicationException(e);
-				}
-			}
-			//对于一些引用型的数据须重新设值
-			isSetConstantValue=false;
-			//如果已经存在实例则直接返回
-//			return instance;
+			//如果已存在实例则常量值不重新赋值
+			isNewObject=false;
 		}
 		if(instance==null){
 			//构造函数注入
 			for (Constructor<?> constructor : bean.getPrototype().getConstructors()) {
-				List<Object> initTargs=new ArrayList<Object>();
+				List<Object> paramValues=new ArrayList<Object>();
 				for(Parameter param:constructor.getParameters()){
 					if(param.isAnnotationPresent(Qualifier.class)){
 						Qualifier qualifier=param.getAnnotation(Qualifier.class);
 						Class<?> type=param.getType();
 						if(qualifier.value().isEmpty()){
-							if(ContextObject.getBeanInfo(type.getName())==null){
-								initTargs.add(getBean(param.getName(),type));
+							if(type.isInterface()){
+								paramValues.add(getBean(param.getName()));
 							}else{
-								initTargs.add(getBean(type));
+								paramValues.add(getBean(type));
 							}
 						}else{
-							initTargs.add(getBean(qualifier.value(),param.getType()));
+							paramValues.add(getBean(qualifier.value()));
 						}
 					}else{
-						if(!initTargs.isEmpty()){
+						if(!paramValues.isEmpty()){
 							String message=Message.getMessage(Message.PM_3017, bean.getName());
 							throw new ApplicationException(message);
 						}
 						break;
 					}
 				}
-				if(!initTargs.isEmpty()){
+				if(!paramValues.isEmpty()){
 					try {
-						instance=constructor.newInstance(initTargs.toArray());
+						instance=constructor.newInstance(paramValues.toArray());
 						break;
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException e) {
@@ -139,7 +86,7 @@ public class ApplicationContext{
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
-			instance=builder.getBean(bean);
+			instance=builder.newBean(bean);
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();
@@ -152,7 +99,7 @@ public class ApplicationContext{
 						&& field.getModifiers() != 4) {
 					continue;
 				}
-				if(isSetConstantValue){
+				if(isNewObject){
 					//设置常量
 					Constant constant=field.getAnnotation(Constant.class);
 					if (constant!=null) {
@@ -173,13 +120,13 @@ public class ApplicationContext{
 					try {
 						Class<?> type=field.getType();
 						if(resource.value().isEmpty()){
-							if(ContextObject.getBeanInfo(type.getName())==null){
-								field.set(instance,getBean(field.getName(),type));
+							if(type.isInterface()){
+								field.set(instance,getBean(field.getName()));
 							}else{
 								field.set(instance,getBean(type));
 							}
 						}else{
-							field.set(instance,getBean(resource.value(),type));
+							field.set(instance,getBean(resource.value()));
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						throw new ApplicationException(e);
@@ -195,7 +142,7 @@ public class ApplicationContext{
 			if(methodName.startsWith("set")){
 				String name=methodName.substring(3, 4).toLowerCase()+methodName.substring(4, methodName.length());
 				String value=null;
-				if(isSetConstantValue){
+				if(isNewObject){
 					value=bean.getValues().get(name);
 					if(value!=null){
 						Class<?> type=method.getParameterTypes()[0];
@@ -217,6 +164,27 @@ public class ApplicationContext{
 					}
 					continue;
 				}
+			}
+		}
+		//如果为缓存对象则不重复执行初始化方法
+		if(isNewObject){
+			//执行初始化方法
+			if(instance instanceof InitializingBean){
+				try {
+					((InitializingBean)instance).afterPropertiesSet();
+				} catch (Exception e) {
+					throw new ApplicationException(e);
+				}
+			}
+			//执行初始化方法
+			ReflectUtils.invokeMethod(instance,bean.getInit());
+		}
+		//
+		if(instance instanceof BeforeBean){
+			try {
+				((BeforeBean)instance).beforeinvoking(bean);
+			} catch (Exception e) {
+				throw new ApplicationException(e);
 			}
 		}
 		return instance;
