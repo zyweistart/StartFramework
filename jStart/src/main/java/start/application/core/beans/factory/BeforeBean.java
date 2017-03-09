@@ -5,7 +5,7 @@ import start.application.core.beans.BeanDefinition;
 public interface BeforeBean {
 	
 	/**
-	 * 方法调用之前执行
+	 * 每次从容器获取对象时都会调用该方法
 	 * @throws Exception
 	 */
 	void beforeinvoking(BeanDefinition bean) throws Exception;

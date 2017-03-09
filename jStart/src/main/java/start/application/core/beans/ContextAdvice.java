@@ -13,7 +13,7 @@ public abstract class ContextAdvice implements Context{
 		BeanDefinition bd=new BeanDefinition();
 		bd.setName(beanName);
 		bd.setPrototype(className);
-		bd.setBeanContextName(this.getClass().getName());
+		bd.setBeanContextName(ContextObject.getBeanInfo(this.getClass().getName()).getName());
 		ContextObject.registerBean(bd);
 	}
 	

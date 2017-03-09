@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
-import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.DisposableBean;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.ConstantConfig;
@@ -19,6 +21,7 @@ import start.application.core.context.BeanLoaderContext;
 import start.application.core.context.LoaderHandler;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
+import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
 import start.application.orm.context.OrmLoaderContext;
 import start.application.web.context.WebLoaderContext;
@@ -27,6 +30,16 @@ public class Container implements Closeable {
 	
 	private final static Logger log=LoggerFactory.getLogger(Container.class);
 	
+	private static ConcurrentMap<String,Object> cacheContext=new ConcurrentHashMap<String,Object>();
+
+	public static void putCacheContext(String name,Object beanObj) {
+		cacheContext.putIfAbsent(name, beanObj);
+	}
+	
+	public static Object getCacheContext(String name) {
+		return cacheContext.get(name);
+	}
+
 	/**
 	 * 容器初始化时调用该方法来加载容器对象
 	 */
@@ -127,10 +140,17 @@ public class Container implements Closeable {
 	 */
 	@Override
 	public void close() {
-		try {
-			BeanContextFactory.destory();
-		} catch (Exception e) {
-			throw new ApplicationException(e);
+		for(String name:cacheContext.keySet()){
+			BeanDefinition bean=ContextObject.getBean(name);
+			Object instance=cacheContext.get(name);
+			ReflectUtils.invokeMethod(instance,bean.getDestory());
+			if(instance instanceof DisposableBean){
+				try {
+					((DisposableBean)instance).destroy();
+				} catch (Exception e) {
+					throw new ApplicationException(e);
+				}
+			}
 		}
 	}
 	

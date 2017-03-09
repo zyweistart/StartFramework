@@ -15,12 +15,14 @@ import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
 import start.application.core.annotation.Repository;
 import start.application.core.beans.ContextAdvice;
+import start.application.core.beans.factory.DisposableBean;
+import start.application.core.beans.factory.InitializingBean;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
-public class MybatisManager extends ContextAdvice {
+public class MybatisManager extends ContextAdvice implements InitializingBean,DisposableBean {
 	
 	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
 	
@@ -74,17 +76,13 @@ public class MybatisManager extends ContextAdvice {
 		return session.getMapper(bean.getPrototype());
 	}
 
-//	@Override
-//	public void closeContext() throws Exception {
-//		//如果存在连接资源则关闭连接对象
-//		if(session!=null){
-//			session.commit();
-//			session.close();
-//		}
-//	}
-
 	@Override
 	public void destroy() throws Exception {
+		//如果存在连接资源则关闭连接对象
+		if(session!=null){
+			session.commit();
+			session.close();
+		}
 	}
 
 

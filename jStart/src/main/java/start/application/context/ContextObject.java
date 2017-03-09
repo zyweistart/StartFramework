@@ -9,9 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import start.application.core.Message;
-import start.application.core.beans.ContextAdvice;
-import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.ContextAdvice;
 import start.application.core.config.XmlTag;
 import start.application.core.utils.ReflectUtils;
 import start.application.orm.annotation.Entity;
@@ -60,7 +59,9 @@ public class ContextObject {
 				beans.put(bean.getPrototypeString(), bean);
 			}
 			if(ReflectUtils.isSuperClass(bean.getPrototype(), ContextAdvice.class)){
-				BeanContextFactory.registerContext(bean);
+				//直接创建组件
+				ApplicationContext.getBean(bean);
+				log.info("自定义ContextAdvice容器生成对象："+bean.getName()+"，加载成功~~~");
 			}
 			//拦截器
 			if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){

@@ -23,12 +23,11 @@ import start.application.core.utils.ClassLoaderUtils;
 public final class ConfigInfo {
 	
 	public static final String IMPORT="import";
-	public static final String CONSTANT="constant";
 	public static final String PROPERTIES="properties";
-	public static final String BEAN="bean";
 	public static final String PATH="path";
 	public static final String CONFIG="config";
-	public static final String PLUGIN="plugin";
+	public static final String CONSTANT="constant";
+	public static final String BEAN="bean";
 	
 	private DocumentBuilder builder;
 	private ConfigImpl impl;

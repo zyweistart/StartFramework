@@ -12,11 +12,9 @@ import start.application.core.Message;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;
 import start.application.core.annotation.Resource;
-import start.application.core.beans.ContextAdvice;
-import start.application.core.beans.BeanContextFactory;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.ContextAdvice;
 import start.application.core.beans.factory.BeforeBean;
-import start.application.core.beans.factory.CacheBean;
 import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
 import start.application.core.exceptions.ApplicationException;
@@ -37,11 +35,13 @@ public class ApplicationContext{
 	}
 	
 	public static Object getBean(BeanDefinition bean){
-		ContextAdvice builder=BeanContextFactory.getBeanContext(bean.getBeanContextName());
-		Object instance=null;
-		if(builder instanceof CacheBean){
-			instance=((CacheBean)builder).getCache(bean);
+		if(bean.getBeanContextName()!=null){
+			//当前对象是否需要使用其它容器来创建
+			ContextAdvice context=(ContextAdvice)getBean(bean.getBeanContextName());
+			return context.newBean(bean);
 		}
+		//从缓存中直接获取已创建的对象
+		Object instance=Container.getCacheContext(bean.getName());
 		//常量值是否更新
 		boolean isNewObject=true;
 		if(instance!=null){
@@ -86,7 +86,13 @@ public class ApplicationContext{
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
-			instance=builder.newBean(bean);
+			try {
+				instance=bean.getPrototype().newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new ApplicationException(e);
+			}
+			//把对象加入缓存列表
+			Container.putCacheContext(bean.getName(),instance);
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();
@@ -179,7 +185,7 @@ public class ApplicationContext{
 			//执行初始化方法
 			ReflectUtils.invokeMethod(instance,bean.getInit());
 		}
-		//
+		//每次获取对象时都会调用该方法
 		if(instance instanceof BeforeBean){
 			try {
 				((BeforeBean)instance).beforeinvoking(bean);

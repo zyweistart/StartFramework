@@ -17,12 +17,15 @@ import start.application.core.config.XmlTag;
  */
 public class XmlApplicationConfigAnalysis implements ConfigImpl {
 
+	public static final String CONSTANT="constant";
+	public static final String BEAN="bean";
+	
 	// 注册Bean对象
 	private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();
 
 	@Override
 	public void read(XmlTag xml) {
-		if (ConfigInfo.CONSTANT.equalsIgnoreCase(xml.getName())) {
+		if (CONSTANT.equalsIgnoreCase(xml.getName())) {
 			String name = xml.getAttributes().get("name");
 			String value = null;
 			if (xml.getAttributes().containsKey("value")) {
@@ -37,7 +40,7 @@ public class XmlApplicationConfigAnalysis implements ConfigImpl {
 				// 注册常量
 				ContextObject.registerConstant(key, xml.getAttributes().get(key));
 			}
-		} else if (ConfigInfo.BEAN.equalsIgnoreCase(xml.getName())) {
+		} else if (BEAN.equalsIgnoreCase(xml.getName())) {
 			BeanDefinition bean = new BeanDefinition();
 			bean.getAttributes().putAll(xml.getAttributes());
 			for (XmlTag child : xml.getChildTags()) {
