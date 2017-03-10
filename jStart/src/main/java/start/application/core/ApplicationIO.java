@@ -13,6 +13,11 @@ import start.application.core.constant.DataTypeValidation;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.StringHelper;
 import start.application.orm.annotation.Temporal;
+import start.application.orm.annotation.verify.VerifyValueEmpty;
+import start.application.orm.annotation.verify.VerifyValueEnum;
+import start.application.orm.annotation.verify.VerifyValueLength;
+import start.application.orm.annotation.verify.VerifyValueTimeFormat;
+import start.application.orm.exceptions.VerifyException;
 
 /**
  * 数据的读写
@@ -39,6 +44,58 @@ public final class ApplicationIO {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * 验证字段类型
+	 * @param field
+	 * @param value
+	 */
+	public static void verify(Field field,String value){
+		if(field==null){
+			return;
+		}
+		//验证是否为空
+		VerifyValueEmpty empty=field.getAnnotation(VerifyValueEmpty.class);
+		if(empty!=null){
+			if(StringHelper.isEmpty(value)){
+				throw new VerifyException(empty.message());
+			}
+		}
+		//验证长度
+		VerifyValueLength length=field.getAnnotation(VerifyValueLength.class);
+		if(length!=null){
+			if(value.length()>=length.min()&&value.length()<=length.max()){
+				throw new VerifyException(length.message());
+			}
+		}
+		//验证枚举类型
+		VerifyValueEnum enumv=field.getAnnotation(VerifyValueEnum.class);
+		if(enumv!=null){
+			if(field.getType().isEnum()){
+				Integer curInt;
+				try {
+					curInt=Integer.parseInt(value);
+				} catch (Exception e) {
+					throw new VerifyException(enumv.message());
+				}
+				if (field.getType().getEnumConstants().length <= curInt) {
+					throw new VerifyException(enumv.message());
+				}
+			}else{
+				throw new VerifyException(enumv.message());
+			}
+		}
+		//验证时间日期格式
+		VerifyValueTimeFormat format=field.getAnnotation(VerifyValueTimeFormat.class);
+		if(format!=null){
+			SimpleDateFormat sdf=new SimpleDateFormat(format.format());
+			try {
+				sdf.parse(value);
+			} catch (ParseException e) {
+				throw new VerifyException(enumv.message());
+			}
+		}
 	}
 	
 	/**

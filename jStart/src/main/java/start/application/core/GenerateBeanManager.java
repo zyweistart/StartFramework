@@ -248,7 +248,6 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 						try {
 							method.invoke(instance, ApplicationIO.read(null,type,ConstantConfig.get(bean.getValues().get(name))));
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							e.printStackTrace();
 							throw new ApplicationException(e);
 						}
 						continue;
