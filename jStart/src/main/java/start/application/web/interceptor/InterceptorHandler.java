@@ -1,6 +1,5 @@
 package start.application.web.interceptor;
 
-import start.application.core.beans.factory.Aware;
 import start.application.web.action.ActionSupport;
 
 /**
@@ -9,7 +8,7 @@ import start.application.web.action.ActionSupport;
  * @author zhenyao
  *
  */
-public abstract class InterceptorHandler extends AbstractInterceptorHandler implements Interceptor,Aware {
+public abstract class InterceptorHandler extends AbstractInterceptorHandler implements Interceptor {
 
 	public void doInterceptor(ActionSupport support) throws Exception{
 		if(getHandler()!=null){

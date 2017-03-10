@@ -2,14 +2,13 @@ package start.application.core;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.core.beans.factory.Container;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.ConstantConfig;
 import start.application.core.constant.Constant;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
-public class XmlPathApplicationContext extends GenerateBeanManager implements Container {
+public class XmlPathApplicationContext extends GenerateBeanManager {
 	
 	private final static Logger log=LoggerFactory.getLogger(XmlPathApplicationContext.class);
 
@@ -24,7 +23,6 @@ public class XmlPathApplicationContext extends GenerateBeanManager implements Co
 		this.configFiles = configFiles;
 	}
 
-	@Override
 	public void start() {
 		// 1、解析配置文件
 		ConfigInfo configInfo = new ConfigInfo(new XmlConfigAnalysis(this));

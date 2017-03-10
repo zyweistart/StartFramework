@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.context.ApplicationIO;
 import start.application.core.annotation.AOP;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;

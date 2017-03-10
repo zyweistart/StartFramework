@@ -1,20 +1,17 @@
 package start.application.web;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import start.application.commons.logger.Logger;
-import start.application.commons.logger.LoggerFactory;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConstantConfig;
 import start.application.web.action.Action;
 import start.application.web.action.ActionResult;
 import start.application.web.action.ActionSupport;
 import start.application.web.annotation.Controller;
+import start.application.web.context.ContextLoaderListener;
 import start.application.web.context.WebApplicationContext;
 import start.application.web.interceptor.InterceptorHandler;
 
@@ -24,22 +21,12 @@ import start.application.web.interceptor.InterceptorHandler;
  * @author zhenyao
  *
  */
-public final class ActionDispatcher implements Closeable {
+public final class ActionDispatcher {
 	
-	private final static Logger log=LoggerFactory.getLogger(ActionDispatcher.class);
-	
-	private static WebApplicationContext mWebApplicationContext;
-	
-	static{
-		mWebApplicationContext=new WebApplicationContext();
-		long start=System.currentTimeMillis();
-		mWebApplicationContext.start();
-		long value=System.currentTimeMillis()-start;
-		log.info("解析配置文件及扫描包总花费时间："+value+" ms");
-	}
+	private WebApplicationContext mWebApplicationContext;
 	
 	public ActionDispatcher() {
-		
+		mWebApplicationContext=ContextLoaderListener.getmWebApplicationContext();
 	}
 	
 	/**
@@ -81,11 +68,6 @@ public final class ActionDispatcher implements Closeable {
 			// 返回值必须实现了ActionResult接口
 			result.doExecute(support);
 		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		mWebApplicationContext.close();
 	}
 	
 }

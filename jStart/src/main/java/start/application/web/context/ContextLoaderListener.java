@@ -37,5 +37,9 @@ public class ContextLoaderListener implements ServletContextListener {
 			e.printStackTrace();
 		}
 	}
+
+	public static WebApplicationContext getmWebApplicationContext() {
+		return mWebApplicationContext;
+	}
 	
 }
