@@ -36,7 +36,7 @@ public interface ApplicationContext {
 	 * @param name
 	 * @return
 	 */
-	Object getBean(Class<?> prototype);
+	<T> T  getBean(Class<T> prototype);
 	
 	
 }

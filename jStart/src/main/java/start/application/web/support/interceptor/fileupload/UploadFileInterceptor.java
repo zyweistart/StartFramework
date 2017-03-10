@@ -3,6 +3,7 @@ package start.application.web.support.interceptor.fileupload;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +17,11 @@ import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.config.ConstantConfig;
 import start.application.core.utils.FileHelper;
+import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
 import start.application.web.interceptor.InterceptorHandler;
-import start.application.web.support.interceptor.RequestParameterInject;
 
 public class UploadFileInterceptor extends InterceptorHandler {
 
@@ -52,10 +53,6 @@ public class UploadFileInterceptor extends InterceptorHandler {
 
 	@Override
 	public void intercept(ActionSupport support) throws Exception {
-		if(support.getBean().isSingleton()){
-			doInterceptor(support);
-			return;
-		}
 		try {
 			HttpServletRequest request = support.request();
 			String contentType = request.getContentType();
@@ -190,13 +187,13 @@ public class UploadFileInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(lists));
 					}
 				}
-				RequestParameterInject.injectParameter(support.getAction(),params);
+				ReflectUtils.injectParameter(support.getAction(),params);
 				// 文件注入
 				Map<String,List<UpLoadFile>> fileParams=new HashMap<String,List<UpLoadFile>>();
 				for (String fileField : upLoadFiles.keySet()) {
 					fileParams.put(fileField	, upLoadFiles.get(fileField));
 				}
-				RequestParameterInject.injectObject(support.getAction(), fileParams);
+				injectObject(support.getAction(), fileParams);
 			}
 		} catch (Exception e) {
 			throw new ActionException(e);
@@ -269,6 +266,19 @@ public class UploadFileInterceptor extends InterceptorHandler {
 			}
 		}
 		return false;
+	}
+	
+	static void injectObject(Object entity,Map<String,List<UpLoadFile>> fieldMap) throws IllegalArgumentException, IllegalAccessException{
+		Field[] fields=entity.getClass().getDeclaredFields();
+		for(Field field:fields){
+			//返回类型判断
+			String fieldName=field.getName();
+			List<UpLoadFile> value=fieldMap.get(fieldName);
+			if(value!=null){
+				field.setAccessible(true);
+				field.set(entity, value);
+			}
+		}
 	}
 
 }

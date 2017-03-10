@@ -3,7 +3,8 @@ package start.application.orm.support.jdbc;
 import java.lang.reflect.Method;
 
 import net.sf.cglib.proxy.MethodProxy;
-import start.application.core.AOPBeanProxy;
+import start.application.core.aop.AOPBeanProxy;
+import start.application.orm.annotation.Transaction;
 
 public class DataSourceTransactionManager implements AOPBeanProxy {
 	
@@ -19,21 +20,29 @@ public class DataSourceTransactionManager implements AOPBeanProxy {
 
 	@Override
 	public void doBefore(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		session.beginTrans();
+		if(method.isAnnotationPresent(Transaction.class)){
+			session.beginTrans();
+		}
 	}
 
 	@Override
 	public void doAfter(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		session.commitTrans();
+		if(method.isAnnotationPresent(Transaction.class)){
+			session.commitTrans();
+		}
 	}
 
 	@Override
 	public void doException(Object obj, Method method, Object[] args, MethodProxy proxy, Throwable e) {
-		session.rollbackTrans();
+		if(method.isAnnotationPresent(Transaction.class)){
+			session.rollbackTrans();
+		}
 	}
 
 	@Override
 	public void doFinally(Object obj, Method method, Object[] args, MethodProxy proxy) {
+		if(method.isAnnotationPresent(Transaction.class)){
+		}
 	}
 	
 }

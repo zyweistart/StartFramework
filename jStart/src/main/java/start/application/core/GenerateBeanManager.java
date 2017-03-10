@@ -21,6 +21,8 @@ import start.application.core.annotation.AOP;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;
 import start.application.core.annotation.Resource;
+import start.application.core.aop.AOPBeanProxy;
+import start.application.core.aop.BeanProxyInterceptor;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.beans.ContextBeanAdvice;
 import start.application.core.beans.factory.ApplicationContext;
@@ -94,8 +96,9 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 	}
 
 	@Override
-	public Object getBean(Class<?> prototype){
-		return getBean(getBeanDefinitionInfoByClass(prototype.getName()));
+	@SuppressWarnings("unchecked")
+	public <T> T  getBean(Class<T> prototype){
+		return (T) getBean(getBeanDefinitionInfoByClass(prototype.getName()));
 	}
 	
 	private Object getBean(BeanDefinition bean){
@@ -261,7 +264,7 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 				}
 			}
 		}
-		//如果为缓存对象则不重复执行初始化方法
+		//如果为缓存对象则不重复执行
 		if(isNewObject){
 			if(instance instanceof ApplicationContextAware){
 				try {

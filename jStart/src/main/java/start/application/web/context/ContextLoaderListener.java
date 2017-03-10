@@ -12,11 +12,7 @@ public class ContextLoaderListener implements ServletContextListener {
 	
 	private final static Logger log=LoggerFactory.getLogger(ContextLoaderListener.class);
 
-	private WebApplicationContext mWebApplicationContext;
-	
-	public ContextLoaderListener() {
-		mWebApplicationContext=new WebApplicationContext();
-	}
+	private static WebApplicationContext mWebApplicationContext=new WebApplicationContext();
 
 	/**
 	 * Initialize the root web application context.
@@ -24,7 +20,7 @@ public class ContextLoaderListener implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		long start=System.currentTimeMillis();
-		this.mWebApplicationContext.start();
+		mWebApplicationContext.start();
 		long value=System.currentTimeMillis()-start;
 		log.info("解析配置文件及扫描包总花费时间："+value+" ms");
 	}
@@ -36,7 +32,7 @@ public class ContextLoaderListener implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		try {
-			this.mWebApplicationContext.close();
+			mWebApplicationContext.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

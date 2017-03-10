@@ -1,4 +1,4 @@
-package start.application.core;
+package start.application.core.aop;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import java.util.Set;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import start.application.core.exceptions.ApplicationException;
 
 public class BeanProxyInterceptor implements MethodInterceptor {
 	
@@ -39,7 +40,7 @@ public class BeanProxyInterceptor implements MethodInterceptor {
 	}
 	
 	@Override
-	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		Object resultObj=null;
 		try{
 			for(AOPBeanProxy p:proxys){
@@ -49,11 +50,11 @@ public class BeanProxyInterceptor implements MethodInterceptor {
 			for(AOPBeanProxy p:proxys){
 				p.doAfter(resultObj, method, args, proxy);
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			for(AOPBeanProxy p:proxys){
 				p.doException(resultObj, method, args, proxy, e);
 			}
-			e.printStackTrace();
+			throw new ApplicationException(e);
 		}finally{
 			for(AOPBeanProxy p:proxys){
 				p.doFinally(resultObj, method, args, proxy);

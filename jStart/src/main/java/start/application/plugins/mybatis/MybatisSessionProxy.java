@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 
 import org.apache.ibatis.session.SqlSession;
 
+import start.application.core.exceptions.ApplicationException;
+
 public class MybatisSessionProxy implements InvocationHandler {
 	
 	private SqlSession session;
@@ -22,7 +24,7 @@ public class MybatisSessionProxy implements InvocationHandler {
 			session.commit();
 		}catch(Exception e){
 			session.rollback();
-			e.printStackTrace();
+			throw new ApplicationException(e);
 		}finally{
 //			session.close();
 		}

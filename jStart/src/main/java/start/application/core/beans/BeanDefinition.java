@@ -3,9 +3,7 @@ package start.application.core.beans;
 import java.util.HashMap;
 import java.util.Map;
 
-import start.application.core.annotation.Scope;
 import start.application.core.exceptions.ApplicationException;
-import start.application.core.utils.StringHelper;
 
 public class BeanDefinition {
 	
@@ -22,8 +20,6 @@ public class BeanDefinition {
 	private String init;
 	
 	private String destory;
-	
-	private Boolean singleton;
 	
 	private Map<String,String> values;
 	
@@ -107,27 +103,6 @@ public class BeanDefinition {
 
 	public Map<String, String> getAttributes() {
 		return attributes;
-	}
-	
-	public Boolean isSingleton(){
-		if(singleton==null){
-			if(getPrototype().isAnnotationPresent(Scope.class)){
-				singleton=false;
-			}else{
-				String sing=getAttributes().get("singleton");
-				if(StringHelper.isEmpty(sing)){
-					//默认为单例
-					singleton=true;
-				}else{
-					singleton=StringHelper.nullToBoolean(sing);
-				}
-			}
-		}
-		return singleton;
-	}
-
-	public void setSingleton(Boolean singleton) {
-		this.singleton = singleton;
 	}
 
 	public  String getBeanContextName() {

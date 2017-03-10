@@ -102,8 +102,8 @@ public class SessionManager {
 	/**
 	 * 获取事务对象
 	 */
-	public Transaction getTransaction() throws SQLException{
-		return new Transaction(getConnection());
+	public TransactionManager getTransaction() throws SQLException{
+		return new TransactionManager(getConnection());
 	}
 	
 	/**

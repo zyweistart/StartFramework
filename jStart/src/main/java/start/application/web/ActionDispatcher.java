@@ -62,8 +62,7 @@ public final class ActionDispatcher implements Closeable {
 		ActionSupport support=new ActionSupport(
 				action,
 				request,
-				response,
-				bean);
+				response);
 		if(!mWebApplicationContext.getInterceptors().isEmpty()){
 			//责任链模式执行拦截器
 			InterceptorHandler handler=null;

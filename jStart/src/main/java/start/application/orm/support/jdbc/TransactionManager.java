@@ -5,11 +5,11 @@ import java.sql.SQLException;
 
 import start.application.orm.exceptions.RepositoryException;
 
-public class Transaction {
+public class TransactionManager {
 	
 	private Connection mConnection;
 	
-	public Transaction(Connection connection){
+	public TransactionManager(Connection connection){
 		this.mConnection=connection;
 	}
 	
@@ -39,7 +39,6 @@ public class Transaction {
 	public void commitTrans() {
 		try{
 			getConnection().commit();
-			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
 			throw new RepositoryException(e);
 		}finally{
@@ -53,7 +52,6 @@ public class Transaction {
 	public void rollbackTrans() {
 		try{
 			getConnection().rollback();
-			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
 			throw new RepositoryException(e);
 		}finally{

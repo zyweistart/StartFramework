@@ -3,7 +3,6 @@ package start.application.web.action;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import start.application.core.beans.BeanDefinition;
 import start.application.web.utils.ApplicationMap;
 import start.application.web.utils.RequestMap;
 import start.application.web.utils.SessionMap;
@@ -13,7 +12,6 @@ public class ActionSupport{
 	private Action action;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
-	private BeanDefinition bean;
 	
 	private RequestMap requestMap;
 	private SessionMap<String, Object> sessionMap;
@@ -22,13 +20,11 @@ public class ActionSupport{
 	public ActionSupport(
 			Action action,
 			HttpServletRequest request,
-			HttpServletResponse response,
-			BeanDefinition bean
+			HttpServletResponse response
 			){
 		this.action=action;
 		this.request=request;
 		this.response=response;
-		this.bean=bean;
 	}
 	
 	
@@ -42,10 +38,6 @@ public class ActionSupport{
 
 	public HttpServletResponse response() {
 		return response;
-	}
-
-	public BeanDefinition getBean() {
-		return bean;
 	}
 
 	/**

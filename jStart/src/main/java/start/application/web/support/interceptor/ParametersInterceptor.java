@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
@@ -22,10 +23,6 @@ public class ParametersInterceptor extends InterceptorHandler {
 	
 	@Override
 	public void intercept(ActionSupport support) throws Exception{
-		if(support.getBean().isSingleton()){
-			doInterceptor(support);
-			return;
-		}
 		try{
 			HttpServletRequest request=support.request();
 			if(!MULTIPARTFORMDATA.equals(request.getContentType())){
@@ -40,7 +37,7 @@ public class ParametersInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(Arrays.asList(parameterValues)));
 					}
 				}
-				RequestParameterInject.injectParameter(support.getAction(),params);
+				ReflectUtils.injectParameter(support.getAction(),params);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | ParseException e) {
 			throw new ActionException(e);
