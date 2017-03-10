@@ -15,10 +15,10 @@ import start.application.core.config.XmlTag;
  * @author zhenyao
  *
  */
-public class XmlApplicationConfigAnalysis implements ConfigImpl {
+public class XmlConfigAnalysis implements ConfigImpl {
 
-	public static final String CONSTANT="constant";
 	public static final String BEAN="bean";
+	public static final String CONSTANT="constant";
 	
 	// 注册Bean对象
 	private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();

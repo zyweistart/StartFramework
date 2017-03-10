@@ -1,8 +1,5 @@
 package start.application.support;
 
-import java.io.Closeable;
-import java.io.IOException;
-
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.Constant;
@@ -10,14 +7,14 @@ import start.application.core.config.ConfigInfo;
 import start.application.core.config.ConstantConfig;
 import start.application.core.utils.StringHelper;
 
-public class XmlPathApplicationContext implements Closeable {
+public class XmlPathApplicationContext extends GenerateBeanManager {
 	
 	private final static Logger log=LoggerFactory.getLogger(XmlPathApplicationContext.class);
 
 	private String[] configFiles;
-	private BeanManager mBeanManager;
 	
 	public XmlPathApplicationContext() {
+		//默认配置文件
 		this(new String[] { "StartConfig" });
 	}
 
@@ -31,7 +28,7 @@ public class XmlPathApplicationContext implements Closeable {
 
 	public void start() {
 		// 1、解析配置文件
-		ConfigInfo configInfo = new ConfigInfo(new XmlApplicationConfigAnalysis());
+		ConfigInfo configInfo = new ConfigInfo(new XmlConfigAnalysis());
 		for(String xmlfile:configFiles){
 			configInfo.loadConfigFile(xmlfile);
 		}
@@ -42,21 +39,6 @@ public class XmlPathApplicationContext implements Closeable {
 		//2、扫描类路径
 		ScannerClassPath scanner=new ScannerClassPath(ConstantConfig.CLASSSCANPATH.split(Constant.COMMA));
 		scanner.doScanner();
-		//3、创建Bean管理容器
-		mBeanManager=new BeanManager();
-	}
-	
-	public Object getBean(String name){
-		return mBeanManager.getBean(name);
-	}
-
-	public Object getBean(Class<?> prototype){
-		return mBeanManager.getBean(prototype);
-	}
-
-	@Override
-	public void close() throws IOException {
-		mBeanManager.close();
 	}
 	
 }

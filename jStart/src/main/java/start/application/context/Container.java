@@ -31,13 +31,13 @@ public class Container implements Closeable {
 	private final static Logger log=LoggerFactory.getLogger(Container.class);
 	
 	private static ConcurrentMap<String,Object> cacheContext=new ConcurrentHashMap<String,Object>();
-
-	public static void putCacheContext(String name,Object beanObj) {
-		cacheContext.putIfAbsent(name, beanObj);
-	}
 	
 	public static Object getCacheContext(String name) {
 		return cacheContext.get(name);
+	}
+
+	public static void putCacheContext(String name,Object beanObj) {
+		cacheContext.putIfAbsent(name, beanObj);
 	}
 
 	/**
