@@ -2,13 +2,11 @@
 <!--默认配置文件-->
 <jstart>
 
-	<import path="ApplicationConfig"/>
+	<import path="ApplicationConfig.xml"/>
 	
 	<!-- 常量 -->
 	<!--需扫描的包-->
 	<constant name="CLASSSCANPATH" value=""/>
-	<!--开发模式-->
-	<constant name="DEVMODE" value="true"/>
 	<!--全局编码模式-->
 	<constant name="ENCODING" value="UTF-8"/>
 	<!-- 默认日期时间格式 -->

@@ -26,8 +26,6 @@ public final class ConfigInfo {
 	public static final String PROPERTIES="properties";
 	public static final String PATH="path";
 	public static final String CONFIG="config";
-	public static final String CONSTANT="constant";
-	public static final String BEAN="bean";
 	
 	private DocumentBuilder builder;
 	private ConfigImpl impl;
@@ -54,7 +52,7 @@ public final class ConfigInfo {
 	 */
 	private void readXml(String classpath){
 		try{
-			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath+".xml",getClass())));
+			readXml(builder.parse(ClassLoaderUtils.getResourceAsStream(classpath,getClass())));
 		} catch (Exception e) {
 			throw new ConfigError(classpath+"打开失败， 请检查XML配置文件，错误信息："+e.getMessage());
 		}

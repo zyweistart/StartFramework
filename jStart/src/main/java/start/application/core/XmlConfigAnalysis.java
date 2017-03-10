@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.ApplicationContext;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.XmlTag;
@@ -19,9 +20,9 @@ public class XmlConfigAnalysis implements ConfigImpl {
 
 	public static final String BEAN="bean";
 	public static final String CONSTANT="constant";
-	private XmlPathApplicationContext mApplicationContext;
+	private ApplicationContext mApplicationContext;
 	
-	public XmlConfigAnalysis(XmlPathApplicationContext application){
+	public XmlConfigAnalysis(ApplicationContext application){
 		this.mApplicationContext=application;
 	}
 	

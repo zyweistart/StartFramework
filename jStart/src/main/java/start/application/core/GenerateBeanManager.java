@@ -101,18 +101,20 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 	}
 	
 	private Object getBean(BeanDefinition bean){
+		//常量值是否更新
+		boolean isNewObject=true;
+		Object instance=null;
 		if(bean.getBeanContextName()!=null){
 			//当前对象是否需要使用其它容器来创建
 			ContextBeanAdvice context=(ContextBeanAdvice)getBean(bean.getBeanContextName());
-			return context.newBean(bean);
-		}
-		//从缓存中直接获取已创建的对象
-		Object instance=getCacheContext(bean.getName());
-		//常量值是否更新
-		boolean isNewObject=true;
-		if(instance!=null){
-			//如果已存在实例则常量值不重新赋值
-			isNewObject=false;
+			instance=context.newBean(bean);
+		}else{
+			//从缓存中直接获取已创建的对象
+			instance=getCacheContext(bean.getName());
+			if(instance!=null){
+				//如果已存在实例则常量值不重新赋值
+				isNewObject=false;
+			}
 		}
 		if(instance==null){
 			//构造函数注入

@@ -13,16 +13,6 @@ public class ConstantConfig {
 	public static final String DEFAULT_PLACEHOLDER_SUFFIX="}";
 	
 	/**
-	 * 开发模式
-	 * <pre>
-	 * 可选值：
-	 * 	true: 会打印一些帮助信息
-	 * 	false:关闭打印信息
-	 * </pre>
-	 */
-	public final static Boolean DEVMODE=ConstantConfig.getBoolean("DEVMODE");
-	
-	/**
 	 * 默认编码格式 
 	 *	<pre>
 	 *	GBK、UTF-8

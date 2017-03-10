@@ -8,7 +8,7 @@ import start.application.core.ApplicationIO;
 import start.application.core.beans.factory.ApplicationContext;
 import start.application.core.constant.DataTypeValidation;
 import start.application.core.constant.Message;
-import start.application.core.context.LoaderHandler;
+import start.application.core.context.LoaderClassAnnotationHandler;
 import start.application.core.exceptions.AnnoationError;
 import start.application.orm.annotation.Column;
 import start.application.orm.annotation.Entity;
@@ -23,7 +23,7 @@ import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
 import start.application.orm.exceptions.EntityDefinitionError;
 
-public class OrmLoaderContext extends LoaderHandler {
+public class OrmLoaderContext extends LoaderClassAnnotationHandler {
 
 	@Override
 	public void load(ApplicationContext applicationContext,Class<?> prototype) {
@@ -32,7 +32,7 @@ public class OrmLoaderContext extends LoaderHandler {
 			ContextCacheEntity.registerEntity(entity);
 			return;
 		}
-		this.doLoadContext(applicationContext,prototype);
+		this.doLoaderAnnotation(applicationContext,prototype);
 	}
 	
 	/**

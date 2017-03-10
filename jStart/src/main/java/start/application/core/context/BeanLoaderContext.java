@@ -6,25 +6,17 @@ import start.application.core.annotation.Service;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.beans.factory.ApplicationContext;
 
-public class BeanLoaderContext extends LoaderHandler{
+public class BeanLoaderContext extends LoaderClassAnnotationHandler{
 
 	@Override
 	public void load(ApplicationContext applicationContext,Class<?> prototype) {
-		//组件不归入Bean容器管理
-		Component component = prototype.getAnnotation(Component.class);
-		if (component != null) {
-			BeanDefinition bean=new BeanDefinition();
-			bean.setPrototype(prototype.getName());
-			applicationContext.registerBeanDoManagerCenter(bean);
-			return;
-		}
 		//注册Bean
 		BeanDefinition bean=analysisBean(prototype);
 		if(bean!=null){
 			applicationContext.registerBeanDoManagerCenter(bean);
 			return;
 		}
-		this.doLoadContext(applicationContext,prototype);
+		this.doLoaderAnnotation(applicationContext,prototype);
 	}
 	
 	/**
@@ -34,6 +26,15 @@ public class BeanLoaderContext extends LoaderHandler{
 	 */
 	public static BeanDefinition analysisBean(Class<?> prototype){
 		BeanDefinition bean=null;
+		// 组件
+		Component component = prototype.getAnnotation(Component.class);
+		if (component != null) {
+			bean=new BeanDefinition();
+			if(!component.value().isEmpty()){
+				bean.setName(component.value());
+			}
+			bean.setPrototype(prototype.getName());
+		}
 		// 服务层
 		Service service = prototype.getAnnotation(Service.class);
 		if (service != null) {

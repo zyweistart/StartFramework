@@ -16,7 +16,7 @@ public class XmlPathApplicationContext extends GenerateBeanManager {
 	
 	public XmlPathApplicationContext() {
 		//默认配置文件
-		this("StartConfig");
+		this("StartConfig.xml");
 	}
 
 	public XmlPathApplicationContext(String... configFiles) {
@@ -29,16 +29,16 @@ public class XmlPathApplicationContext extends GenerateBeanManager {
 		for(String xmlfile:configFiles){
 			configInfo.loadConfigFile(xmlfile);
 		}
+		//2、扫描类路径
 		if (StringHelper.isEmpty(ConstantConfig.CLASSSCANPATH)) {
 			log.warn("扫描的类路径为空，请配置CLASSSCANPATH常量,需要扫描的类路径");
-			return;
-		}
-		//2、扫描类路径
-		String[] classpaths=ConstantConfig.CLASSSCANPATH.split(Constant.COMMA);
-		AnnotationConfigContext annotationConfig=new AnnotationConfigContext(this);
-		for (String packageName :classpaths) {
-			for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
-				annotationConfig.load(clasz);
+		}else{
+			String[] classpaths=ConstantConfig.CLASSSCANPATH.split(Constant.COMMA);
+			AnnotationConfigContext annotationConfig=new AnnotationConfigContext(this);
+			for (String packageName :classpaths) {
+				for (Class<?> clasz : ClassHelper.getClasses(packageName)) {
+					annotationConfig.load(clasz);
+				}
 			}
 		}
 	}

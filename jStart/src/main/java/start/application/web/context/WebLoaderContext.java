@@ -3,13 +3,13 @@ package start.application.web.context;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.beans.factory.ApplicationContext;
 import start.application.core.constant.Message;
-import start.application.core.context.LoaderHandler;
+import start.application.core.context.LoaderClassAnnotationHandler;
 import start.application.core.exceptions.AnnoationError;
 import start.application.core.utils.ReflectUtils;
 import start.application.web.action.Action;
 import start.application.web.annotation.Controller;
 
-public class WebLoaderContext extends LoaderHandler {
+public class WebLoaderContext extends LoaderClassAnnotationHandler {
 	
 	@Override
 	public void load(ApplicationContext applicationContext,Class<?> prototype) {
@@ -19,7 +19,7 @@ public class WebLoaderContext extends LoaderHandler {
 			applicationContext.registerBeanDoManagerCenter(bean);
 			return;
 		}
-		doLoadContext(applicationContext,prototype);
+		doLoaderAnnotation(applicationContext,prototype);
 	}
 	
 	/**
