@@ -1,5 +1,7 @@
 package start.application.plugins.mybatis;
 
+import java.lang.reflect.Proxy;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.mapping.Environment;
@@ -13,7 +15,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.core.annotation.Repository;
-import start.application.core.beans.ContextAdvice;
+import start.application.core.beans.ContextBeanAdvice;
 import start.application.core.beans.factory.DisposableBean;
 import start.application.core.beans.factory.InitializingBean;
 import start.application.core.constant.Constant;
@@ -22,14 +24,13 @@ import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;
 import start.application.core.utils.StringHelper;
 
-public class MybatisManager extends ContextAdvice implements InitializingBean,DisposableBean {
+public class MybatisManager extends ContextBeanAdvice implements InitializingBean,DisposableBean {
 	
 	private final static Logger log=LoggerFactory.getLogger(MybatisManager.class);
 	
 	private String basePackage;
 	private DataSource dataSource;
 	private SqlSessionFactory sqlSessionFactory;
-	private SqlSession session;
 
 	public DataSource getDataSource() {
 		return dataSource;
@@ -72,17 +73,14 @@ public class MybatisManager extends ContextAdvice implements InitializingBean,Di
 	
 	@Override
 	public Object newBean(BeanDefinition bean) {
-		session=sqlSessionFactory.openSession();
-		return session.getMapper(bean.getPrototype());
+		SqlSession session=sqlSessionFactory.openSession();
+		Object mapper=session.getMapper(bean.getPrototype());
+		MybatisSessionProxy proxy=new MybatisSessionProxy(session,mapper);
+		return Proxy.newProxyInstance(mapper.getClass().getClassLoader(), mapper.getClass().getInterfaces(),proxy);
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		//如果存在连接资源则关闭连接对象
-		if(session!=null){
-			session.commit();
-			session.close();
-		}
 	}
 
 

@@ -1,4 +1,4 @@
-package start.application.core.annotation;
+package start.application.orm.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,12 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 用于实现组件功能，定义该注解的类须实现相应接口
- * @author zhenyao
- *
+ * 用于注解当前执行的方法需要事务管理
+ * @author Start
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Component {
-}
+public @interface Transaction {
 
+}

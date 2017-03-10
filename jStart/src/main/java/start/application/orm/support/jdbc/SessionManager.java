@@ -124,7 +124,6 @@ public class SessionManager {
 	public void commitTrans() {
 		try{
 			getConnection().commit();
-			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
 			throw new RepositoryException(e);
 		}finally{
@@ -138,7 +137,6 @@ public class SessionManager {
 	public void rollbackTrans() {
 		try{
 			getConnection().rollback();
-			getConnection().setAutoCommit(true);
 		}catch(SQLException e){
 			throw new RepositoryException(e);
 		}finally{

@@ -7,21 +7,22 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.context.ApplicationIO;
+import start.application.core.annotation.AOP;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;
 import start.application.core.annotation.Resource;
 import start.application.core.beans.BeanDefinition;
-import start.application.core.beans.ContextAdvice;
+import start.application.core.beans.ContextBeanAdvice;
 import start.application.core.beans.factory.ApplicationContext;
 import start.application.core.beans.factory.ApplicationContextAware;
 import start.application.core.beans.factory.BeanDefinitionAware;
@@ -63,7 +64,7 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 		}else{
 			beanDefinitions.put(bean.getPrototypeString(), bean);
 		}
-		if(ReflectUtils.isSuperClass(bean.getPrototype(), ContextAdvice.class)){
+		if(ReflectUtils.isSuperClass(bean.getPrototype(), ContextBeanAdvice.class)){
 			//直接创建组件
 			getBean(bean);
 			log.info("自定义ContextAdvice容器生成对象："+bean.getName()+"，加载成功~~~");
@@ -100,7 +101,7 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 	private Object getBean(BeanDefinition bean){
 		if(bean.getBeanContextName()!=null){
 			//当前对象是否需要使用其它容器来创建
-			ContextAdvice context=(ContextAdvice)getBean(bean.getBeanContextName());
+			ContextBeanAdvice context=(ContextBeanAdvice)getBean(bean.getBeanContextName());
 			return context.newBean(bean);
 		}
 		//从缓存中直接获取已创建的对象
@@ -114,11 +115,13 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 		if(instance==null){
 			//构造函数注入
 			for (Constructor<?> constructor : bean.getPrototype().getConstructors()) {
-				List<Object> paramValues=new ArrayList<Object>();
+				Set<Class<?>> paramTypes=new HashSet<Class<?>>();
+				Set<Object> paramValues=new HashSet<Object>();
 				for(Parameter param:constructor.getParameters()){
 					if(param.isAnnotationPresent(Qualifier.class)){
 						Qualifier qualifier=param.getAnnotation(Qualifier.class);
 						Class<?> type=param.getType();
+						paramTypes.add(type);
 						if(qualifier.value().isEmpty()){
 							if(type.isInterface()){
 								paramValues.add(getBean(param.getName()));
@@ -138,19 +141,42 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 				}
 				if(!paramValues.isEmpty()){
 					try {
-						instance=constructor.newInstance(paramValues.toArray());
-						break;
+						Object[] params=paramValues.toArray();
+						if(bean.getPrototype().isAnnotationPresent(AOP.class)){
+							Class<?>[] tyeps =new Class<?>[paramTypes.size()];
+							paramTypes.toArray(tyeps);
+							BeanProxyInterceptor proxy=new BeanProxyInterceptor();
+							AOP aop=bean.getPrototype().getAnnotation(AOP.class);
+							for(String name:aop.value()){
+								proxy.addProxy((AOPBeanProxy)getBean(name));
+							}
+							instance=proxy.getInstance(bean.getPrototype(),tyeps,params);
+						}else{
+							instance=constructor.newInstance(params);
+						}
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException e) {
 						throw new ApplicationException(e);
 					}
+					//把对象加入缓存列表
+					putCacheContext(bean.getName(),instance);
+					break;
 				}
 			}
 		}
 		if (instance == null) {
 			//如果构造函数未注册则创造一个实例
 			try {
-				instance=bean.getPrototype().newInstance();
+				if(bean.getPrototype().isAnnotationPresent(AOP.class)){
+					BeanProxyInterceptor proxy=new BeanProxyInterceptor();
+					AOP aop=bean.getPrototype().getAnnotation(AOP.class);
+					for(String name:aop.value()){
+						proxy.addProxy((AOPBeanProxy)getBean(name));
+					}
+					instance=proxy.getInstance(bean.getPrototype());
+				}else{
+					instance=bean.getPrototype().newInstance();
+				}
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new ApplicationException(e);
 			}

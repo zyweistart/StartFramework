@@ -3,7 +3,7 @@ package start.application.core.beans;
 import start.application.core.beans.factory.ApplicationContext;
 import start.application.core.beans.factory.ApplicationContextAware;
 
-public abstract class ContextAdvice implements Context,ApplicationContextAware{
+public abstract class ContextBeanAdvice implements ApplicationContextAware{
 	
 	private ApplicationContext mApplication;
 	
@@ -24,5 +24,12 @@ public abstract class ContextAdvice implements Context,ApplicationContextAware{
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.mApplication=applicationContext;
 	}
+
+	/**
+	 * 获取实例对象,重复调用
+	 * @param bean
+	 * @return
+	 */
+	public abstract Object newBean(BeanDefinition bean);
 	
 }
