@@ -1,14 +1,14 @@
-package start.application.support;
+package start.application.core;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import start.application.context.ContextObject;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.XmlTag;
+import start.application.core.context.ContextCacheObject;
 
 /**
  * 应用配置文件解析
@@ -19,6 +19,11 @@ public class XmlConfigAnalysis implements ConfigImpl {
 
 	public static final String BEAN="bean";
 	public static final String CONSTANT="constant";
+	private XmlPathApplicationContext mApplicationContext;
+	
+	public XmlConfigAnalysis(XmlPathApplicationContext application){
+		this.mApplicationContext=application;
+	}
 	
 	// 注册Bean对象
 	private List<BeanDefinition> registerBeans = new ArrayList<BeanDefinition>();
@@ -34,11 +39,11 @@ public class XmlConfigAnalysis implements ConfigImpl {
 				value = xml.getTextContent();
 			}
 			// 注册常量
-			ContextObject.registerConstant(name, value);
+			ContextCacheObject.registerConstant(name, value);
 		} else if (ConfigInfo.PROPERTIES.equalsIgnoreCase(xml.getName())) {
 			for (String key : xml.getAttributes().keySet()) {
 				// 注册常量
-				ContextObject.registerConstant(key, xml.getAttributes().get(key));
+				ContextCacheObject.registerConstant(key, xml.getAttributes().get(key));
 			}
 		} else if (BEAN.equalsIgnoreCase(xml.getName())) {
 			BeanDefinition bean = new BeanDefinition();
@@ -62,7 +67,7 @@ public class XmlConfigAnalysis implements ConfigImpl {
 			registerBeans.add(bean);
 		} else {
 			// 注册自定义标签
-			ContextObject.registerCustom(xml.getName(), xml);
+			ContextCacheObject.registerCustom(xml.getName(), xml);
 		}
 	}
 
@@ -70,7 +75,7 @@ public class XmlConfigAnalysis implements ConfigImpl {
 	public void finish() {
 		// 读取完成后执行注册加载操作
 		for (BeanDefinition bean : registerBeans) {
-			ContextObject.registerBean(bean);
+			this.mApplicationContext.registerBeanDoManagerCenter(bean);
 		}
 	}
 

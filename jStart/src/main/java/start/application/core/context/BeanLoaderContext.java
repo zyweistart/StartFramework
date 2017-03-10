@@ -1,30 +1,30 @@
 package start.application.core.context;
 
-import start.application.context.ContextObject;
 import start.application.core.annotation.Component;
 import start.application.core.annotation.Repository;
 import start.application.core.annotation.Service;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.ApplicationContext;
 
 public class BeanLoaderContext extends LoaderHandler{
 
 	@Override
-	public void load(Class<?> prototype) {
+	public void load(ApplicationContext applicationContext,Class<?> prototype) {
 		//组件不归入Bean容器管理
 		Component component = prototype.getAnnotation(Component.class);
 		if (component != null) {
 			BeanDefinition bean=new BeanDefinition();
 			bean.setPrototype(prototype.getName());
-			ContextObject.registerBean(bean);
+			applicationContext.registerBeanDoManagerCenter(bean);
 			return;
 		}
 		//注册Bean
 		BeanDefinition bean=analysisBean(prototype);
 		if(bean!=null){
-			ContextObject.registerBean(bean);
+			applicationContext.registerBeanDoManagerCenter(bean);
 			return;
 		}
-		this.doLoadContext(prototype);
+		this.doLoadContext(applicationContext,prototype);
 	}
 	
 	/**

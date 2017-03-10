@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import start.application.commons.codec.MD5;
-import start.application.core.Constant;
+import start.application.core.constant.Constant;
 
 public class StringHelper {
 

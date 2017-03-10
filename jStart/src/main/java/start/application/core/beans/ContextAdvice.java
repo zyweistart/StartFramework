@@ -1,8 +1,11 @@
 package start.application.core.beans;
 
-import start.application.context.ContextObject;
+import start.application.core.beans.factory.ApplicationContext;
+import start.application.core.beans.factory.ApplicationContextAware;
 
-public abstract class ContextAdvice implements Context{
+public abstract class ContextAdvice implements Context,ApplicationContextAware{
+	
+	private ApplicationContext mApplication;
 	
 	/**
 	 * 注册Bean对象到管理中心
@@ -13,8 +16,13 @@ public abstract class ContextAdvice implements Context{
 		BeanDefinition bd=new BeanDefinition();
 		bd.setName(beanName);
 		bd.setPrototype(className);
-		bd.setBeanContextName(ContextObject.getBeanInfo(this.getClass().getName()).getName());
-		ContextObject.registerBean(bd);
+		bd.setBeanContextName(this.mApplication.getBeanDefinitionInfoByClass(this.getClass().getName()).getName());
+		this.mApplication.registerBeanDoManagerCenter(bd);
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.mApplication=applicationContext;
 	}
 	
 }

@@ -1,19 +1,21 @@
 package test.framework;
 
+import java.io.IOException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import junit.framework.TestCase;
-import start.application.context.Container;
+import start.application.core.XmlPathApplicationContext;
 
 public class StartTest extends TestCase {
 
-	Container container=new Container();
+	XmlPathApplicationContext container=new XmlPathApplicationContext();
 
 	@BeforeClass
 	public void testBeforeClass() {
-		container.init();
+		container.start();
 	}
 
 	@Test
@@ -22,7 +24,7 @@ public class StartTest extends TestCase {
 	}
 
 	@AfterClass
-	public void testAfterClass() {
+	public void testAfterClass() throws IOException {
 		container.close();
 	}
 

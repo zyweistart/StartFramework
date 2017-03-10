@@ -1,6 +1,6 @@
 package start.application.core.config;
 
-import start.application.context.ContextObject;
+import start.application.core.context.ContextCacheObject;
 import start.application.core.utils.StringHelper;
 
 /**
@@ -54,19 +54,19 @@ public class ConstantConfig {
 	public final static String TMPPATH=ConstantConfig.getString("TMPPATH");
 	
 	public static Integer getInt(String key){
-		return StringHelper.nullToInt(ContextObject.getConstant(key));
+		return StringHelper.nullToInt(ContextCacheObject.getConstant(key));
 	}
 
 	public static Long getLong(String key){
-		return StringHelper.nullToLong(ContextObject.getConstant(key));
+		return StringHelper.nullToLong(ContextCacheObject.getConstant(key));
 	}
 	
 	public static String getString(String key){
-		return StringHelper.nullToStrTrim(ContextObject.getConstant(key));
+		return StringHelper.nullToStrTrim(ContextCacheObject.getConstant(key));
 	}
 	
 	public static Boolean getBoolean(String key){
-		return StringHelper.nullToBoolean(ContextObject.getConstant(key));
+		return StringHelper.nullToBoolean(ContextCacheObject.getConstant(key));
 	}
 	
 	public static String get(String value) {
@@ -75,7 +75,7 @@ public class ConstantConfig {
 
 		if (p1 > -1 && p2 > -1) {
 			String innerKey = value.substring(p1 + DEFAULT_PLACEHOLDER_PREFIX.length(), p2);
-			value = ContextObject.getConstant(innerKey);
+			value = ContextCacheObject.getConstant(innerKey);
 		}
 		return value;
 	}

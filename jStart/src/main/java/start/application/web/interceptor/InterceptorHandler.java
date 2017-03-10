@@ -1,6 +1,6 @@
 package start.application.web.interceptor;
 
-import start.application.core.Aware;
+import start.application.core.beans.factory.Aware;
 import start.application.web.action.ActionSupport;
 
 /**

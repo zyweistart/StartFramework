@@ -1,20 +1,21 @@
 package start.application.web.context;
 
+import java.io.IOException;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.context.Container;
 
-public class ContextLoaderListener extends ContextLoader implements ServletContextListener {
+public class ContextLoaderListener implements ServletContextListener {
 	
 	private final static Logger log=LoggerFactory.getLogger(ContextLoaderListener.class);
 
-	private Container mContainer;
+	private WebApplicationContext mWebApplicationContext;
 	
 	public ContextLoaderListener() {
-		mContainer=new Container();
+		mWebApplicationContext=new WebApplicationContext();
 	}
 
 	/**
@@ -23,7 +24,7 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		long start=System.currentTimeMillis();
-		mContainer.init();
+		this.mWebApplicationContext.start();
 		long value=System.currentTimeMillis()-start;
 		log.info("解析配置文件及扫描包总花费时间："+value+" ms");
 	}
@@ -34,7 +35,11 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
-		mContainer.close();
+		try {
+			this.mWebApplicationContext.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

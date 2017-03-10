@@ -18,12 +18,12 @@ import com.mongodb.client.result.UpdateResult;
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
 import start.application.context.ApplicationIO;
-import start.application.context.ContextObject;
-import start.application.core.Message;
+import start.application.core.constant.Message;
 import start.application.core.utils.StringHelper;
 import start.application.orm.AbstractEntityManager;
 import start.application.orm.annotation.GeneratedValue;
 import start.application.orm.annotation.Id;
+import start.application.orm.context.ContextCacheEntity;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
 import start.application.orm.exceptions.RepositoryException;
@@ -35,7 +35,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 
 	@Override
 	public void persist(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
+		EntityInfo entityMember = ContextCacheEntity.getEntity(entity.getClass());
 		// 主键值
 		Object primaryKeyValue = null;
 		MongoCollection<Document> dbCollection = getSession().getDataBase().getCollection(entityMember.getTableName());
@@ -86,7 +86,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 
 	@Override
 	public long merge(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
+		EntityInfo entityMember = ContextCacheEntity.getEntity(entity.getClass());
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -127,7 +127,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 	@Override
 	public long remove(Object entity) {
 		Class<?> prototype = entity.getClass();
-		EntityInfo entityMember = ContextObject.getEntity(prototype);
+		EntityInfo entityMember = ContextCacheEntity.getEntity(prototype);
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -151,7 +151,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 
 	@Override
 	public <T> T load(Class<T> prototype, Serializable primaryKeyValue) {
-		EntityInfo entityMember = ContextObject.getEntity(prototype);
+		EntityInfo entityMember = ContextCacheEntity.getEntity(prototype);
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
 			throw new RepositoryException(message);
@@ -169,7 +169,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getListEntity(Class<T> prototype, Document doc) {
 		// 把List,Map组成装对象
-		EntityInfo entityMember = ContextObject.getEntity(prototype);
+		EntityInfo entityMember = ContextCacheEntity.getEntity(prototype);
 		List<Map<String, String>> entitys = getListMap(entityMember.getTableName(),doc);
 		List<T> tEntitys = new ArrayList<T>();
 		if (entitys.isEmpty()) {

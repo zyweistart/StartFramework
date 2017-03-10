@@ -1,8 +1,8 @@
 package start.application.web.context;
 
-import start.application.context.ContextObject;
-import start.application.core.Message;
 import start.application.core.beans.BeanDefinition;
+import start.application.core.beans.factory.ApplicationContext;
+import start.application.core.constant.Message;
 import start.application.core.context.LoaderHandler;
 import start.application.core.exceptions.AnnoationError;
 import start.application.core.utils.ReflectUtils;
@@ -12,14 +12,14 @@ import start.application.web.annotation.Controller;
 public class WebLoaderContext extends LoaderHandler {
 	
 	@Override
-	public void load(Class<?> prototype) {
+	public void load(ApplicationContext applicationContext,Class<?> prototype) {
 		//2.2注册Bean
 		BeanDefinition bean=analysisBean(prototype);
 		if(bean!=null){
-			ContextObject.registerBean(bean);
+			applicationContext.registerBeanDoManagerCenter(bean);
 			return;
 		}
-		doLoadContext(prototype);
+		doLoadContext(applicationContext,prototype);
 	}
 	
 	/**

@@ -12,11 +12,11 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.core.Constant;
 import start.application.core.annotation.Repository;
 import start.application.core.beans.ContextAdvice;
 import start.application.core.beans.factory.DisposableBean;
 import start.application.core.beans.factory.InitializingBean;
+import start.application.core.constant.Constant;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ClassHelper;

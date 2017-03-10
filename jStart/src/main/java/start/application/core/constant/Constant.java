@@ -1,4 +1,4 @@
-package start.application.core;
+package start.application.core.constant;
 
 /**
  * 常量

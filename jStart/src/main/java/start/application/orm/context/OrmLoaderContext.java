@@ -5,9 +5,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 
 import start.application.context.ApplicationIO;
-import start.application.context.ContextObject;
-import start.application.core.DataTypeValidation;
-import start.application.core.Message;
+import start.application.core.beans.factory.ApplicationContext;
+import start.application.core.constant.DataTypeValidation;
+import start.application.core.constant.Message;
 import start.application.core.context.LoaderHandler;
 import start.application.core.exceptions.AnnoationError;
 import start.application.orm.annotation.Column;
@@ -26,13 +26,13 @@ import start.application.orm.exceptions.EntityDefinitionError;
 public class OrmLoaderContext extends LoaderHandler {
 
 	@Override
-	public void load(Class<?> prototype) {
+	public void load(ApplicationContext applicationContext,Class<?> prototype) {
 		EntityInfo entity =analysisEntity(prototype);
 		if(entity!=null){
-			ContextObject.registerEntity(entity);
+			ContextCacheEntity.registerEntity(entity);
 			return;
 		}
-		this.doLoadContext(prototype);
+		this.doLoadContext(applicationContext,prototype);
 	}
 	
 	/**

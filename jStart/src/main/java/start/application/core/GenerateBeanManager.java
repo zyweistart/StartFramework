@@ -1,4 +1,4 @@
-package start.application.support;
+package start.application.core;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -8,46 +8,96 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import start.application.commons.logger.Logger;
+import start.application.commons.logger.LoggerFactory;
 import start.application.context.ApplicationIO;
-import start.application.context.ContextObject;
-import start.application.core.Message;
 import start.application.core.annotation.Constant;
 import start.application.core.annotation.Qualifier;
 import start.application.core.annotation.Resource;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.beans.ContextAdvice;
+import start.application.core.beans.factory.ApplicationContext;
+import start.application.core.beans.factory.ApplicationContextAware;
+import start.application.core.beans.factory.BeanDefinitionAware;
 import start.application.core.beans.factory.BeforeBean;
 import start.application.core.beans.factory.DisposableBean;
 import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
+import start.application.core.constant.Message;
 import start.application.core.exceptions.ApplicationException;
 import start.application.core.utils.ReflectUtils;
 
-public class GenerateBeanManager implements Closeable {
-
+public class GenerateBeanManager implements ApplicationContext,Closeable {
+	
+	private final static Logger log=LoggerFactory.getLogger(GenerateBeanManager.class);
+	
+	private Map<String, String> beanDefinitionDictionaries = new HashMap<String, String>();
+	private Map<String, BeanDefinition> beanDefinitions = new HashMap<String, BeanDefinition>();
 	private ConcurrentMap<String,Object> cacheContext=new ConcurrentHashMap<String,Object>();
 
-	public void putCacheContext(String name,Object beanObj) {
-		cacheContext.putIfAbsent(name, beanObj);
-	}
-	
 	public Object getCacheContext(String name) {
 		return cacheContext.get(name);
 	}
 	
-	public Object getBean(String name){
-		return getBean(ContextObject.getBean(name));
-	}
-
-	public Object getBean(Class<?> prototype){
-		return getBean(ContextObject.getBeanInfo(prototype.getName()));
+	public void putCacheContext(String name,Object beanObj) {
+		cacheContext.putIfAbsent(name, beanObj);
 	}
 	
-	public Object getBean(BeanDefinition bean){
+	@Override
+	public void registerBeanDoManagerCenter(BeanDefinition bean){
+		if (beanDefinitionDictionaries.containsKey(bean.getName())) {
+			String message=Message.getMessage(Message.PM_3000, bean.getName());
+			throw new IllegalArgumentException(message);
+		}else{
+			beanDefinitionDictionaries.put(bean.getName(), bean.getPrototypeString());
+		}
+		if (beanDefinitions.containsKey(bean.getPrototypeString())) {
+			String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
+			throw new IllegalArgumentException(message);
+		}else{
+			beanDefinitions.put(bean.getPrototypeString(), bean);
+		}
+		if(ReflectUtils.isSuperClass(bean.getPrototype(), ContextAdvice.class)){
+			//直接创建组件
+			getBean(bean);
+			log.info("自定义ContextAdvice容器生成对象："+bean.getName()+"，加载成功~~~");
+		}
+	}
+	
+	@Override
+	public BeanDefinition getBeanDefinitionInfoByName(String name) {
+		String prototypeString=beanDefinitionDictionaries.get(name);
+		if(prototypeString==null){
+			throw new NullPointerException(Message.getMessage(Message.PM_1003, name));
+		}
+		return getBeanDefinitionInfoByClass(prototypeString);
+	}
+	
+	@Override
+	public BeanDefinition getBeanDefinitionInfoByClass(String prototypeString) {
+		if(!beanDefinitions.containsKey(prototypeString)){
+			throw new NullPointerException(Message.getMessage(Message.PM_1003, prototypeString));
+		}
+		return beanDefinitions.get(prototypeString);
+	}
+
+	@Override
+	public Object getBean(String name){
+		return getBean(getBeanDefinitionInfoByName(name));
+	}
+
+	@Override
+	public Object getBean(Class<?> prototype){
+		return getBean(getBeanDefinitionInfoByClass(prototype.getName()));
+	}
+	
+	private Object getBean(BeanDefinition bean){
 		if(bean.getBeanContextName()!=null){
 			//当前对象是否需要使用其它容器来创建
 			ContextAdvice context=(ContextAdvice)getBean(bean.getBeanContextName());
@@ -187,6 +237,20 @@ public class GenerateBeanManager implements Closeable {
 		}
 		//如果为缓存对象则不重复执行初始化方法
 		if(isNewObject){
+			if(instance instanceof ApplicationContextAware){
+				try {
+					((ApplicationContextAware)instance).setApplicationContext(this);
+				} catch (Exception e) {
+					throw new ApplicationException(e);
+				}
+			}
+			if(instance instanceof BeanDefinitionAware){
+				try {
+					((BeanDefinitionAware)instance).setBeanDefinition(bean);
+				} catch (Exception e) {
+					throw new ApplicationException(e);
+				}
+			}
 			//执行初始化方法
 			if(instance instanceof InitializingBean){
 				try {
@@ -212,7 +276,7 @@ public class GenerateBeanManager implements Closeable {
 	@Override
 	public void close() throws IOException {
 		for(String name:cacheContext.keySet()){
-			BeanDefinition bean=ContextObject.getBean(name);
+			BeanDefinition bean=getBeanDefinitionInfoByName(name);
 			Object instance=cacheContext.get(name);
 			ReflectUtils.invokeMethod(instance,bean.getDestory());
 			if(instance instanceof DisposableBean){

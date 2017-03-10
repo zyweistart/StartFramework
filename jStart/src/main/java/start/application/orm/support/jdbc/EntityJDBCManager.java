@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 import start.application.context.ApplicationIO;
-import start.application.context.ContextObject;
-import start.application.core.Message;
+import start.application.core.constant.Message;
 import start.application.core.utils.StringHelper;
 import start.application.orm.AbstractEntityManager;
 import start.application.orm.annotation.GeneratedValue;
 import start.application.orm.annotation.Id;
+import start.application.orm.context.ContextCacheEntity;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
 import start.application.orm.exceptions.RepositoryException;
@@ -39,7 +39,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 
 	@Override
 	public void persist(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
+		EntityInfo entityMember = ContextCacheEntity.getEntity(entity.getClass());
 		// 主键值
 		Object primaryKeyValue = null;
 		List<String> fieldNames = new ArrayList<String>();
@@ -101,7 +101,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 
 	@Override
 	public long merge(Object entity) {
-		EntityInfo entityMember = ContextObject.getEntity(entity.getClass());
+		EntityInfo entityMember = ContextCacheEntity.getEntity(entity.getClass());
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -147,7 +147,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 	@Override
 	public long remove(Object entity) {
 		Class<?> prototype = entity.getClass();
-		EntityInfo entityMember = ContextObject.getEntity(prototype);
+		EntityInfo entityMember = ContextCacheEntity.getEntity(prototype);
 		Object primaryKeyValue=null;
 		try {
 			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
@@ -177,7 +177,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 	/////////////////////////////////////// Select///////////////////////////////////////////////////
 	@Override
 	public <T> T load(Class<T> prototype, Serializable primaryKeyValue) {
-		EntityInfo entityMember = ContextObject.getEntity(prototype);
+		EntityInfo entityMember = ContextCacheEntity.getEntity(prototype);
 		if (primaryKeyValue == null) {
 			String message = Message.getMessage(Message.PM_5001, entityMember.getEntityName());
 			throw new RepositoryException(message);
@@ -240,7 +240,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			return tEntitys;
 		}
 		// 把List,Map组成装对象
-		EntityInfo entityMember = ContextObject.getEntity(prototype);
+		EntityInfo entityMember = ContextCacheEntity.getEntity(prototype);
 		for (Map<String, String> en : entitys) {
 			Object obj;
 			try {

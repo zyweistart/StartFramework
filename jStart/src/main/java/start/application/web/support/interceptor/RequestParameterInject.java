@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import start.application.context.ApplicationIO;
-import start.application.core.Message;
+import start.application.core.constant.Message;
 import start.application.web.exceptions.ActionException;
 import start.application.web.support.interceptor.fileupload.UpLoadFile;
 

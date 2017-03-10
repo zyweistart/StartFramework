@@ -1,4 +1,4 @@
-package start.application.core;
+package start.application.core.constant;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;

@@ -1,16 +1,18 @@
-package start.application.support;
+package start.application.core;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import start.application.core.beans.factory.ApplicationContext;
 import start.application.core.context.BeanLoaderContext;
 import start.application.core.context.LoaderHandler;
 import start.application.orm.context.OrmLoaderContext;
 import start.application.web.context.WebLoaderContext;
 
-public class AnnotationApplicationContext {
+public class AnnotationConfigContext {
 
+	private ApplicationContext mApplication;
 	private LoaderHandler handler = null;
 	private static List<LoaderHandler> loaders = new ArrayList<LoaderHandler>();
 	
@@ -23,7 +25,8 @@ public class AnnotationApplicationContext {
 		loaders.add(new OrmLoaderContext());
 	}
 	
-	public AnnotationApplicationContext(){
+	public AnnotationConfigContext(ApplicationContext applicationContext){
+		this.mApplication=applicationContext;
 		Iterator<LoaderHandler> interceptors = loaders.iterator();
 		while (interceptors.hasNext()) {
 			LoaderHandler currentHandler = interceptors.next();
@@ -37,7 +40,7 @@ public class AnnotationApplicationContext {
 		if (prototype.isInterface()) {
 			return;
 		}
-		handler.load(prototype);
+		handler.load(this.mApplication,prototype);
 		handler.reset();
 	}
 	
