@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * @author zhenyao
  *
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.FIELD,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface VerifyValueTimeFormat {
 	String format() default "yyyyMMddHHmmss";

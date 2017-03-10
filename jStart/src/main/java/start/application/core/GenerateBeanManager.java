@@ -246,7 +246,7 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 					if(value!=null){
 						Class<?> type=method.getParameterTypes()[0];
 						try {
-							method.invoke(instance, ApplicationIO.read(null,type,ConstantConfig.get(bean.getValues().get(name))));
+							method.invoke(instance, ApplicationIO.read(null,method,type,ConstantConfig.get(bean.getValues().get(name))));
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 							throw new ApplicationException(e);
 						}
