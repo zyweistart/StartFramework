@@ -72,7 +72,7 @@ public class OrmLoaderContext extends LoaderClassAnnotationHandler {
 					continue;
 				}
 				//判断是否为支持的数据类型
-				if(!ApplicationIO.isDataTypeSupport(field)){
+				if(!ApplicationIO.isDataTypeSupport(field.getType())){
 					String message=Message.getMessage(Message.PM_5019,entityInfo.getEntityName(),
 							field.getName(), field.getType().getName());
 					throw new AnnoationError(message);

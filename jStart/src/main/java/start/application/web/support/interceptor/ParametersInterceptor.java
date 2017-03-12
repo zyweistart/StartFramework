@@ -1,6 +1,5 @@
 package start.application.web.support.interceptor;
 
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -37,9 +36,9 @@ public class ParametersInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(Arrays.asList(parameterValues)));
 					}
 				}
-				ReflectUtils.injectParameter(support.getAction(),params);
+				ReflectUtils.iocObjectParameter(support.getAction(),params);
 			}
-		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | ParseException e) {
+		} catch (IllegalArgumentException e) {
 			throw new ActionException(e);
 		}finally{
 			// 继续执行下一个拦截器

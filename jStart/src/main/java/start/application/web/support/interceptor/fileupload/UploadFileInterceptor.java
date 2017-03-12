@@ -187,7 +187,7 @@ public class UploadFileInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(lists));
 					}
 				}
-				ReflectUtils.injectParameter(support.getAction(),params);
+				ReflectUtils.iocObjectParameter(support.getAction(),params);
 				// 文件注入
 				Map<String,List<UpLoadFile>> fileParams=new HashMap<String,List<UpLoadFile>>();
 				for (String fileField : upLoadFiles.keySet()) {

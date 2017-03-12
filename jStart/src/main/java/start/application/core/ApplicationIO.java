@@ -40,11 +40,11 @@ public final class ApplicationIO {
 	 * @param entityName
 	 * @param field
 	 */
-	public static boolean isDataTypeSupport(Field field) {
-		String typeName = field.getType().getName();
-		if (field.getType().isEnum()) {
+	public static boolean isDataTypeSupport(Class<?> type) {
+		String typeName = type.getName();
+		if (type.isEnum()) {
 			return true;
-		} else if (field.getType().isArray()) {
+		} else if (type.isArray()) {
 			if (DataTypeValidation.isSupportDataTypeArray.contains(typeName)) {
 				// 数组类型只支持字符串数组
 				return true;
