@@ -389,11 +389,45 @@ public final class ApplicationIO {
 				throw new VerifyException(verify.message());
 			}
 			if(verify.type()==FormatType.MOBILE){
-				
+				if(!VerifyCheck.isMobile(value)){
+					throw new VerifyException(verify.message());
+				}
 			}else if(verify.type()==FormatType.MAIL){
-				
+				if(!VerifyCheck.isMail(value)){
+					throw new VerifyException(verify.message());
+				}
 			}else if(verify.type()==FormatType.IDCARD){
-				
+				if(!VerifyCheck.isIDCard(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.PHONE){
+				if(!VerifyCheck.isPhone(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.MD5){
+				if(!VerifyCheck.isMD5(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.IP){
+				if(!VerifyCheck.isIPAddress(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.MAC){
+				if(!VerifyCheck.isMacAddress(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.CHINESE){
+				if(!VerifyCheck.isChinese(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.NUMBER){
+				if(!VerifyCheck.isNumber(value)){
+					throw new VerifyException(verify.message());
+				}
+			}else if(verify.type()==FormatType.MONEY){
+				if(!VerifyCheck.isMoney(value)){
+					throw new VerifyException(verify.message());
+				}
 			}
 		}
 	}
