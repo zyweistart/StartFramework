@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import start.application.core.utils.ReflectUtils;
+import start.application.core.ApplicationIO;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
@@ -36,7 +36,7 @@ public class ParametersInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(Arrays.asList(parameterValues)));
 					}
 				}
-				ReflectUtils.iocObjectParameter(support.getAction(),params);
+				ApplicationIO.iocObjectParameter(support.getAction(),params);
 			}
 		} catch (IllegalArgumentException e) {
 			throw new ActionException(e);

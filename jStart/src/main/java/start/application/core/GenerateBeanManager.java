@@ -244,10 +244,10 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 			}
 			cClass = cClass.getSuperclass();
 		}
-		ReflectUtils.iocObjectParameter(instance, bean.getRefs(),mBeanValueImpl);
+		ApplicationIO.iocObjectParameter(instance, bean.getRefs(),mBeanValueImpl);
 		//如果为缓存对象则不重复执行
 		if(isNewObject){
-			ReflectUtils.iocObjectParameter(instance, bean.getValues(),mConstantValueImpl);
+			ApplicationIO.iocObjectParameter(instance, bean.getValues(),mConstantValueImpl);
 			if(instance instanceof ApplicationContextAware){
 				try {
 					((ApplicationContextAware)instance).setApplicationContext(this);

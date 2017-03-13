@@ -71,7 +71,7 @@ public class EntityJDBCManager extends AbstractEntityManager {
 			fieldNames.add(entityMember.getPrimaryKeyMember().getFieldName());
 			positions.add("?");
 			parameters.add(
-					write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+					ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		}
 		// 其它字段
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
@@ -87,7 +87,7 @@ public class EntityJDBCManager extends AbstractEntityManager {
 			}
 			fieldNames.add(propertyMember.getFieldName());
 			positions.add("?");
-			parameters.add(write(propertyMember.getField(), value));
+			parameters.add(ApplicationIO.write(propertyMember.getField(), value));
 		}
 		// 生成语句
 		String SQL = String.format(INSERT, entityMember.getTableName(),
@@ -129,11 +129,11 @@ public class EntityJDBCManager extends AbstractEntityManager {
 				continue;
 			}
 			fieldNames.add(propertyMember.getFieldName() + "=?");
-			parameters.add(write(propertyMember.getField(), value));
+			parameters.add(ApplicationIO.write(propertyMember.getField(), value));
 		}
 		// 主键字段
 		whereFieldNames.add(entityMember.getPrimaryKeyMember().getFieldName() + "=?");
-		parameters.add(write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+		parameters.add(ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		// 生成语句
 		String SQL = String.format(UPDATE, entityMember.getTableName(),
 				StringHelper.listToString(fieldNames), StringHelper.listToString(whereFieldNames));
@@ -165,7 +165,7 @@ public class EntityJDBCManager extends AbstractEntityManager {
 		// 生成语句
 		String SQL = String.format(DELETE, entityMember.getTableName(),
 				StringHelper.listToString(whereFieldNames));
-		primaryKeyValue = write(entityMember.getPrimaryKeyMember().getField(),
+		primaryKeyValue = ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(),
 				primaryKeyValue);
 		try {
 			return getSession().executeUpdate(SQL, primaryKeyValue);
@@ -189,7 +189,7 @@ public class EntityJDBCManager extends AbstractEntityManager {
 		String SQL = String.format(SELECT, entityMember.getTableName(),
 				StringHelper.listToString(whereFieldNames));
 		List<T> entitys = getListEntityBySQL(prototype, SQL,
-				write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		if (entitys.size() > 0) {
 			return entitys.get(0);
 		} else {

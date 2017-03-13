@@ -64,7 +64,7 @@ public class EntityMongoDBManager extends AbstractEntityManager {
 		} else {
 			// 主键字段
 			doc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-					write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+					ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		}
 		// 其它字段
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
@@ -78,7 +78,7 @@ public class EntityMongoDBManager extends AbstractEntityManager {
 			if (value == null) {
 				continue;
 			}
-			doc.put(propertyMember.getFieldName(), write(propertyMember.getField(), value));
+			doc.put(propertyMember.getFieldName(), ApplicationIO.write(propertyMember.getField(), value));
 		}
 		logDocument(doc);
 		dbCollection.insertOne(doc);
@@ -114,10 +114,10 @@ public class EntityMongoDBManager extends AbstractEntityManager {
 			if (value == null) {
 				continue;
 			}
-			updateDoc.put(propertyMember.getFieldName(), write(propertyMember.getField(), value));
+			updateDoc.put(propertyMember.getFieldName(), ApplicationIO.write(propertyMember.getField(), value));
 		}
 		whereDoc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-				write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		logDocument(whereDoc);
 		logDocument(updateDoc);
 		UpdateResult result=dbCollection.updateOne(whereDoc, new Document("$set",updateDoc));
@@ -143,7 +143,7 @@ public class EntityMongoDBManager extends AbstractEntityManager {
 				.getCollection(entityMember.getTableName());
 		Document doc = new Document();
 		doc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-				write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		logDocument(doc);
 		DeleteResult result=dbCollection.deleteOne(doc);
 		return result.getDeletedCount();

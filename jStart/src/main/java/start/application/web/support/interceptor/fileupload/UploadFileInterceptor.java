@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
+import start.application.core.ApplicationIO;
 import start.application.core.config.ConstantConfig;
 import start.application.core.utils.FileHelper;
-import start.application.core.utils.ReflectUtils;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;
@@ -187,7 +187,7 @@ public class UploadFileInterceptor extends InterceptorHandler {
 						params.put(parameterName, StringHelper.listToString(lists));
 					}
 				}
-				ReflectUtils.iocObjectParameter(support.getAction(),params);
+				ApplicationIO.iocObjectParameter(support.getAction(),params);
 				// 文件注入
 				Map<String,List<UpLoadFile>> fileParams=new HashMap<String,List<UpLoadFile>>();
 				for (String fileField : upLoadFiles.keySet()) {
