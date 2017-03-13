@@ -27,7 +27,6 @@ public class ActionSupport{
 		this.response=response;
 	}
 	
-	
 	public Action getAction() {
 		return action;
 	}

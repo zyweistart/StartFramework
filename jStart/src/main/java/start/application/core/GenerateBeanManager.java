@@ -32,8 +32,9 @@ import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
 import start.application.core.constant.Message;
 import start.application.core.exceptions.ApplicationException;
-import start.application.core.ioc.BeanValueImpl;
-import start.application.core.ioc.ConstantValueImpl;
+import start.application.core.io.ApplicationIO;
+import start.application.core.io.BeanValueImpl;
+import start.application.core.io.ConstantValueImpl;
 import start.application.core.utils.ReflectUtils;
 
 public class GenerateBeanManager implements ApplicationContext,Closeable {

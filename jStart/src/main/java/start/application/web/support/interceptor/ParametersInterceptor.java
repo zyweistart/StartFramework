@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import start.application.core.ApplicationIO;
+import start.application.core.io.ApplicationIO;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
 import start.application.web.exceptions.ActionException;

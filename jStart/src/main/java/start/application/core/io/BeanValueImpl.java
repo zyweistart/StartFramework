@@ -1,4 +1,4 @@
-package start.application.core.ioc;
+package start.application.core.io;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

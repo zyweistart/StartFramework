@@ -1,9 +1,8 @@
-package start.application.core.ioc;
+package start.application.core.io;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import start.application.core.ApplicationIO;
 import start.application.core.GenerateBeanManager;
 import start.application.core.config.ConstantConfig;
 
