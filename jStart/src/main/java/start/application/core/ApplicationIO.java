@@ -5,8 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +61,9 @@ public final class ApplicationIO {
 	}
 
 	public static Object read(Field field, Method method, Class<?> type,String value) {
+		if(!isDataTypeSupport(type)){
+			return null;
+		}
 		isVerifyField(field, value);
 		isVerifyMethod(method, value);
 		String typeName = type.getName();
@@ -122,56 +123,7 @@ public final class ApplicationIO {
 		}
 		return value;
 	}
-
-	/**
-	 * 内部字段类型转化输出到外部
-	 */
-	@SuppressWarnings("rawtypes")
-	public static Object write(Field field, Object value) {
-		if (StringHelper.isEmpty(value)) {
-			return "";
-		}
-		String tarValue = String.valueOf(value);
-		String typeName = field.getType().getName();
-		if (DataTypeValidation.isDate.contains(typeName)) {
-			String format = ConstantConfig.DATAFORMAT;
-			if (field.isAnnotationPresent(Temporal.class)) {
-				Temporal temporal = field.getAnnotation(Temporal.class);
-				format = temporal.format();
-			}
-			SimpleDateFormat sdf = new SimpleDateFormat(format);
-			return sdf.format(value);
-		} else if (field.getType().isEnum()) {
-			// 字符找索引
-			return ((Enum) value).ordinal();
-		} else if (field.getType().isArray()) {
-			// 数组转成字符串用逗号分隔
-			List<String> lists = new ArrayList<String>();
-			for (Object o : (Object[]) value) {
-				lists.add(String.valueOf(o));
-			}
-			return StringHelper.listToString(lists);
-		} else if (DataTypeValidation.isBoolean.contains(typeName)) {
-			return Boolean.parseBoolean(tarValue) ? 1 : 0;
-		} else if (DataTypeValidation.isShort.contains(typeName) || DataTypeValidation.isInteger.contains(typeName)
-				|| DataTypeValidation.isLong.contains(typeName) || DataTypeValidation.isFloat.contains(typeName)
-				|| DataTypeValidation.isDouble.contains(typeName) || DataTypeValidation.isString.contains(typeName)) {
-			return tarValue;
-		}
-		return tarValue;
-	}
-
-	public static void isVerifyMethod(Method method, String value) {
-		if(method==null){
-			return;
-		}
-		verify(method.getAnnotation(VerifyValueEmpty.class),value);
-		verify(method.getAnnotation(VerifyValueLength.class),value);
-		verify(method.getAnnotation(VerifyValueEnum.class),method.getParameterTypes()[0],value);
-		verify(method.getAnnotation(VerifyValueTimeFormat.class),value);
-		verify(method.getAnnotation(VerifyValueFormat.class),value);
-		verify(method.getAnnotation(VerifyValueRegex.class),value);
-	}
+	
 	/**
 	 * 验证字段类型
 	 * 
@@ -189,6 +141,23 @@ public final class ApplicationIO {
 		verify(field.getAnnotation(VerifyValueFormat.class),value);
 		verify(field.getAnnotation(VerifyValueRegex.class),value);
 	}
+
+	/**
+	 * 验证set方法的字段类型
+	 * @param method
+	 * @param value
+	 */
+	public static void isVerifyMethod(Method method, String value) {
+		if(method==null){
+			return;
+		}
+		verify(method.getAnnotation(VerifyValueEmpty.class),value);
+		verify(method.getAnnotation(VerifyValueLength.class),value);
+		verify(method.getAnnotation(VerifyValueEnum.class),method.getParameterTypes()[0],value);
+		verify(method.getAnnotation(VerifyValueTimeFormat.class),value);
+		verify(method.getAnnotation(VerifyValueFormat.class),value);
+		verify(method.getAnnotation(VerifyValueRegex.class),value);
+	}
 	
 	/**
 	 * 验证是否为空
@@ -202,6 +171,7 @@ public final class ApplicationIO {
 			}
 		}
 	}
+	
 	/**
 	 * 验证长度
 	 * @param length

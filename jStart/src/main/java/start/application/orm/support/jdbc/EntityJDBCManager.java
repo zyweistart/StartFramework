@@ -15,20 +15,20 @@ import java.util.Map;
 import start.application.core.ApplicationIO;
 import start.application.core.constant.Message;
 import start.application.core.utils.StringHelper;
-import start.application.orm.AbstractEntityManager;
 import start.application.orm.annotation.GeneratedValue;
 import start.application.orm.annotation.Id;
 import start.application.orm.context.ContextCacheEntity;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
 import start.application.orm.exceptions.RepositoryException;
+import start.application.orm.support.AbstractEntityManager;
 
 /**
  * 实体管理器
  * 
  * @author Start
  */
-public class EntityJDBCManager implements AbstractEntityManager {
+public class EntityJDBCManager extends AbstractEntityManager {
 
 	private static final String INSERT="INSERT INTO %s(%s) VALUES(%s)";
 	private static final String UPDATE="UPDATE %s SET %s WHERE %s";
@@ -71,7 +71,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			fieldNames.add(entityMember.getPrimaryKeyMember().getFieldName());
 			positions.add("?");
 			parameters.add(
-					ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+					write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		}
 		// 其它字段
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
@@ -87,7 +87,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 			}
 			fieldNames.add(propertyMember.getFieldName());
 			positions.add("?");
-			parameters.add(ApplicationIO.write(propertyMember.getField(), value));
+			parameters.add(write(propertyMember.getField(), value));
 		}
 		// 生成语句
 		String SQL = String.format(INSERT, entityMember.getTableName(),
@@ -129,11 +129,11 @@ public class EntityJDBCManager implements AbstractEntityManager {
 				continue;
 			}
 			fieldNames.add(propertyMember.getFieldName() + "=?");
-			parameters.add(ApplicationIO.write(propertyMember.getField(), value));
+			parameters.add(write(propertyMember.getField(), value));
 		}
 		// 主键字段
 		whereFieldNames.add(entityMember.getPrimaryKeyMember().getFieldName() + "=?");
-		parameters.add(ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+		parameters.add(write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		// 生成语句
 		String SQL = String.format(UPDATE, entityMember.getTableName(),
 				StringHelper.listToString(fieldNames), StringHelper.listToString(whereFieldNames));
@@ -165,7 +165,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		// 生成语句
 		String SQL = String.format(DELETE, entityMember.getTableName(),
 				StringHelper.listToString(whereFieldNames));
-		primaryKeyValue = ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(),
+		primaryKeyValue = write(entityMember.getPrimaryKeyMember().getField(),
 				primaryKeyValue);
 		try {
 			return getSession().executeUpdate(SQL, primaryKeyValue);
@@ -189,7 +189,7 @@ public class EntityJDBCManager implements AbstractEntityManager {
 		String SQL = String.format(SELECT, entityMember.getTableName(),
 				StringHelper.listToString(whereFieldNames));
 		List<T> entitys = getListEntityBySQL(prototype, SQL,
-				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		if (entitys.size() > 0) {
 			return entitys.get(0);
 		} else {

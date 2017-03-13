@@ -12,6 +12,14 @@ public class BeanValueImpl extends PackingValueImpl{
 	public BeanValueImpl(GenerateBeanManager manager){
 		this.manager=manager;
 	}
+	
+	public Object newInstance(Class<?> type,String name){
+		if(this.manager.isBeanDefinitionExistence(type.getName())){
+			return this.manager.getBean(type);
+		}else{
+			return super.newInstance(type, name);
+		}
+	}
 
 	@Override
 	public Object getValue(Field field,Method method,Class<?> type,String key) {

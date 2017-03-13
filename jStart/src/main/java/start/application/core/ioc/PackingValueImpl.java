@@ -17,7 +17,7 @@ public class PackingValueImpl {
 	}
 
 	public Object getValue(Field field,Method method,Class<?> type,String key){
-		return ApplicationIO.read(null, method, type, key);
+		return ApplicationIO.read(field, method, type, key);
 	}
 	
 }

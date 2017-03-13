@@ -5,6 +5,12 @@ import start.application.core.beans.BeanDefinition;
 public interface ApplicationContext {
 	
 	/**
+	 * 判断Bean是否已经定义
+	 * @param bean
+	 */
+	boolean  isBeanDefinitionExistence(String prototypeString);
+	
+	/**
 	 * 注册Bean到管理中心
 	 * @param bean
 	 */

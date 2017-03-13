@@ -20,15 +20,15 @@ import start.application.commons.logger.LoggerFactory;
 import start.application.core.ApplicationIO;
 import start.application.core.constant.Message;
 import start.application.core.utils.StringHelper;
-import start.application.orm.AbstractEntityManager;
 import start.application.orm.annotation.GeneratedValue;
 import start.application.orm.annotation.Id;
 import start.application.orm.context.ContextCacheEntity;
 import start.application.orm.entity.EntityInfo;
 import start.application.orm.entity.EntityProperty;
 import start.application.orm.exceptions.RepositoryException;
+import start.application.orm.support.AbstractEntityManager;
 
-public class EntityMongoDBManager implements AbstractEntityManager {
+public class EntityMongoDBManager extends AbstractEntityManager {
 
 	private final static Logger log=LoggerFactory.getLogger(EntityMongoDBManager.class);
 	private MongoDBDatasource session;
@@ -64,7 +64,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 		} else {
 			// 主键字段
 			doc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-					ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+					write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		}
 		// 其它字段
 		for (EntityProperty propertyMember : entityMember.getPropertyMembers()) {
@@ -78,7 +78,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			if (value == null) {
 				continue;
 			}
-			doc.put(propertyMember.getFieldName(), ApplicationIO.write(propertyMember.getField(), value));
+			doc.put(propertyMember.getFieldName(), write(propertyMember.getField(), value));
 		}
 		logDocument(doc);
 		dbCollection.insertOne(doc);
@@ -114,10 +114,10 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 			if (value == null) {
 				continue;
 			}
-			updateDoc.put(propertyMember.getFieldName(), ApplicationIO.write(propertyMember.getField(), value));
+			updateDoc.put(propertyMember.getFieldName(), write(propertyMember.getField(), value));
 		}
 		whereDoc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		logDocument(whereDoc);
 		logDocument(updateDoc);
 		UpdateResult result=dbCollection.updateOne(whereDoc, new Document("$set",updateDoc));
@@ -143,7 +143,7 @@ public class EntityMongoDBManager implements AbstractEntityManager {
 				.getCollection(entityMember.getTableName());
 		Document doc = new Document();
 		doc.put(entityMember.getPrimaryKeyMember().getFieldName(),
-				ApplicationIO.write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
+				write(entityMember.getPrimaryKeyMember().getField(), primaryKeyValue));
 		logDocument(doc);
 		DeleteResult result=dbCollection.deleteOne(doc);
 		return result.getDeletedCount();

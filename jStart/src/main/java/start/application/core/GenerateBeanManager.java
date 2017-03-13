@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +32,8 @@ import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
 import start.application.core.constant.Message;
 import start.application.core.exceptions.ApplicationException;
+import start.application.core.ioc.BeanValueImpl;
+import start.application.core.ioc.ConstantValueImpl;
 import start.application.core.utils.ReflectUtils;
 
 public class GenerateBeanManager implements ApplicationContext,Closeable {
@@ -42,6 +43,9 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 	private Map<String, String> beanDefinitionDictionaries = new HashMap<String, String>();
 	private Map<String, BeanDefinition> beanDefinitions = new HashMap<String, BeanDefinition>();
 	private ConcurrentMap<String,Object> cacheContext=new ConcurrentHashMap<String,Object>();
+
+	private ConstantValueImpl mConstantValueImpl=new ConstantValueImpl(this);
+	private BeanValueImpl mBeanValueImpl=new BeanValueImpl(this);
 
 	public Object getCacheContext(String name) {
 		return cacheContext.get(name);
@@ -59,7 +63,7 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 		}else{
 			beanDefinitionDictionaries.put(bean.getName(), bean.getPrototypeString());
 		}
-		if (beanDefinitions.containsKey(bean.getPrototypeString())) {
+		if (isBeanDefinitionExistence(bean.getPrototypeString())) {
 			String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
 			throw new IllegalArgumentException(message);
 		}else{
@@ -70,6 +74,11 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 			getBean(bean);
 			log.info("自定义ContextAdvice容器生成对象："+bean.getName()+"，加载成功~~~");
 		}
+	}
+
+	@Override
+	public boolean isBeanDefinitionExistence(String prototypeString) {
+		return beanDefinitions.containsKey(prototypeString);
 	}
 	
 	@Override
@@ -235,37 +244,10 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 			}
 			cClass = cClass.getSuperclass();
 		}
-		//当前对象为BeanInfo则注入设置的常量值
-		for(Method method:bean.getPrototype().getMethods()){
-			String methodName=method.getName();
-			if(methodName.startsWith("set")){
-				String name=methodName.substring(3, 4).toLowerCase()+methodName.substring(4, methodName.length());
-				String value=null;
-				if(isNewObject){
-					value=bean.getValues().get(name);
-					if(value!=null){
-						Class<?> type=method.getParameterTypes()[0];
-						try {
-							method.invoke(instance, ApplicationIO.read(null,method,type,ConstantConfig.get(bean.getValues().get(name))));
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							throw new ApplicationException(e);
-						}
-						continue;
-					}
-				}
-				value=bean.getRefs().get(name);
-				if(value!=null){
-					try {
-						method.invoke(instance, getBean(bean.getRefs().get(name)));
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						throw new ApplicationException(e);
-					}
-					continue;
-				}
-			}
-		}
+		ReflectUtils.iocObjectParameter(instance, bean.getRefs(),mBeanValueImpl);
 		//如果为缓存对象则不重复执行
 		if(isNewObject){
+			ReflectUtils.iocObjectParameter(instance, bean.getValues(),mConstantValueImpl);
 			if(instance instanceof ApplicationContextAware){
 				try {
 					((ApplicationContextAware)instance).setApplicationContext(this);
