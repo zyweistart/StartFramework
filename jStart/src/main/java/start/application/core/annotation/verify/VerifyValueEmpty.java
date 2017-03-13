@@ -1,4 +1,4 @@
-package start.application.orm.annotation.verify;
+package start.application.core.annotation.verify;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

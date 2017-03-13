@@ -1,4 +1,4 @@
-package start.application.orm.annotation.verify;
+package start.application.core.annotation.verify;
 
 public enum FormatType {
 	//手机号码
