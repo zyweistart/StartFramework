@@ -5,7 +5,6 @@ import java.util.List;
 
 import start.application.commons.logger.Logger;
 import start.application.commons.logger.LoggerFactory;
-import start.application.core.XmlPathApplicationContext;
 import start.application.core.beans.BeanDefinition;
 import start.application.core.utils.ReflectUtils;
 import start.application.orm.OrmApplicationContext;
@@ -18,7 +17,7 @@ import start.application.web.interceptor.InterceptorHandler;
  */
 public class WebApplicationContext extends OrmApplicationContext {
 	
-	private final static Logger log=LoggerFactory.getLogger(XmlPathApplicationContext.class);
+	private final static Logger log=LoggerFactory.getLogger(WebApplicationContext.class);
 
 	private List<String> interceptors=new ArrayList<String>();
 	
