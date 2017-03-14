@@ -1,4 +1,4 @@
-package start.application.core.io;
+package start.application.core.io.verify.annotation;
 
 /**
  * 验证基接口
