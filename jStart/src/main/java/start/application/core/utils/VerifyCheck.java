@@ -66,13 +66,6 @@ public class VerifyCheck {
 	}
 	
 	/**
-	 * 检测身份证号
-	 */
-	public static boolean isIDCard(String str){
-		return true;
-	}
-	
-	/**
 	 * 检测电子邮件
 	 */
 	public static boolean isMail(String email){

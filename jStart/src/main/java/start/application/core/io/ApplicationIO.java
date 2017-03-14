@@ -13,10 +13,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import start.application.core.annotation.verify.FormatType;
+import start.application.core.annotation.verify.VerifyValueCustom;
 import start.application.core.annotation.verify.VerifyValueEmpty;
 import start.application.core.annotation.verify.VerifyValueEnum;
 import start.application.core.annotation.verify.VerifyValueFormat;
+import start.application.core.annotation.verify.VerifyValueFormat.FormatType;
 import start.application.core.annotation.verify.VerifyValueLength;
 import start.application.core.annotation.verify.VerifyValueNotNull;
 import start.application.core.annotation.verify.VerifyValueRegex;
@@ -273,6 +274,7 @@ public final class ApplicationIO {
 		verify(field.getAnnotation(VerifyValueTimeFormat.class),value);
 		verify(field.getAnnotation(VerifyValueFormat.class),value);
 		verify(field.getAnnotation(VerifyValueRegex.class),value);
+		verify(field.getAnnotation(VerifyValueCustom.class),value);
 	}
 
 	/**
@@ -291,6 +293,7 @@ public final class ApplicationIO {
 		verify(method.getAnnotation(VerifyValueTimeFormat.class),value);
 		verify(method.getAnnotation(VerifyValueFormat.class),value);
 		verify(method.getAnnotation(VerifyValueRegex.class),value);
+		verify(method.getAnnotation(VerifyValueCustom.class),value);
 	}
 	
 	/**
@@ -396,10 +399,6 @@ public final class ApplicationIO {
 				if(!VerifyCheck.isMail(value)){
 					throw new VerifyException(verify.message());
 				}
-			}else if(verify.type()==FormatType.IDCARD){
-				if(!VerifyCheck.isIDCard(value)){
-					throw new VerifyException(verify.message());
-				}
 			}else if(verify.type()==FormatType.PHONE){
 				if(!VerifyCheck.isPhone(value)){
 					throw new VerifyException(verify.message());
@@ -443,6 +442,25 @@ public final class ApplicationIO {
 			Matcher matcher = pattern.matcher(value);
 			// 字符串是否与正则表达式相匹配
 			if (!matcher.matches()) {
+				throw new VerifyException(verify.message());
+			}
+		}
+	}
+	
+	/**
+	 * 自定义校验
+	 * @param regex
+	 * @param value
+	 */
+	public static void verify(VerifyValueCustom verify,String value){
+		if (verify != null) {
+			VerifyCheckCustom check=null;
+			try {
+				check=(VerifyCheckCustom)verify.check().newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new ApplicationException(e);
+			}
+			if(!check.check(value)){
 				throw new VerifyException(verify.message());
 			}
 		}
