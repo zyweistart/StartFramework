@@ -7,7 +7,6 @@ import java.util.Set;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import start.application.core.exceptions.ApplicationException;
 
 public class BeanProxyInterceptor implements MethodInterceptor {
 	
@@ -40,27 +39,34 @@ public class BeanProxyInterceptor implements MethodInterceptor {
 	}
 	
 	@Override
-	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
+	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Object resultObj=null;
+		Set<AOPBeanProxy> executable=new HashSet<AOPBeanProxy>();
+		//过滤当前方法可以执行的拦截器
+		for(AOPBeanProxy p:proxys){
+			if(p.condition(resultObj, method, args, proxy)){
+				executable.add(p);
+			}
+		}
 		try{
-			for(AOPBeanProxy p:proxys){
+			for(AOPBeanProxy p:executable){
 				p.doBefore(obj, method, args, proxy);
 			}
 			resultObj=proxy.invokeSuper(obj, args);
-			for(AOPBeanProxy p:proxys){
+			for(AOPBeanProxy p:executable){
 				p.doAfter(resultObj, method, args, proxy);
 			}
+			return resultObj;
 		}catch(Throwable e){
-			for(AOPBeanProxy p:proxys){
+			for(AOPBeanProxy p:executable){
 				p.doException(resultObj, method, args, proxy, e);
 			}
-			throw new ApplicationException(e);
+			throw e;
 		}finally{
-			for(AOPBeanProxy p:proxys){
+			for(AOPBeanProxy p:executable){
 				p.doFinally(resultObj, method, args, proxy);
 			}
 		}
-		return resultObj;
 	}
 
 }

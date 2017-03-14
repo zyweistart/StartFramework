@@ -7,6 +7,11 @@ import net.sf.cglib.proxy.MethodProxy;
 public interface AOPBeanProxy {
 	
 	/**
+	 * 执行条件，只有返回为真时才会执行拦截操作
+	 */
+	boolean condition(Object obj, Method method, Object[] args, MethodProxy proxy);
+	
+	/**
 	 * 执行之前
 	 * @param proxy
 	 * @param method

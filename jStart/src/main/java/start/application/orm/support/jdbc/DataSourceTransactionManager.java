@@ -17,32 +17,30 @@ public class DataSourceTransactionManager implements AOPBeanProxy {
 	public void setSession(SessionManager session) {
 		this.session = session;
 	}
+	
+	@Override
+	public boolean condition(Object obj, Method method, Object[] args, MethodProxy proxy) {
+		return method.isAnnotationPresent(Transaction.class);
+	}
+	
 
 	@Override
 	public void doBefore(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		if(method.isAnnotationPresent(Transaction.class)){
-			session.beginTrans();
-		}
+		session.beginTrans();
 	}
 
 	@Override
 	public void doAfter(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		if(method.isAnnotationPresent(Transaction.class)){
-			session.commitTrans();
-		}
+		session.commitTrans();
 	}
 
 	@Override
 	public void doException(Object obj, Method method, Object[] args, MethodProxy proxy, Throwable e) {
-		if(method.isAnnotationPresent(Transaction.class)){
-			session.rollbackTrans();
-		}
+		session.rollbackTrans();
 	}
 
 	@Override
 	public void doFinally(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		if(method.isAnnotationPresent(Transaction.class)){
-		}
 	}
 	
 }
