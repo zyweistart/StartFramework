@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import start.application.core.config.ConstantConfig;
 import start.application.core.constant.Constant;
@@ -22,11 +20,11 @@ import start.application.core.io.verify.annotation.VerifyCheckCustom;
 import start.application.core.io.verify.annotation.VerifyValueEmpty;
 import start.application.core.io.verify.annotation.VerifyValueEnum;
 import start.application.core.io.verify.annotation.VerifyValueFormat;
+import start.application.core.io.verify.annotation.VerifyValueFormat.FormatType;
 import start.application.core.io.verify.annotation.VerifyValueLength;
 import start.application.core.io.verify.annotation.VerifyValueNotNull;
 import start.application.core.io.verify.annotation.VerifyValueRegex;
 import start.application.core.io.verify.annotation.VerifyValueTimeFormat;
-import start.application.core.io.verify.annotation.VerifyValueFormat.FormatType;
 import start.application.core.utils.StringHelper;
 import start.application.core.utils.VerifyCheck;
 import start.application.orm.annotation.Temporal;
@@ -151,12 +149,12 @@ public final class ApplicationIO {
 		if(!isDataTypeSupport(type)){
 			return null;
 		}
-		isVerifyField(field, value);
-		isVerifyMethod(method, value);
-		String typeName = type.getName();
 		if(value==null){
 			return null;
 		}
+		isVerifyField(field, value);
+		isVerifyMethod(method, value);
+		String typeName = type.getName();
 //		if (StringHelper.isEmpty(value)) {
 //			if (DataTypeValidation.isString.contains(typeName)) {
 //				return "";
@@ -376,10 +374,7 @@ public final class ApplicationIO {
 			if (StringHelper.isEmpty(value)) {
 				throw new VerifyException(verify.message());
 			}
-			SimpleDateFormat sdf = new SimpleDateFormat(verify.format());
-			try {
-				sdf.parse(value);
-			} catch (ParseException e) {
+			if(!VerifyCheck.checkTime(value, verify.format())){
 				throw new VerifyException(verify.message());
 			}
 		}
@@ -442,10 +437,7 @@ public final class ApplicationIO {
 	 */
 	public static void verify(VerifyValueRegex verify,String value){
 		if (verify != null) {
-			Pattern pattern = Pattern.compile(verify.regex());
-			Matcher matcher = pattern.matcher(value);
-			// 字符串是否与正则表达式相匹配
-			if (!matcher.matches()) {
+			if(!VerifyCheck.regex(value, verify.regex())){
 				throw new VerifyException(verify.message());
 			}
 		}

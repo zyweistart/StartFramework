@@ -42,20 +42,18 @@ public class EntityMongoDBManager extends AbstractEntityManager {
 		Document doc = new Document();
 		Id id = (Id) entityMember.getPrimaryKeyMember().getField().getAnnotation(Id.class);
 		if (id.value() == GeneratedValue.UID) {
-			// 如果为UID生成策略则自动生成一个UID值
-			primaryKeyValue = StringHelper.random();
 			try {
-				entityMember.getPrimaryKeyMember().getSet().invoke(entity, primaryKeyValue);
+				// 如果为UID生成策略则自动生成一个UID值
+				entityMember.getPrimaryKeyMember().getSet().invoke(entity, StringHelper.random());
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RepositoryException(e);
 			}
-		} else if (id.value() == GeneratedValue.NONE) {
-			// 获取已经设置的主键值
-			try {
-				primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new RepositoryException(e);
-			}
+		}
+		// 获取已经设置的主键值
+		try {
+			primaryKeyValue = entityMember.getPrimaryKeyMember().getGet().invoke(entity);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RepositoryException(e);
 		}
 		// 主键不能为空
 		if (primaryKeyValue == null) {

@@ -4,17 +4,18 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class VerifyCheck {
 	
+	/**
+	 * 正则表达式验证
+	 */
 	public static boolean regex(String str, String regex) {
 		return str.matches(regex);
 	}
+	
 	/**
-	 * 检测是否为数字
-	 * @param str
-	 * @return
+	 * 检测是否全为数字型
 	 */
 	public static boolean isNumeric(String str) {
 		for (int i = 0; i < str.length(); i++) {
@@ -124,7 +125,7 @@ public class VerifyCheck {
 	}
 	
 	/**
-	 * 判断是否为中文
+	 * 判断是否全为中文字符
 	 */
 	public static boolean isChinese(String str) {
 		boolean isChinese = false;
@@ -139,7 +140,7 @@ public class VerifyCheck {
 	}
 	
 	/**
-	 * 金额
+	 * 判断是否为金额
 	 */
 	public static boolean isMoney(String money) {
 		money = StringHelper.nullToStrTrim(money);
@@ -173,14 +174,11 @@ public class VerifyCheck {
 	 * 检测时间格式
 	 */
 	public static boolean checkTime(String time,String format) {
-		if (time.length() != 14) {
+		if (time.length() != format.length()) {
 			return false;
 		}
-		if (!regex(time, "[2][0-9]+")) {
-			return false;
-		}
-		DateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);
 		try {
+			DateFormat formatter = new SimpleDateFormat(format);
 			Date date = (Date) formatter.parse(time);
 			return time.equals(formatter.format(date));
 		} catch (ParseException e) {

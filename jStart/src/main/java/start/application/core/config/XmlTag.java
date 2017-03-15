@@ -9,9 +9,9 @@ public class XmlTag {
 	
 	private String name;
 	
-	private Map<String,String> attributes=new HashMap<String,String>();
-	
 	private String textContent;
+	
+	private Map<String,String> attributes=new HashMap<String,String>();
 	
 	private List<XmlTag> childTags=new ArrayList<XmlTag>();
 
