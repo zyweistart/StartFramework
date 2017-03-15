@@ -36,7 +36,7 @@ public class TimeUtils {
 	 * 取得系统时间
 	 */
     public static String getSysTime(String pattern) {
-        return formatSysTime(new SimpleDateFormat(pattern, Locale.ENGLISH));
+        return formatSysTime(new SimpleDateFormat(pattern));
     }
 
     /**
@@ -48,7 +48,7 @@ public class TimeUtils {
     }
 
     public static String format(Date date, String pattern) {
-    	SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
+    	SimpleDateFormat format = new SimpleDateFormat(pattern);
         String str = format.format(date);
 		return str;
     }
@@ -68,7 +68,7 @@ public class TimeUtils {
     }
 
     public static boolean validTime(String str, String pattern) {
-    	DateFormat formatter = new SimpleDateFormat(pattern, Locale.ENGLISH);
+    	DateFormat formatter = new SimpleDateFormat(pattern);
 		Date date = null;
 		try {
 			date = (Date) formatter.parse(str);
@@ -80,15 +80,13 @@ public class TimeUtils {
 	}
 
     public static Date format(String str, String pattern) {
-    	DateFormat formatter = new SimpleDateFormat(pattern, Locale.ENGLISH);
-		Date date = null;
 		try {
-			date = (Date) formatter.parse(str);
+	    	DateFormat formatter = new SimpleDateFormat(pattern);
+			return (Date) formatter.parse(str);
 		} catch (ParseException e) {
 			log.error(StackTraceInfo.getTraceInfo() + e.getMessage());
 			return null;
 		}
-		return date;
 	}
 
     public static String getSysYear() {
@@ -284,7 +282,7 @@ public class TimeUtils {
 	}
 
     public static String formatGMTTime(String str, String pattern, String TimeZoneFormat) {
-		DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+		DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		Date date = null;
 		try {
 			date = (Date) dateFormat.parse(str);

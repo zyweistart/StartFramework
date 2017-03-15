@@ -86,7 +86,7 @@ public final class ApplicationIO {
 		
 		Class<?> prototype=instance.getClass();
 		while (true) {
-			if (prototype == null||prototype.equals(Object.class)) {
+			if (prototype.equals(Object.class)||prototype == null) {
 				break;
 			}
 			for(Method method:prototype.getDeclaredMethods()){
