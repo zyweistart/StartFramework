@@ -26,7 +26,7 @@ public class WebApplicationContext extends OrmApplicationContext {
 		super.registerBeanDoManagerCenter(bean);
 		//拦截器
 		if(ReflectUtils.isSuperClass(bean.getPrototype(),InterceptorHandler.class)){
-			registerInterceptors(bean.getName());
+			registerInterceptors(bean.getClassName());
 		}
 	}
 	
@@ -42,7 +42,7 @@ public class WebApplicationContext extends OrmApplicationContext {
 	 */
 	public void registerInterceptors(String name) {
 		if(name!=null){
-			if(getBean(name)==null){
+			if(!isBeanDefinitionExistence(name)){
 				throw new IllegalArgumentException("拦截器:"+name+"未注册为Bean对象");
 			}
 			interceptors.add(name);

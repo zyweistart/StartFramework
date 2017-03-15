@@ -10,7 +10,7 @@ import start.application.web.action.ActionSupport;
  */
 public abstract class InterceptorHandler extends AbstractInterceptorHandler implements Interceptor {
 
-	public void doInterceptor(ActionSupport support) throws Exception{
+	public void doInterceptor(ActionSupport support){
 		if(getHandler()!=null){
 			getHandler().intercept(support);
 		}

@@ -33,21 +33,21 @@ public class BeanLoaderContext extends LoaderClassAnnotationHandler{
 			if(!component.value().isEmpty()){
 				bean.setName(component.value());
 			}
-			bean.setPrototype(prototype.getName());
+			bean.setClass(prototype.getName());
 		}
 		// 服务层
 		Service service = prototype.getAnnotation(Service.class);
 		if (service != null) {
 			bean=new BeanDefinition();
 			bean.setName(service.value());
-			bean.setPrototype(prototype.getName());
+			bean.setClass(prototype.getName());
 		}
 		// 数据访问层
 		Repository repository = prototype.getAnnotation(Repository.class);
 		if (repository != null) {
 			bean=new BeanDefinition();
 			bean.setName(repository.value());
-			bean.setPrototype(prototype.getName());
+			bean.setClass(prototype.getName());
 		}
 		return bean;
 	}

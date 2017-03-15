@@ -62,13 +62,13 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 			String message=Message.getMessage(Message.PM_3000, bean.getName());
 			throw new IllegalArgumentException(message);
 		}else{
-			beanDefinitionDictionaries.put(bean.getName(), bean.getPrototypeString());
+			beanDefinitionDictionaries.put(bean.getName(), bean.getClassName());
 		}
-		if (isBeanDefinitionExistence(bean.getPrototypeString())) {
-			String message=Message.getMessage(Message.PM_3000, bean.getPrototypeString());
+		if (isBeanDefinitionExistence(bean.getClassName())) {
+			String message=Message.getMessage(Message.PM_3000, bean.getClassName());
 			throw new IllegalArgumentException(message);
 		}else{
-			beanDefinitions.put(bean.getPrototypeString(), bean);
+			beanDefinitions.put(bean.getClassName(), bean);
 		}
 		if(ReflectUtils.isSuperClass(bean.getPrototype(), ContextBeanAdvice.class)){
 			//直接创建组件

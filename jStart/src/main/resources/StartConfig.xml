@@ -21,6 +21,7 @@
 	<constant name="ALLOWUPLOADTYPES">*</constant>
 	
 	<!-- 以下拦截器对象，可自执行选择加载使用 -->
+	<bean class="start.application.web.support.interceptor.CharacterEncodingInterceptor"/>
 	<!-- <bean class="start.application.web.support.interceptor.ParametersInterceptor"/> -->
 	<!-- <bean class="start.application.web.support.interceptor.fileupload.UploadFileInterceptor"/> -->
 	

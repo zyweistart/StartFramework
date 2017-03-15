@@ -10,6 +10,7 @@ import start.application.core.config.ConfigImpl;
 import start.application.core.config.ConfigInfo;
 import start.application.core.config.XmlTag;
 import start.application.core.context.ContextCacheObject;
+import start.application.core.io.ApplicationIO;
 
 /**
  * 应用配置文件解析
@@ -48,7 +49,7 @@ public class XmlConfigAnalysis implements ConfigImpl {
 			}
 		} else if (BEAN.equalsIgnoreCase(xml.getName())) {
 			BeanDefinition bean = new BeanDefinition();
-			bean.getAttributes().putAll(xml.getAttributes());
+			ApplicationIO.iocObjectParameter(bean, xml.getAttributes());
 			for (XmlTag child : xml.getChildTags()) {
 				if ("property".equals(child.getName())) {
 					Map<String, String> attributes = child.getAttributes();

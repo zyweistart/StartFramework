@@ -18,13 +18,13 @@ public class ActionSupport{
 	private ApplicationMap applicationMap;
 
 	public ActionSupport(
-			Action action,
 			HttpServletRequest request,
-			HttpServletResponse response
+			HttpServletResponse response,
+			Action action
 			){
-		this.action=action;
 		this.request=request;
 		this.response=response;
+		this.action=action;
 	}
 	
 	public Action getAction() {

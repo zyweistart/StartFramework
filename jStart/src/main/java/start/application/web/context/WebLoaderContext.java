@@ -38,7 +38,7 @@ public class WebLoaderContext extends LoaderClassAnnotationHandler {
 			}
 			bean=new BeanDefinition();
 			bean.setName(controller.value());
-			bean.setPrototype(prototype.getName());
+			bean.setClass(prototype.getName());
 		}
 		return bean;
 	}

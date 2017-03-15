@@ -7,12 +7,6 @@ import start.application.core.exceptions.ApplicationException;
 
 public class BeanDefinition {
 	
-	public BeanDefinition(){
-		values=new HashMap<String,String>();
-		refs=new HashMap<String,String>();
-		attributes=new HashMap<String,String>();
-	}
-	
 	private String name;
 	
 	private String prototype;
@@ -25,17 +19,12 @@ public class BeanDefinition {
 	
 	private Map<String,String> refs;
 	
-	private Map<String,String> attributes;
-	
 	private String beanContextName;
 
 	public String getName() {
 		if(name==null){
-			name=getAttributes().get("name");
-			if(name==null){
-				//默认name为当前类的全名
-				name=getPrototypeString();
-			}
+			//默认name为当前类的全名
+			name=getClassName();
 		}
 		return name;
 	}
@@ -46,27 +35,21 @@ public class BeanDefinition {
 
 	public Class<?> getPrototype() {
 		try {
-			return Class.forName(getPrototypeString());
+			return Class.forName(getClassName());
 		} catch (ClassNotFoundException e) {
 			throw new ApplicationException(e);
 		}
 	}
 	
-	public String getPrototypeString() {
-		if(prototype==null){
-			prototype=getAttributes().get("class");
-		}
+	public String getClassName() {
 		return prototype;
 	}
 
-	public void setPrototype(String prototype) {
+	public void setClass(String prototype) {
 		this.prototype = prototype;
 	}
 
 	public String getInit() {
-		if(init==null){
-			init=getAttributes().get("init");
-		}
 		return init;
 	}
 
@@ -75,9 +58,6 @@ public class BeanDefinition {
 	}
 
 	public String getDestory() {
-		if(destory==null){
-			destory=getAttributes().get("destory");
-		}
 		return destory;
 	}
 
@@ -86,6 +66,9 @@ public class BeanDefinition {
 	}
 
 	public Map<String,String> getValues() {
+		if(values==null){
+			values=new HashMap<String,String>();
+		}
 		return values;
 	}
 
@@ -94,15 +77,14 @@ public class BeanDefinition {
 	}
 
 	public Map<String,String> getRefs() {
+		if(refs==null){
+			refs=new HashMap<String,String>();
+		}
 		return refs;
 	}
 
 	public void setRefs(Map<String,String> refs) {
 		this.refs = refs;
-	}
-
-	public Map<String, String> getAttributes() {
-		return attributes;
 	}
 
 	public  String getBeanContextName() {

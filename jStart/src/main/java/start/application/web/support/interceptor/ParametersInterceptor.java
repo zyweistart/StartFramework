@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import start.application.core.io.ApplicationIO;
 import start.application.core.utils.StringHelper;
 import start.application.web.action.ActionSupport;
-import start.application.web.exceptions.ActionException;
 import start.application.web.interceptor.InterceptorHandler;
 
 /**
@@ -21,7 +20,7 @@ public class ParametersInterceptor extends InterceptorHandler {
 	private final static String MULTIPARTFORMDATA="multipart/form-data";
 	
 	@Override
-	public void intercept(ActionSupport support) throws Exception{
+	public void intercept(ActionSupport support){
 		try{
 			HttpServletRequest request=support.request();
 			if(!MULTIPARTFORMDATA.equals(request.getContentType())){
@@ -38,8 +37,6 @@ public class ParametersInterceptor extends InterceptorHandler {
 				}
 				ApplicationIO.iocObjectParameter(support.getAction(),params);
 			}
-		} catch (IllegalArgumentException e) {
-			throw new ActionException(e);
 		}finally{
 			// 继续执行下一个拦截器
 			doInterceptor(support);

@@ -7,6 +7,6 @@ import start.application.web.action.ActionSupport;
  */
 public interface Interceptor {
 
-	void intercept(ActionSupport support) throws Exception;
+	void intercept(ActionSupport support);
 
 }

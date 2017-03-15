@@ -52,7 +52,7 @@ public class UploadFileInterceptor extends InterceptorHandler {
 	private final static String MULTIPARTFORMDATA="multipart/form-data";
 
 	@Override
-	public void intercept(ActionSupport support) throws Exception {
+	public void intercept(ActionSupport support) {
 		try {
 			HttpServletRequest request = support.request();
 			String contentType = request.getContentType();

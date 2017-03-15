@@ -2,6 +2,6 @@ package start.application.web.action;
 
 public interface Action {
 	
-	ActionResult execute(ActionSupport support) throws Exception;
+	ActionResult execute(ActionSupport support);
 
 }

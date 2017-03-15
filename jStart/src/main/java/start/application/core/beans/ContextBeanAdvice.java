@@ -15,7 +15,7 @@ public abstract class ContextBeanAdvice implements ApplicationContextAware{
 	public void registerBeanCenter(String beanName,String className){
 		BeanDefinition bd=new BeanDefinition();
 		bd.setName(beanName);
-		bd.setPrototype(className);
+		bd.setClass(className);
 		bd.setBeanContextName(this.mApplication.getBeanDefinitionInfoByClass(this.getClass().getName()).getName());
 		this.mApplication.registerBeanDoManagerCenter(bd);
 	}

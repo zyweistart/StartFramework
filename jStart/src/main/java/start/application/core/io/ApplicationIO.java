@@ -154,13 +154,16 @@ public final class ApplicationIO {
 		isVerifyField(field, value);
 		isVerifyMethod(method, value);
 		String typeName = type.getName();
-		if (StringHelper.isEmpty(value)) {
-			if (DataTypeValidation.isString.contains(typeName)) {
-				return "";
-			} else {
-				return null;
-			}
+		if(value==null){
+			return null;
 		}
+//		if (StringHelper.isEmpty(value)) {
+//			if (DataTypeValidation.isString.contains(typeName)) {
+//				return "";
+//			} else {
+//				return null;
+//			}
+//		}
 		if (DataTypeValidation.isDate.contains(typeName)) {
 			String format = ConstantConfig.DATAFORMAT;
 			if (field != null) {

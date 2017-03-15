@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import start.application.core.beans.BeanDefinition;
-import start.application.core.config.ConstantConfig;
 import start.application.web.action.Action;
 import start.application.web.action.ActionResult;
 import start.application.web.action.ActionSupport;
@@ -41,15 +40,8 @@ public final class ActionDispatcher {
 		if (!bean.getPrototype().isAnnotationPresent(Controller.class)) {
 			throw new  IllegalAccessException(name+"无访问权限" );
 		}
-		// 请求编码设置防止乱码
-		if (request.getCharacterEncoding() == null) {
-			request.setCharacterEncoding(ConstantConfig.ENCODING);
-		}
 		Action action = (Action)mWebApplicationContext.getBean(bean.getName());
-		ActionSupport support=new ActionSupport(
-				action,
-				request,
-				response);
+		ActionSupport support=new ActionSupport(request,response,action);
 		if(!mWebApplicationContext.getInterceptors().isEmpty()){
 			//责任链模式执行拦截器
 			InterceptorHandler handler=null;
@@ -65,7 +57,6 @@ public final class ActionDispatcher {
 		//执行Action
 		ActionResult result=action.execute(support);
 		if (result != null) {
-			// 返回值必须实现了ActionResult接口
 			result.doExecute(support);
 		}
 	}
