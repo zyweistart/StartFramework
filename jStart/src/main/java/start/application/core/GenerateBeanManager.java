@@ -1,6 +1,5 @@
 package start.application.core;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -28,6 +27,7 @@ import start.application.core.beans.factory.ApplicationContextAware;
 import start.application.core.beans.factory.BeanDefinitionAware;
 import start.application.core.beans.factory.BeforeBean;
 import start.application.core.beans.factory.DisposableBean;
+import start.application.core.beans.factory.FactoryBean;
 import start.application.core.beans.factory.InitializingBean;
 import start.application.core.config.ConstantConfig;
 import start.application.core.constant.Message;
@@ -37,7 +37,7 @@ import start.application.core.io.BeanValueImpl;
 import start.application.core.io.ConstantValueImpl;
 import start.application.core.utils.ReflectUtils;
 
-public class GenerateBeanManager implements ApplicationContext,Closeable {
+public class GenerateBeanManager implements ApplicationContext {
 	
 	private final static Logger log=LoggerFactory.getLogger(GenerateBeanManager.class);
 	
@@ -110,6 +110,7 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 		return (T) getBean(getBeanDefinitionInfoByClass(prototype.getName()));
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private Object getBean(BeanDefinition bean){
 		//常量值是否更新
 		boolean isNewObject=true;
@@ -119,11 +120,14 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 			ContextBeanAdvice context=(ContextBeanAdvice)getBean(bean.getBeanContextName());
 			instance=context.newBean(bean);
 		}else{
-			//从缓存中直接获取已创建的对象
-			instance=getCacheContext(bean.getName());
-			if(instance!=null){
-				//如果已存在实例则常量值不重新赋值
-				isNewObject=false;
+			//是单例则从缓存容器中读取
+			if(bean.isSington()){
+				//从缓存中直接获取已创建的对象
+				instance=getCacheContext(bean.getName());
+				if(instance!=null){
+					//如果已存在实例则常量值不重新赋值
+					isNewObject=false;
+				}
 			}
 		}
 		if(instance==null){
@@ -172,8 +176,6 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 							| InvocationTargetException e) {
 						throw new ApplicationException(e);
 					}
-					//把对象加入缓存列表
-					putCacheContext(bean.getName(),instance);
 					break;
 				}
 			}
@@ -194,8 +196,6 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new ApplicationException(e);
 			}
-			//把对象加入缓存列表
-			putCacheContext(bean.getName(),instance);
 		}
 		//字段注入
 		Class<?> cClass=instance.getClass();
@@ -278,6 +278,17 @@ public class GenerateBeanManager implements ApplicationContext,Closeable {
 		if(instance instanceof BeforeBean){
 			try {
 				((BeforeBean)instance).beforeinvoking(bean);
+			} catch (Exception e) {
+				throw new ApplicationException(e);
+			}
+		}
+		if(bean.isSington()){
+			//把对象加入缓存列表
+			putCacheContext(bean.getName(),instance);
+		}
+		if(instance instanceof FactoryBean){
+			try {
+				return ((FactoryBean)instance).getObject();
 			} catch (Exception e) {
 				throw new ApplicationException(e);
 			}

@@ -1,8 +1,10 @@
 package start.application.core.beans.factory;
 
+import java.io.Closeable;
+
 import start.application.core.beans.BeanDefinition;
 
-public interface ApplicationContext {
+public interface ApplicationContext extends Closeable {
 	
 	/**
 	 * 判断Bean是否已经定义

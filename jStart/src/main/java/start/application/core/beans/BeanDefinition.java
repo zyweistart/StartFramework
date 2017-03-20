@@ -20,6 +20,8 @@ public class BeanDefinition {
 	private Map<String,String> refs;
 	
 	private String beanContextName;
+	
+	private boolean sington=true;
 
 	public String getName() {
 		if(name==null){
@@ -63,6 +65,14 @@ public class BeanDefinition {
 
 	public void setDestory(String destory) {
 		this.destory = destory;
+	}
+	
+	public boolean isSington() {
+		return sington;
+	}
+
+	public void setSington(boolean sington) {
+		this.sington = sington;
 	}
 
 	public Map<String,String> getValues() {
